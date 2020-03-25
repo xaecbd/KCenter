@@ -1,21 +1,15 @@
-#!/bin/bash
+#!/bin/sh
 echo "PROJECT_BASE_DIR :"$PROJECT_BASE_DIR
 #cd $APP_ROOT_DIR
 cd $PROJECT_BASE_DIR
- 
 
- 
-if [ ! -n "$START_JAR" ]; then
-    START_JAR=(`ls|grep .jar$`)
-    if [ "${#START_JAR[@]}"x != "1x" ]; then
-        echo ${START_JAR[@]}" please set START_JAR by environment!"
-        exit 2
-    fi
-fi
- 
-echo "***jar start!***"+$START_JAR
-if [ ! -n "$JAVA_OPTS" ]; then
-    java -jar $START_JAR $@
+
+
+appName=`ls|grep .jar$`
+echo start to run $appName
+
+if [ -n "$JAVA_OPTIONS" ];then
+	java $JAVA_OPTIONS -jar $appName   $@
 else
-   java $JAVA_OPTS -jar $START_JAR $@
+    java -jar $appName   $@
 fi
