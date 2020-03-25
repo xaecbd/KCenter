@@ -63,7 +63,7 @@ $ git clone https://github.com/xaecbd/KafkaCenter.git
 $ cd KafkaCenter
 $ mvn clean package -Dmaven.test.skip=true
 $ cd KafkaCenter\KafkaCenter-Core\target
-$ java -jar KafkaCenter-Core-0.0.1-SNAPSHOT.jar
+$ java -jar KafkaCenter-Core-2.0.0-SNAPSHOT.jar
 ```
 
 ### 3.view system
