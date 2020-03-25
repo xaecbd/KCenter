@@ -6,7 +6,7 @@
 
 	<groupId>org.nesc.ec.bigdata</groupId>
 	<artifactId>KafkaCenter</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${revision}</version>
 	<packaging>pom</packaging>
 
 	<name>KafkaCenter</name>
@@ -14,6 +14,7 @@
 	<description>Kafka Center Platform</description>
 
 	<properties>
+		<revision>2.0.0-SNAPSHOT</revision>
 		<elasticsearch.version>7.3.0</elasticsearch.version>
 		<java.version>11</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

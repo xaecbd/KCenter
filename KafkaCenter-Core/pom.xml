@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.nesc.ec.bigdata</groupId>
 		<artifactId>KafkaCenter</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${revision}</version>
 	</parent>
 	<artifactId>KafkaCenter-Core</artifactId>
 	<name>KafkaCenter-Core</name>
@@ -58,7 +58,7 @@
 		<dependency>
 			<groupId>org.nesc.ec.bigdata</groupId>
 			<artifactId>KafkaCenter-Base</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${revision}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

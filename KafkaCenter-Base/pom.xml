@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.nesc.ec.bigdata</groupId>
 		<artifactId>KafkaCenter</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${revision}</version>
 	</parent>
 	<artifactId>KafkaCenter-Base</artifactId>
 	<name>KafkaCenter-Base</name>
