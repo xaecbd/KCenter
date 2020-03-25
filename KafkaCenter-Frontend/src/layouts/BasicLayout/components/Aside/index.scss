@@ -1,0 +1,28 @@
+.ice-layout {
+  .ice-layout-aside.custom-aside {
+    background: #fff;
+    box-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
+    .custom-menu {
+      min-height: 100%;
+      width: 240px;
+      padding-top: 20px;
+      box-shadow: 0px 0px 8px #eee;
+      .next-opened {
+        background: transparent !important;
+        color: #333 !important;
+      }
+      i {
+        margin-right: 5px !important;
+      }
+      font-size: 14px !important;
+      font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+      font-weight: 400;
+    }
+  }
+}
+
+.next-nav.next-ver .next-menu-item-inner {
+  height: 40px;
+  font-size: 15px;
+  font-weight: 550;
+} 

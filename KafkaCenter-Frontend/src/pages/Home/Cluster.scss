@@ -1,0 +1,35 @@
+.test:hover {
+    cursor:pointer; 
+}
+
+.test{
+    margin: 0 0 8px;
+    font-size: 13px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-Space: nowrap;
+
+}
+
+.yellowcircle {
+    border-radius: 50%;
+    width: 9px;
+    height: 9px;
+    background-color: #ffd876
+  }
+
+  .redcircle {
+    border-radius: 50%;
+    width: 9px;
+    height: 9px;
+    background-color: #ff3b1f
+  }
+
+  .greencircle {
+    border-radius: 50%;
+    width: 9px;
+    height: 9px;
+    background-color: #40a339
+  }
+
+

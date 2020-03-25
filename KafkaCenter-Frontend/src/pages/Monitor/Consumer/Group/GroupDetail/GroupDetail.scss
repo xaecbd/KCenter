@@ -1,0 +1,150 @@
+.custom-table {
+  width: 100%;
+  tr {
+    border: 1px solid #eee;
+    td {
+      border-right: 1px solid #eeeeee;
+      min-height: 12rem;
+      border: 0;
+      &:nth-child(2n-1) {
+        font-weight: 500;
+      }
+      &:last-child {
+        border-right: 0;
+      }
+    }
+  }
+  th {
+    border: 1px solid #fbfbfb;
+    //border-bottom: 1px solid #fbfbfb;
+    background: #ffffff;
+  }
+}
+
+.refresh{
+    float: right;
+    // background-color: rgb(242, 242, 242) !important;
+    // border-color:rgb(242, 242, 242) !important;
+  }
+.refresh:hover{  
+    // background:#C4C6CF !important;
+    // background-color:#FFFFFF !important;
+}  
+.circle {
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: thecolorsduke 2s infinite;
+  -webkit-animation: thecolorsduke 2s infinite;
+}
+.custom-table thead {
+  display: none;
+}
+.circle div {
+  display: none; /*默认隐藏*/
+}
+
+.circle:hover div {
+  display: initial; /*当鼠标hover时展示*/
+}
+.circleStop {
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: stopconsumber 2s infinite;
+  -webkit-animation: stopconsumber 2s infinite;
+}
+.circleStop div {
+  display: none; /*默认隐藏*/
+}
+
+.circleStop:hover div {
+  display: initial; /*当鼠标hover时展示*/
+}
+.yellowcricle {
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: yellowconsumber 2s infinite;
+  -webkit-animation: yellowconsumber 2s infinite;
+}
+
+.onMeous span {
+  display: none; /*默认隐藏*/
+}
+
+.onMeous:hover span {
+  display: initial; /*当鼠标hover时展示*/
+}
+.yellowcricle div {
+  display: none; /*默认隐藏*/
+}
+
+.yellowcricle:hover div {
+  display: initial; /*当鼠标hover时展示*/
+}
+
+@keyframes yellowconsumber {
+  0% {
+    background: #ffd876;
+  }
+  20% {
+    background: #f5cc6b;
+  }
+  40% {
+    background: #e8c05f;
+  }
+  60% {
+    background: #dbb454;
+  }
+  80% {
+    background: #cea849;
+  }
+  100% {
+    background: #c19d3d;
+  }
+}
+
+
+@keyframes stopconsumber {
+  0% {
+    background: #ff3b1f;
+  }
+  20% {
+    background: #ff2e16;
+  }
+  40% {
+    background: #ff1d0b;
+  }
+  60% {
+    background: #ff0000;
+  }
+  80% {
+    background: #f40000;
+  }
+  100% {
+    background: #ea0000;
+  }
+}
+
+
+@keyframes thecolorsduke {
+  0% {
+    background: #40a339;
+  }
+  20% {
+    background: #379b32;
+  }
+  40% {
+    background: #2d932a;
+  }
+  60% {
+    background: #228b22;
+  }
+  80% {
+    background: #15831a;
+  }
+  100% {
+    background: #017b10;
+  }
+}

@@ -1,0 +1,27 @@
+
+.next-table-body {
+    font-size: 14px !important;
+}
+.next-table-heade {
+    font-size: 14px !important;
+}
+
+
+@font-face{
+    font-family:iconfonts;    
+    src:local('iconfonts'),
+    url('/font/font_997286_q8pck7x35wb.eot');
+    src:url('/font/font_997286_q8pck7x35wb.eot') format("embedded-opentype"),
+    url('/font/font_997286_q8pck7x35wb.woff') format("woff"),
+    url('/font/font_997286_q8pck7x35wb.ttf') format("truetype"),
+    url('/font/font_997286_q8pck7x35wb.xml') format("svg")}
+
+
+.next-icon{font-family:"iconfonts" !important;}
+
+body {
+    font-family:Roboto,"Helvetica Neue",Helvetica,Tahoma,Arial,"PingFang SC","Microsoft YaHei" !important;
+    font-size: 12px !important;
+    line-height: 1.28571;
+    color: #333;
+}
