@@ -1,3 +1,8 @@
+# 2.0.0 (2020-3-25)
+### Features / Enhancements
+* add ksql feature
+* add oauth2 feature
+* refactor monitor module
 # 1.5.5.2 (2020-2-18)
 ### Bug Fixes
 * **普通用户首次登陆系统，查看team报错**
