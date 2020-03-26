@@ -55,7 +55,7 @@ elasticsearch(7.0+)|非必须|监控信息，例如集群metirc,消费lag可视�
 - Docker run(**推荐**)
 
 ```
-docker run -d -p 8080:8080 --name KafkaCenter -v ${pwd}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.0.0
+docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.0.0
 ```
 
 - Local run

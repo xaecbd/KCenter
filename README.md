@@ -52,7 +52,7 @@ down [application.properties](KafkaCenter-Core/src/main/resources/application.pr
 - Docker run(**recommend**)
 
 ```
-docker run -d -p 8080:8080 --name KafkaCenter -v ${pwd}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.0.0
+docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.0.0
 ```
 
 - Local run
