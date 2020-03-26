@@ -5,7 +5,6 @@ import java.util.Objects;
 public class BrokerInfo {
 	public BrokerInfo() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 	private int bid;
 	private String host;

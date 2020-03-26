@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 /**
  * @author Truman.P.Du
@@ -541,12 +542,14 @@ public class MonitorService {
 	}
 
 	private Set<MeterMetric> mergeBrokerMetricRest(Map<String,MeterMetric> meterMetricMap,String clusterId){
-		Set<MeterMetric> metricSet = new HashSet<>();
+		Set<MeterMetric> metricSet = new TreeSet<>(Comparator.comparingInt(o -> o.getMetricName().length()));
 		meterMetricMap.forEach((metricName,metricObj)->{
 			metricObj.setMetricName(metricName);
 			metricObj.setClusterID(clusterId);
 			metricSet.add(metricObj);
 		});
+
+
 		return metricSet;
 	}
 

@@ -64,6 +64,7 @@ public class CollectMetricsJob {
             String index = elasticsearchService.getMonitorElasticsearchIndexName() + "-" + sFormat.format(new Date());
             if(elasticsearchService.getESDB()!=null){
                 elasticsearchService.getESDB().batchInsertES(result, index);
+                LOG.debug("collect metric success!");
             }
         } catch (Exception e) {
             LOG.error("monitor metric  error.", e);

@@ -12,9 +12,11 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.ConnectException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 public class JmxCollector{
@@ -51,6 +53,10 @@ public class JmxCollector{
         return JMXConnectorFactory.connect(jmxUrl, env);
     }
     public Map<String,Set<MeterMetric>> metricEveryBroker(List<BrokerInfo> brokers) throws Exception {
+        brokers = brokers.stream().filter(brokerInfo -> brokerInfo.getJmxPort()!=-1 ).collect(Collectors.toList());
+        if(brokers.isEmpty()){
+            return new HashMap<>();
+        }
         return  metricEveryBrokerTopic(brokers,"");
     }
 
@@ -58,13 +64,16 @@ public class JmxCollector{
      * host,metricSet
      * */
     public Map<String,Set<MeterMetric>> metricEveryBrokerTopic(List<BrokerInfo> brokers, String topic) throws Exception {
-        String[] metricName = new String[] {"MessagesInPerSec", "BytesInPerSec", "BytesOutPerSec", "BytesRejectedPerSec",
+        String[] metricName = new String[] {"MessagesInPerSec", "BytesInPerSec", "BytesOutPerSec","BytesRejectedPerSec",
                 "FailedFetchRequestsPerSec", "FailedProduceRequestsPerSec"};
+        if("".equalsIgnoreCase(topic)){
+            metricName = new String[]{"MessagesInPerSec", "BytesInPerSec", "BytesOutPerSec"};
+        }
         Map<String,Set<MeterMetric>> result = new HashMap<>();
         for(BrokerInfo brokerInfo : brokers){
-            JMXConnector jmxConnector = this.getJmxConnector(brokerInfo.getHost(),brokerInfo.getJmxPort());
             Set<MeterMetric> metricSet = new HashSet<>();
             try{
+                JMXConnector jmxConnector = this.getJmxConnector(brokerInfo.getHost(),brokerInfo.getJmxPort());
                 for(String metric:metricName){
                     MeterMetric meterMetric = getMetricValue(metric,topic,jmxConnector.getMBeanServerConnection());
                     meterMetric.setMetricName(metric);
@@ -75,6 +84,7 @@ public class JmxCollector{
                 }
             }catch (IOException e){
                 removeJmxConnector(brokerInfo.getHost());
+                LOG.error("connect closed:",e);
             }catch (Exception e){
                 throw e;
             }
@@ -97,22 +107,30 @@ public class JmxCollector{
         return map;
     }
 
-    private MeterMetric getMetricValue(String metricName, String topicName, MBeanServerConnection mBeanServerConnection) throws Exception {
+    private MeterMetric getMetricValue(String metricName, String topicName, MBeanServerConnection mBeanServerConnection)  {
         JSONObject jsonObject = new JSONObject();
-        ObjectName objectName =  this.getObjectName(metricName,Optional.of(topicName));
-        MBeanInfo mBeanInfo = mBeanServerConnection.getMBeanInfo(objectName);
-        MBeanAttributeInfo[] attrInfo = mBeanInfo.getAttributes();
-        for (MBeanAttributeInfo attributeInfo:attrInfo){
-            String value = mBeanServerConnection.getAttribute(objectName,attributeInfo.getName()).toString();
-            if(!isString(value)){
-                double d = Double.parseDouble(value);
-                BigDecimal bigDecimal = new BigDecimal(d);
-                jsonObject.put(attributeInfo.getName(), bigDecimal.setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue());
+        try {
+            ObjectName objectName =  this.getObjectName(metricName,Optional.of(topicName));
+            MBeanInfo mBeanInfo = mBeanServerConnection.getMBeanInfo(objectName);
+            MBeanAttributeInfo[] attrInfo = mBeanInfo.getAttributes();
+            for (MBeanAttributeInfo attributeInfo:attrInfo){
+                String value = mBeanServerConnection.getAttribute(objectName,attributeInfo.getName()).toString();
+                if(!isString(value)){
+                    double d = Double.parseDouble(value);
+                    BigDecimal bigDecimal = new BigDecimal(d);
+                    jsonObject.put(attributeInfo.getName(),  bigDecimal.setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue());
+                }
             }
+            return jsonObject.toJavaObject(MeterMetric.class);
+        }catch (Exception e){
+            LOG.error("collect this metric info faild:",e);
+            return new MeterMetric();
         }
 
 
-        return jsonObject.toJavaObject(MeterMetric.class);
+
+
+
     }
 
 

@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 public class KafkaManagerService {
@@ -554,8 +555,8 @@ public class KafkaManagerService {
 				brokers.forEach(broker->{
 					KafkaManagerBroker kafkaManagerBroker = new KafkaManagerBroker();
 					kafkaManagerBroker.setBrokerInfo(broker);
-					Set<MeterMetric>  metricSet = metricBroker.get(broker.getHost());
 					kafkaManagerBroker.setClusterName(cluster.getName());
+					Set<MeterMetric>  metricSet = metricBroker.isEmpty()?new HashSet<>():metricBroker.get(broker.getHost());
 					try{
 						metricSet.forEach(meterMetric -> {
 							switch (meterMetric.getMetricName()){
