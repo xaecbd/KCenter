@@ -48,7 +48,7 @@ public class CollectMetricsJob {
             for (ClusterInfo cluster:clusters){
                 if (initConfig.isMonitorCollectorIncludeEnable() && !cluster.getLocation()
                         .equalsIgnoreCase(initConfig.getMonitorCollectorIncludelocation())) {
-                    return;
+                    continue;
                 }
                 Set<MeterMetric> metricSet = homeService.brokerMetric(cluster);
                 if (!metricSet.isEmpty()) {
