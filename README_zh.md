@@ -4,6 +4,9 @@
 
 # KafkaCenter
 KafkaCenter是Kafka 集群管理和维护，生产/消费监控，生态组件使用的统一一站式平台。
+
+[GitHub地址](https://github.com/xaecbd/KafkaCenter) 第一时间更新，请移步查看！
+
 - [KafkaCenter](#kafkacenter)
   - [Main Features](#main-features)
   - [Getting Started](#getting-started)
