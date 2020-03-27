@@ -7,7 +7,7 @@ Kafka Center中使用内嵌frame的形式加入了Kafka Connect ui，为了适�
 ```sh
 docker run --rm -it -p 8000:8000 \
            -e "CONNECT_URL=http://connect.distributed.url" \
-           landoop/kafka-connect-ui
+           xaecbd/kafka-connect-ui
 ```
 
 更多详细信息请见： [README](https://github.com/xaecbd/kafka-connect-ui)
