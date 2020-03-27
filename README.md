@@ -79,8 +79,8 @@ out an open PR:
 
 For more information, see the README in [KafkaCenter/docs](./docs).<br/>
 For information about module the documentation, see the Module in [KafkaCenter/docs/Module](./docs/Module.md).<br/>
-For information about user guide the documentation, see the UserGuide in [KafkaCenter/docs/UserGuide](./docs/UserGuide.md).
-For information about kafka connect ui, see docs in [KafkaConnectUi](./docs/KafkaConnectUi.md) 
+For information about user guide the documentation, see the UserGuide in [KafkaCenter/docs/UserGuide](./docs/UserGuide.md)  
+For information about kafka connect ui, see docs in [KafkaConnectUi](./docs/KafkaConnectUi.md).
 ## TODO
 
 See [TODO List](https://github.com/xaecbd/KafkaCenter/projects/1)
