@@ -20,8 +20,6 @@ import java.util.concurrent.*;
  */
 @Service
 public class ZKService {
-	@Autowired
-	TopicInfoService topicInfoService;
 
 	@Autowired
 	ClusterInfoMapper clusterInfoMapper;
