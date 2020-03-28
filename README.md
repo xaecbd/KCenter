@@ -44,7 +44,7 @@ mysql|must|Configuration information is stored in **mysql**
 elasticsearch(7.0+)|optional|Monitoring information, such as cluster metirc, consumption lag visualization, etc.
 email server|optional|Apply, approval, warning e-mail alert
 ### 1.init
-#### create datebase and table
+#### create database and table
 execute [table_script.sql](KafkaCenter-Core/sql/table_script.sql)
 #### edit config
 down [application.properties](KafkaCenter-Core/src/main/resources/application.properties),edit config.
