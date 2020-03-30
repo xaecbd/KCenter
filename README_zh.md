@@ -58,7 +58,7 @@ elasticsearch(7.0+)|非必须|监控信息，例如集群metirc,消费lag可视�
 - Docker run(**推荐**)
 
 ```
-docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.0.0
+docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.0.1
 ```
 
 - Local run
@@ -69,7 +69,7 @@ $ git clone https://github.com/xaecbd/KafkaCenter.git
 $ cd KafkaCenter
 $ mvn clean package -Dmaven.test.skip=true
 $ cd KafkaCenter\KafkaCenter-Core\target
-$ java -jar KafkaCenter-Core-2.0.0-SNAPSHOT.jar
+$ java -jar KafkaCenter-Core-2.0.1-SNAPSHOT.jar
 ```
 
 ### 3.最后访问系统
