@@ -11,13 +11,12 @@
 	</parent>
 	<artifactId>KafkaCenter-Base</artifactId>
 	<name>KafkaCenter-Base</name>
-	<url>http://maven.apache.org</url>
+	<url>https://github.com/xaecbd/KafkaCenter</url>
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
-			<version>2.3.0</version>
 		</dependency>
 
 		<dependency>
@@ -35,7 +34,6 @@
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka_2.12</artifactId>
-			<version>2.3.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.zookeeper</groupId>
@@ -76,8 +74,6 @@
 			<version>2.5</version>
 		</dependency>
 
-
-
 		<dependency>
 			<groupId>org.elasticsearch.client</groupId>
 			<artifactId>elasticsearch-rest-high-level-client</artifactId>
@@ -89,6 +85,5 @@
 			<artifactId>fastjson</artifactId>
 			<version>1.2.56</version>
 		</dependency>
-
 	</dependencies>
 </project>
