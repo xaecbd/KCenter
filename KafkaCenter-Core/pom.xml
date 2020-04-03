@@ -11,7 +11,7 @@
 	</parent>
 	<artifactId>KafkaCenter-Core</artifactId>
 	<name>KafkaCenter-Core</name>
-	<url>http://maven.apache.org</url>
+	<url>https://github.com/xaecbd/KafkaCenter</url>
 
 	<properties>
 		<java.version>11</java.version>

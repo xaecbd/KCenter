@@ -11,7 +11,7 @@
 	</parent>
 	<artifactId>KafkaCenter-Base</artifactId>
 	<name>KafkaCenter-Base</name>
-	<url>http://maven.apache.org</url>
+	<url>https://github.com/xaecbd/KafkaCenter</url>
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
 		<dependency>

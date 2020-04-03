@@ -10,7 +10,7 @@
 	<packaging>pom</packaging>
 
 	<name>KafkaCenter</name>
-	<url>http://maven.apache.org</url>
+	<url>https://github.com/xaecbd/KafkaCenter</url>
 	<description>Kafka Center Platform</description>
 
 	<properties>
