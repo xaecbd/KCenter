@@ -30,7 +30,7 @@ API:
 
 ### 后端代码规范
 
-使用阿里java 规范手册约束
+使用[阿里java 规范手册约束](https://alibaba.github.io/Alibaba-Java-Coding-Guidelines/)
 
 ## 前端开发
 
