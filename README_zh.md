@@ -85,8 +85,8 @@ out an open PR:
 ## Documentation
 
 更多文档详见： [KafkaCenter/docs](./docs).<br/>
-系统模块简介：[KafkaCenter/docs/Module](./docs/Module.md).<br/>
 用户使用文档：[KafkaCenter/docs/UserGuide](./docs/UserGuide.md)  
+系统模块简介：[KafkaCenter/docs/Module](./docs/Module.md).<br/>
 KafkaConnectUi文档：[KafkaConnectUi](./docs/KafkaConnectUi.md). 
 
 ## TODO
