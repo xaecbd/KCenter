@@ -64,7 +64,7 @@ $ npm run build
 ### 编译/运行
 
 ```
-$ cd KafkaCenter\KafkaCenter-Core
+$ cd KafkaCenter
 $ mvn clean package -Dmaven.test.skip=true
 $ cd KafkaCenter\KafkaCenter-Core\target
 $ java -jar KafkaCenter-Core-0.0.1-SNAPSHOT.jar
@@ -73,6 +73,6 @@ $ java -jar KafkaCenter-Core-0.0.1-SNAPSHOT.jar
 ### 发布
 
 ```
-$ cd KafkaCenter\KafkaCenter-Core
+$ cd KafkaCenter
 $ mvn clean package -Dmaven.test.skip=true
 ```
