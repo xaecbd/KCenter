@@ -48,7 +48,7 @@
   ![](../docs/images/consumer_partition.png)
   
 ##### 6. 监控消费
-   -  进入Topic -> Consumer,选择Topic，选择topic(topic_test)，查看消费组消费状态
+   -  进入Monitor -> Consumer,选择Topic，选择topic(topic_test)，查看消费组消费状态
    
   ![](../docs/images/consumer_group.png)
 
