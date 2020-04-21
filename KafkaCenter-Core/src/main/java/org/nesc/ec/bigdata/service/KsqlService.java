@@ -248,6 +248,14 @@ public class KsqlService {
         } catch (Exception e) {
             body = "{\"message\":\"ksql execute error.please check you sql.\"}";
             LOGGER.warn("ksql execute error.", e);
+        }finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return body;
     }
