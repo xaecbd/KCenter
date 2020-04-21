@@ -58,7 +58,7 @@ public class MonitorController extends BaseController {
 	public List<MonitorTopic> getTopicList(@RequestParam("cluster") String clusterId) {
 		List<MonitorTopic> monitorTopics = new ArrayList<>();
 		List<ClusterInfo> clusterInfos = "-1".equalsIgnoreCase(clusterId)?clusterService.getTotalData():
-				new ArrayList<>() {{
+				new ArrayList<ClusterInfo>() {{
 					add(clusterService.selectById(Long.parseUnsignedLong(clusterId)));
 				}};
 		UserInfo user = getCurrentUser();
@@ -270,7 +270,7 @@ public class MonitorController extends BaseController {
 	@RequestMapping(value = "/group", method = RequestMethod.GET)
 	public RestResponse getClusterAllGroup(@RequestParam("cluster") String clusterId) {
 		List<ClusterInfo> clusters = "-1".equalsIgnoreCase(clusterId)?clusterService.getTotalData():
-				new ArrayList<>(){{ add(clusterService.selectById(Long.parseUnsignedLong(clusterId)));}};
+				new ArrayList<ClusterInfo>(){{ add(clusterService.selectById(Long.parseUnsignedLong(clusterId)));}};
 		List<ClusterGroup> clusterGroups;
 		try {
 			clusterGroups = monitorService.listGroupsByCluster(clusters, true);

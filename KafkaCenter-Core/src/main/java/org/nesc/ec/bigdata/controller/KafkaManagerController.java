@@ -151,7 +151,7 @@ public class KafkaManagerController extends BaseController{
     @GetMapping(value = "/group")
     public RestResponse getClusterAllGroup(@RequestParam("cluster") String clusterId) {
         List<ClusterInfo> clusters = "-1".equalsIgnoreCase(clusterId)?clusterService.getTotalData():
-                new ArrayList<>() {{
+                new ArrayList<ClusterInfo>() {{
                     add(clusterService.selectById(Long.parseUnsignedLong(clusterId)));
                 }};
         List<ClusterGroup> clusterGroups;

@@ -16,15 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.websocket.Session;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -222,16 +216,35 @@ public class KsqlService {
         String ksqlUrl = ksqlMapUrl.get(id);
 
         String body = null;
-        HttpClient httpClient = HttpClient.newBuilder().build();
+        InputStream is = null;
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(generatorUrl(ksqlUrl, "/ksql")))
-                    .timeout(Duration.ofMinutes(1))
-                    .header(Constants.KeyStr.CONTENT_TYPE, Constants.KeyStr.KSQL_APPLICATION_JSON)
-                    .POST(HttpRequest.BodyPublishers.ofString(message))
-                    .build();
-            HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            body = httpResponse.body();
+            URL url = new URL(generatorUrl(ksqlUrl, "/ksql"));
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setUseCaches(false);
+            connection.setInstanceFollowRedirects(true);
+            connection.setRequestProperty("Connection", "Keep-Alive");// 维持长连接
+            connection.setRequestProperty("Charset", "UTF-8");
+            connection.addRequestProperty(Constants.KeyStr.CONTENT_TYPE, Constants.KeyStr.KSQL_APPLICATION_JSON);
+            connection.connect();
+            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+            if (!"".equals(message)) {
+                out.writeBytes(message);
+            }
+            out.flush();
+            out.close();
+            is = connection.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuffer sb=new StringBuffer();
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+
+            body = sb.toString();
+
         } catch (Exception e) {
             body = "{\"message\":\"ksql execute error.please check you sql.\"}";
             LOGGER.warn("ksql execute error.", e);
@@ -260,20 +273,30 @@ public class KsqlService {
     private void query(WebSocketMessage message, Session session) {
         ksqlQueryMap.put(session.getId(), System.currentTimeMillis());
         String ksqlUrl = ksqlMapUrl.get(message.getId());
-        HttpClient httpClient = HttpClient.newBuilder().build();
         InputStream eventStream = null;
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(generatorUrl(ksqlUrl, "/query")))
-                    .timeout(Duration.ofMinutes(1))
-                    .header(Constants.KeyStr.CONTENT_TYPE, Constants.KeyStr.KSQL_APPLICATION_JSON)
-                    .POST(HttpRequest.BodyPublishers.ofString(message.getMessage()))
-                    .build();
-            HttpResponse<InputStream> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            eventStream = httpResponse.body();
-            BufferedReader br = new BufferedReader(new InputStreamReader(eventStream));
+            URL url = new URL(generatorUrl(ksqlUrl, "/query"));
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setUseCaches(false);
+            connection.setInstanceFollowRedirects(true);
+            connection.setRequestProperty("Connection", "Keep-Alive");// 维持长连接
+            connection.setRequestProperty("Charset", "UTF-8");
+            connection.addRequestProperty(Constants.KeyStr.CONTENT_TYPE, Constants.KeyStr.KSQL_APPLICATION_JSON);
+            connection.connect();
+            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+            if (!"".equals(message.getMessage())) {
+                out.writeBytes(message.getMessage());
+            }
+            out.flush();
+            out.close();
+            eventStream = connection.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(eventStream));
+
             String line = "";
-            while ((line = br.readLine()) != null && isRunQuery(session.getId())) {
+            while ((line = reader.readLine()) != null && isRunQuery(session.getId())) {
                 if (org.apache.commons.lang3.StringUtils.isNotBlank(line)) {
                     try {
                         session.getBasicRemote().sendText(line);
@@ -282,7 +305,7 @@ public class KsqlService {
                     }
                 }
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             LOGGER.error("ksql query error:Unable to get status event stream", e);
         } finally {
             if (eventStream != null) {
