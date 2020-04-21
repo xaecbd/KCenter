@@ -76,7 +76,7 @@ public class KafkaAdminService {
                 flag = true;
             }
 		} catch (Exception e) {
-
+			LOGGER.warn("connect kafka error.",e);
 		}finally {
 			try {
 				if(admin!=null) {
@@ -104,8 +104,11 @@ public class KafkaAdminService {
 						validateKafkaAddress = true;
 					}
 				}catch (Exception e){
+					LOGGER.warn("connect kafka error.",e);
 				}finally {
-					admin.close();
+					if(admin!=null){
+						admin.close();
+					}
 				}
 				return validateKafkaAddress;
 			}
@@ -119,7 +122,7 @@ public class KafkaAdminService {
 				flag = true;
 			}
 		}catch (Exception e) {
-			LOGGER.warn("validateKafkaAddress  result is inactive");
+			LOGGER.warn("validateKafkaAddress  result is inactive",e);
 		}
 		return flag;
 	}
