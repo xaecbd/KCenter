@@ -55,7 +55,7 @@ docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/
 
 - Local run
 
-**Important**: Before you begin, make sure you have installed **jre11** and download the release package in the release.
+**Important**: Before you begin, make sure you have installed **jre1.8** and download the release package in the release.
 ```
 $ git clone https://github.com/xaecbd/KafkaCenter.git
 $ cd KafkaCenter
