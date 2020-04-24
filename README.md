@@ -1,6 +1,4 @@
-<div align="right">Language: :us:
-<a title="Chinese" href="./README_zh.md">:cn:</a>
-</div>
+Language: :us::[cn](./README_zh.md):
 
 # KafkaCenter
 KafkaCenter is a unified one-stop platform for Kafka cluster management and maintenance, producer / consumer monitoring, and use of ecological components.
@@ -73,7 +71,7 @@ view`http://localhost:8080`,default administrator ：**admin/admin**
 You might want to build KafkaCenter locally to contribute some code, test out the latest features, or try
 out an open PR:
 
-- [CONTRIBUTING.md](CONTRIBUTING.md) will help you get KafkaCenter up and running.
+- [CONTRIBUTING.md](./CONTRIBUTING.md) will help you get KafkaCenter up and running.
 
 ## Documentation
 
@@ -87,7 +85,7 @@ See [TODO List](https://github.com/xaecbd/KafkaCenter/projects/1)
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md)
+See [CHANGELOG.md](./CHANGELOG.md)
 
 ## Questions? Problems? Suggestions?
 
