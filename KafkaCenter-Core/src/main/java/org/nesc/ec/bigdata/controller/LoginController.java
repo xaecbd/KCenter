@@ -113,8 +113,8 @@ public class LoginController extends BaseController {
 	@GetMapping("/logout")
 	public void logout(HttpSession session, HttpServletResponse response) {
 		try {
-			response.sendRedirect(url);
 			session.removeAttribute(SessionAttr.USER.getValue());
+			response.sendRedirect(url);
 		} catch (IOException e) {
 			logger.error("redirect logout fail", e);
 		}
