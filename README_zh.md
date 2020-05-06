@@ -1,6 +1,4 @@
-<div align="right">Language: <a title="English" href="./README.md">:us:</a>
-:cn:
-</div>
+Language: :us::[cn](./README_zh.md):
 
 # KafkaCenter
 KafkaCenter是Kafka 集群管理和维护，生产/消费监控，生态组件使用的统一一站式平台。
