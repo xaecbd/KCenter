@@ -1,0 +1,45 @@
+language: java
+jdk:
+  - openjdk8
+
+services:
+  - docker
+
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/.npm
+
+dist: trusty
+jobs:
+  include:
+    - stage: ui_build
+      language: node_js
+      script: cd KafkaCenter-Frontend && npm install && npm run build
+    - stage: build
+      script: mvn ${TRAVIS_TAG#v} clean package -Dmaven.test.skip=true
+    - stage: Build Docker Image for Release
+      script: ./scripts/docker-build-release.sh
+    - stage: GitHub Release
+      script: echo "Deploying to GitHub releases ..." && pwd
+      deploy:
+        provider: releases
+        api_key: $GITHUB_OAUTH_TOKEN
+        file_glob: true
+        file: $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz
+        skip_cleanup: true
+        on:
+          tags: true
+stages:
+  - ui_build
+  - build
+  - name: GitHub Release
+    if: tag =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+  - name: Build Docker Image for Release
+    if: tag =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+
+branches:
+  only:
+    - master
+notifications:
+  email: true
