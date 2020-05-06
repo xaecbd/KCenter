@@ -16,15 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.websocket.Session;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,13 +58,13 @@ public class KsqlService {
             String version = ksqlClusterInfo.getVersion();
             String ksqlUrl = ksqlClusterInfo.getKsqlUrl();
             String[] urls = ksqlUrl.split(",");
-            KsqlInfo ksqlInfo = new KsqlInfo(ksqlServiceId, clusterName, version,ksqlUrl);
+            KsqlInfo ksqlInfo = new KsqlInfo(ksqlServiceId, clusterName, version, ksqlUrl);
             KsqlInfo ksql = null;
-            for (String url :urls){
+            for (String url : urls) {
                 ksql = setHealthyInfo(url, ksqlInfo);
                 String key = clusterName + "|" + ksqlServiceId;
                 ksqlMapUrl.put(key, url);
-                if(ksql!=null){
+                if (ksql != null) {
                     ksqlInfo = ksql;
                 }
             }
@@ -175,25 +169,26 @@ public class KsqlService {
         return body;
     }
 
-    private JSONObject getKsqlInfo(String url){
+    private JSONObject getKsqlInfo(String url) {
         return restTemplate.getForEntity(generatorUrl(url, "/info"), JSONObject.class).getBody();
-   }
-    public Boolean addKsql(Long clusterId , String ksqlAddress){
+    }
+
+    public Boolean addKsql(Long clusterId, String ksqlAddress) {
         boolean result = false;
         ClusterInfo clusterInfo = clusterService.selectById(clusterId);
-        
+
         String clusterName = clusterInfo.getName();
         if (ksqlAddress != null && ksqlAddress.trim().length() > 0) {
             String[] urls = ksqlAddress.split(",");
             String ksqlServiceId = "";
-           String version = "";
-            for (String url :urls){
+            String version = "";
+            for (String url : urls) {
                 JSONObject ksqlInfo = getKsqlInfo(url);
                 ksqlServiceId = ksqlInfo.getJSONObject("KsqlServerInfo").getString("ksqlServiceId");
                 version = ksqlInfo.getJSONObject("KsqlServerInfo").getString("version");
             }
-            KsqlClusterInfo ksqlClusterInfo = ksqlClusterInfoMapper.selectKsqlInfo(clusterId,ksqlServiceId);
-            if(ksqlClusterInfo==null){
+            KsqlClusterInfo ksqlClusterInfo = ksqlClusterInfoMapper.selectKsqlInfo(clusterId, ksqlServiceId);
+            if (ksqlClusterInfo == null) {
                 KsqlClusterInfo ksqlCluster = new KsqlClusterInfo();
                 ksqlCluster.setClusterId(clusterId);
                 ksqlCluster.setClusterName(clusterName);
@@ -205,12 +200,14 @@ public class KsqlService {
         }
         return result;
     }
-    public Boolean delKsql(String clusterName , String ksqlServiceId){
+
+    public Boolean delKsql(String clusterName, String ksqlServiceId) {
         Map<String, Object> map = new HashMap<>();
         map.put("cluster_name", clusterName);
         map.put("ksql_serverId", ksqlServiceId);
         return checkResult(ksqlClusterInfoMapper.deleteByMap(map));
     }
+
     /**
      * 执行ksql（不包含query）语句
      *
@@ -222,19 +219,59 @@ public class KsqlService {
         String ksqlUrl = ksqlMapUrl.get(id);
 
         String body = null;
-        HttpClient httpClient = HttpClient.newBuilder().build();
+        InputStream is = null;
+        HttpURLConnection connection = null;
+        BufferedReader reader = null;
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(generatorUrl(ksqlUrl, "/ksql")))
-                    .timeout(Duration.ofMinutes(1))
-                    .header(Constants.KeyStr.CONTENT_TYPE, Constants.KeyStr.KSQL_APPLICATION_JSON)
-                    .POST(HttpRequest.BodyPublishers.ofString(message))
-                    .build();
-            HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            body = httpResponse.body();
+            URL url = new URL(generatorUrl(ksqlUrl, "/ksql"));
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setUseCaches(false);
+            connection.setInstanceFollowRedirects(true);
+            connection.setRequestProperty("Connection", "Keep-Alive");// 维持长连接
+            connection.setRequestProperty("Charset", "UTF-8");
+            connection.addRequestProperty(Constants.KeyStr.CONTENT_TYPE, Constants.KeyStr.KSQL_APPLICATION_JSON);
+            connection.connect();
+            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+            if (!"".equals(message)) {
+                out.writeBytes(message);
+            }
+            out.flush();
+            out.close();
+            is = connection.getInputStream();
+            reader = new BufferedReader(new InputStreamReader(is));
+            StringBuffer sb = new StringBuffer();
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+
+            body = sb.toString();
+
+
         } catch (Exception e) {
             body = "{\"message\":\"ksql execute error.please check you sql.\"}";
             LOGGER.warn("ksql execute error.", e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
         return body;
     }
@@ -250,7 +287,6 @@ public class KsqlService {
     }
 
 
-
     /**
      * 执行query语句
      *
@@ -260,20 +296,32 @@ public class KsqlService {
     private void query(WebSocketMessage message, Session session) {
         ksqlQueryMap.put(session.getId(), System.currentTimeMillis());
         String ksqlUrl = ksqlMapUrl.get(message.getId());
-        HttpClient httpClient = HttpClient.newBuilder().build();
         InputStream eventStream = null;
+        BufferedReader reader = null;
+        HttpURLConnection connection = null;
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(generatorUrl(ksqlUrl, "/query")))
-                    .timeout(Duration.ofMinutes(1))
-                    .header(Constants.KeyStr.CONTENT_TYPE, Constants.KeyStr.KSQL_APPLICATION_JSON)
-                    .POST(HttpRequest.BodyPublishers.ofString(message.getMessage()))
-                    .build();
-            HttpResponse<InputStream> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            eventStream = httpResponse.body();
-            BufferedReader br = new BufferedReader(new InputStreamReader(eventStream));
+            URL url = new URL(generatorUrl(ksqlUrl, "/query"));
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setUseCaches(false);
+            connection.setInstanceFollowRedirects(true);
+            connection.setRequestProperty("Connection", "Keep-Alive");// 维持长连接
+            connection.setRequestProperty("Charset", "UTF-8");
+            connection.addRequestProperty(Constants.KeyStr.CONTENT_TYPE, Constants.KeyStr.KSQL_APPLICATION_JSON);
+            connection.connect();
+            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+            if (!"".equals(message.getMessage())) {
+                out.writeBytes(message.getMessage());
+            }
+            out.flush();
+            out.close();
+            eventStream = connection.getInputStream();
+            reader = new BufferedReader(new InputStreamReader(eventStream));
+
             String line = "";
-            while ((line = br.readLine()) != null && isRunQuery(session.getId())) {
+            while ((line = reader.readLine()) != null && isRunQuery(session.getId())) {
                 if (org.apache.commons.lang3.StringUtils.isNotBlank(line)) {
                     try {
                         session.getBasicRemote().sendText(line);
@@ -282,15 +330,25 @@ public class KsqlService {
                     }
                 }
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             LOGGER.error("ksql query error:Unable to get status event stream", e);
         } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             if (eventStream != null) {
                 try {
                     eventStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+            if (connection != null) {
+                connection.disconnect();
             }
         }
     }
@@ -398,21 +456,25 @@ public class KsqlService {
     }
 
     public boolean insert(KsqlClusterInfo ksqlClusterInfo) {
-        Integer result =  ksqlClusterInfoMapper.insert(ksqlClusterInfo);
+        Integer result = ksqlClusterInfoMapper.insert(ksqlClusterInfo);
         return checkResult(result);
     }
+
     public boolean update(KsqlClusterInfo ksqlClusterInfo) {
         Integer result = ksqlClusterInfoMapper.updateById(ksqlClusterInfo);
         return checkResult(result);
     }
+
     public boolean delete(Long id) {
         Integer result = ksqlClusterInfoMapper.deleteById(id);
         return checkResult(result);
     }
+
     public KsqlClusterInfo selectById(Long id) {
         return ksqlClusterInfoMapper.selectById(id);
     }
-    public KsqlClusterInfo selectByClusterId(Long clusterId){
+
+    public KsqlClusterInfo selectByClusterId(Long clusterId) {
         return ksqlClusterInfoMapper.selectByClusterId(clusterId);
     }
 
@@ -421,7 +483,7 @@ public class KsqlService {
     }
 
     public boolean checkResult(Integer result) {
-        return result>0?true:false;
+        return result > 0 ? true : false;
     }
 
 }

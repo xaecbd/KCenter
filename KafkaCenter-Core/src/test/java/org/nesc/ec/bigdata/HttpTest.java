@@ -1,14 +1,12 @@
 package org.nesc.ec.bigdata;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * @author Truman.P.Du
@@ -16,32 +14,50 @@ import java.time.Duration;
  * @description
  */
 public class HttpTest {
-    public static void main(String[] args) {
-        InputStream eventStream;
-        HttpClient httpClient = HttpClient.newBuilder().build();
+    public static void main(String[] args) throws Exception {
+        HttpTest test = new HttpTest();
+        test.sendPost("http://127.0.0.1:8088/query","{\n" +
+                "  \"ksql\": \"SELECT * FROM truman EMIT CHANGES;\",\n" +
+                "  \"streamsProperties\": {}\n" +
+                "}");
+    }
+
+    public  String sendPost(String u, String json) throws Exception {
+        StringBuffer sbf = new StringBuffer();
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://127.0.0.1:8088/query"))
-                    .timeout(Duration.ofMinutes(1))
-                    .header("Content-Type", "application/vnd.ksql.v1+json; charset=utf-8")
-                    .POST(HttpRequest.BodyPublishers.ofString("{\"ksql\": \"SELECT * FROM truman EMIT CHANGES;\"}"))
-                    .build();
-            HttpResponse<InputStream> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
-
-            eventStream = httpResponse.body();
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Unable to get status event stream", e);
-        }
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(eventStream));
-        String line = "";
-
-        try {
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
+            URL url = new URL(u);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setUseCaches(false);
+            connection.setInstanceFollowRedirects(true);
+            connection.setRequestProperty("Connection", "Keep-Alive");// 维持长连接
+            connection.setRequestProperty("Charset", "UTF-8");
+            connection.addRequestProperty("Content-Type", "application/vnd.ksql.v1+json; charset=utf-8");
+            connection.connect();
+            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+            if (!"".equals(json)) {
+                out.writeBytes(json);
             }
+            out.flush();
+            out.close();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String lines;
+            while ((lines = reader.readLine()) != null) {
+                System.out.println(lines);
+                sbf.append(lines);
+            }
+            System.out.println(sbf);
+            reader.close();
+            // 断开连接
+            connection.disconnect();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
         } catch (IOException e) {
-            throw new RuntimeException("Unable to read status event stream", e);
+            e.printStackTrace();
         }
+        return sbf.toString();
     }
 }
