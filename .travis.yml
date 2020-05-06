@@ -36,9 +36,9 @@ stages:
   - ui_build
   - build
   - name: GitHub Release
-    if: tag =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    if: tag =~ /^v\d+\.\d+\.\d/
   - name: Build Docker Image for Release
-    if: tag =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    if: tag =~ /^v\d+\.\d+\.\d/
 
 branches:
   only:
