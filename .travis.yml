@@ -15,6 +15,7 @@ jobs:
   include:
     - stage: ui_build
       language: node_js
+      node_js: 10.15.2
       script: cd KafkaCenter-Frontend && npm install && npm run build
     - stage: build
       script: mvn ${TRAVIS_TAG#v} clean package -Dmaven.test.skip=true
