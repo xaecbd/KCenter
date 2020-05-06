@@ -10,11 +10,11 @@ KafkaCenter是Kafka 集群管理和维护，生产/消费监控，生态组件�
 - [KafkaCenter](#kafkacenter)
   - [主要特性](#主要特性)
   - [快速开始](#快速开始)
-    - [编译/运行, 贡献代码](#编译/运行/贡献代码)
+    - [编译/运行, 贡献代码](#编译-运行-贡献代码)
   - [文档](#文档)
   - [计划](#计划)
   - [Changelog](#changelog)
-  - [问题? 建议?](#问题/建议)
+  - [问题? 建议?](#问题-建议)
 
 ## 主要特性
 ![avatar](docs/images/kafka-center.png)
@@ -75,7 +75,7 @@ $ java -jar KafkaCenter-Core-2.0.1-SNAPSHOT.jar
 ### 3.最后访问系统
 
 访问`http://localhost:8080`,管理员用户与密码默认：**admin/admin**
-### 编译/运行/贡献代码
+### 编译,运行,贡献代码
 
 You might want to build KafkaCenter locally to contribute some code, test out the latest features, or try
 out an open PR:
@@ -97,7 +97,7 @@ KafkaConnectUi文档：[KafkaConnectUi](./docs/KafkaConnectUi.md).
 
 查看 [CHANGELOG.md](CHANGELOG.md)
 
-## 问题/建议
+## 问题?建议?
 
 - If you've found a bug or want to request a feature, please create a [Issue](https://github.com/xaecbd/KafkaCenter/issues/new).
 Please check to make sure someone else hasn't already created an issue for the same topic.
