@@ -24,7 +24,8 @@ jobs:
       script: echo "Deploying to GitHub releases ..." && pwd
       deploy:
         provider: releases
-        api_key: $GITHUB_OAUTH_TOKEN
+        user: $GITHUB_USERNAME
+        password: "$GITHUB_PASSWORD
         file_glob: true
         file: $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz
         skip_cleanup: true
