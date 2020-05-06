@@ -16,8 +16,8 @@ jobs:
       node_js: 10.15.2
       script: cd KafkaCenter-Frontend && npm install && npm run build
     - stage: build
-      before_install:
-        - chmod +x mvnw
+      install:
+        - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       script: mvn ${TRAVIS_TAG#v} clean package -Dmaven.test.skip=true
     - stage: Build Docker Image for Release
       script: ./scripts/docker-build-release.sh
