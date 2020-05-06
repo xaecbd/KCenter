@@ -24,7 +24,8 @@ jobs:
       script: echo "Deploying to GitHub releases ..." && pwd
       deploy:
         provider: releases
-        secure: "$API_KEY"
+        api_key:
+          secure: "$API_KEY"
         file_glob: true
         file: $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz
         skip_cleanup: true
