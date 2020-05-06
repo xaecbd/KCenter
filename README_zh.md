@@ -8,15 +8,15 @@ KafkaCenter是Kafka 集群管理和维护，生产/消费监控，生态组件�
 [GitHub地址](https://github.com/xaecbd/KafkaCenter) 第一时间更新，请移步查看！
 
 - [KafkaCenter](#kafkacenter)
-  - [Main Features](#main-features)
-  - [Getting Started](#getting-started)
-    - [Building and Running KafkaCenter, and/or Contributing Code](#building-and-running-kafkacenter-andor-contributing-code)
-  - [Documentation](#documentation)
+  - [主要特性](#主要特性)
+  - [快速开始](#快速开始)
+    - [编译/运行, 贡献代码](#building-and-running-kafkacenter-andor-contributing-code)
+  - [文档](#文档)
   - [TODO](#todo)
   - [Changelog](#changelog)
-  - [Questions? Problems? Suggestions?](#questions-problems-suggestions)
+  - [问题? 建议?](#questions-problems-suggestions)
 
-## Main Features
+## 主要特性
 ![avatar](docs/images/kafka-center.png)
 ![avatar](docs/images/screenshot.png)
 
@@ -37,10 +37,10 @@ KafkaCenter是Kafka 集群管理和维护，生产/消费监控，生态组件�
 - **Kafka Manager**->
 此模块用于管理员对集群的正常维护操作。
 
-## Config
+## 配置
 [application.properties](KafkaCenter-Core/src/main/resources/application.properties)
 
-## Getting Started
+## 快速开始
 
 **Important**: 项目配置信息存储在**mysql**中，因此必须mysql数据库.
 
@@ -75,14 +75,14 @@ $ java -jar KafkaCenter-Core-2.0.1-SNAPSHOT.jar
 ### 3.最后访问系统
 
 访问`http://localhost:8080`,管理员用户与密码默认：**admin/admin**
-### Building and Running KafkaCenter, and/or Contributing Code
+### 编译/运行, 贡献代码
 
 You might want to build KafkaCenter locally to contribute some code, test out the latest features, or try
 out an open PR:
 
 - [CONTRIBUTING.md](CONTRIBUTING.md) will help you get KafkaCenter up and running.
 
-## Documentation
+## 文档
 
 更多文档详见： [KafkaCenter/docs](./docs).<br/>
 用户使用文档：[KafkaCenter/docs/UserGuide](./docs/UserGuide.md)  
@@ -97,7 +97,7 @@ See [TODO List](https://github.com/xaecbd/KafkaCenter/projects/1)
 
 See [CHANGELOG.md](CHANGELOG.md)
 
-## Questions? Problems? Suggestions?
+## 问题? 建议?
 
 - If you've found a bug or want to request a feature, please create a [Issue](https://github.com/xaecbd/KafkaCenter/issues/new).
 Please check to make sure someone else hasn't already created an issue for the same topic.
