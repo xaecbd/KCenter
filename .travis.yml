@@ -18,18 +18,22 @@ jobs:
 
     - stage: GitHubRelease
       install:
-        - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+        - mvn -Drevision=${TRAVIS_TAG#v} install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       script: mvn -Drevision=${TRAVIS_TAG#v} clean package -Dmaven.test.skip=true
       deploy:
         provider: releases
         api_key: $API_KEY
-        file: $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/KafkaCenter-Core-${TRAVIS_TAG#v}-release.tar.gz
+        file_glob: true
+        file:
+          - "KafkaCenter-Core/target/KafkaCenter-Core-${TRAVIS_TAG#v}-release.tar.gz"
         on:
           tags: true
 
     - stage: BuildDockerImageforRelease
       install:
         - echo Build Docker Image for Release
+      before_script:
+        - chmod +x ./scripts/docker-build-release.sh
       script: ./scripts/docker-build-release.sh
 
 stages:
