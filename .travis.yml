@@ -23,12 +23,13 @@ jobs:
       deploy:
         provider: releases
         api_key: $API_KEY
-        file_glob: true
-        file: $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz
+        file: $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/KafkaCenter-Core-${TRAVIS_TAG#v}-release.tar.gz
         on:
           tags: true
 
     - stage: BuildDockerImageforRelease
+      install:
+        - echo Build Docker Image for Release
       script: ./scripts/docker-build-release.sh
 
 stages:
@@ -36,5 +37,8 @@ stages:
   - GitHubRelease
   - BuildDockerImageforRelease
 
+branches:
+  only:
+    - master
 notifications:
   email: true
