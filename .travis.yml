@@ -14,7 +14,6 @@ jobs:
     - stage: ui_build
       language: node_js
       node_js: 10.15.2
-      before_script: rm -rf $TRAVIS_BUILD_DIR
       script: cd KafkaCenter-Frontend && npm install && npm run build
 
     - stage: GitHubRelease
@@ -24,6 +23,7 @@ jobs:
       before_deploy:
         - mkdir -p $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/deploy
         - cp $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/deploy
+        - rm -f $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz
       deploy:
         provider: releases
         api_key: $API_KEY
