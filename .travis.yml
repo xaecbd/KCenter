@@ -41,8 +41,5 @@ stages:
   - GitHubRelease
   - BuildDockerImageforRelease
 
-branches:
-  only:
-    - master
 notifications:
   email: true
