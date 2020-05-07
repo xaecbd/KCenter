@@ -1,6 +1,7 @@
 language: java
 jdk:
   - openjdk8
+before_cache: rm -rf $TRAVIS_BUILD_DIR
 
 cache:
   directories:
@@ -20,7 +21,7 @@ jobs:
       install:
         - mvn -Drevision=${TRAVIS_TAG#v} install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       script: mvn -Drevision=${TRAVIS_TAG#v} clean package -Dmaven.test.skip=true
-      after_script: cp KafkaCenter-Core/target/KafkaCenter-Core-${TRAVIS_TAG#v}-release.tar.gz KafkaCenter-Core/target/deploy
+      before_deploy: cp KafkaCenter-Core/target/KafkaCenter-Core-${TRAVIS_TAG#v}-release.tar.gz KafkaCenter-Core/target/deploy
       deploy:
         provider: releases
         api_key: $API_KEY
@@ -33,8 +34,8 @@ jobs:
       install:
         - echo Build Docker Image for Release
       before_script:
-        - chmod +x ./scripts/docker-build-release.sh
-      script: ./scripts/docker-build-release.sh
+        - chmod +x ./docker/docker-build-release.sh
+      script: ./docker/docker-build-release.sh
 
 stages:
   - ui_build
