@@ -24,8 +24,7 @@ jobs:
         provider: releases
         api_key: $API_KEY
         file_glob: true
-        file:
-          - "KafkaCenter-Core/target/KafkaCenter-Core-${TRAVIS_TAG#v}-release.tar.gz"
+        file: KafkaCenter-Core/target/*-release.tar.gz
         on:
           tags: true
 
