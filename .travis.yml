@@ -19,7 +19,7 @@ jobs:
     - stage: GitHubRelease
       install:
         - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-      script: newVersion=${TRAVIS_TAG#v} && mvn $newVersion clean package -Dmaven.test.skip=true
+      script: mvn -Drevision=${TRAVIS_TAG#v} clean package -Dmaven.test.skip=true
       deploy:
         provider: releases
         api_key: $API_KEY
