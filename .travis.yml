@@ -16,19 +16,15 @@ jobs:
       node_js: 10.15.2
       script: cd KafkaCenter-Frontend && npm install && npm run build
 
-    - stage: build
+    - stage: GitHubRelease
       install:
         - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       script: mvn ${TRAVIS_TAG#v} clean package -Dmaven.test.skip=true
-
-    - stage: GitHubRelease
-      script: echo "Deploying to GitHub releases ..." && pwd
       deploy:
         provider: releases
         api_key: $API_KEY
         file_glob: true
         file: $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz
-        skip_cleanup: true
         on:
           tags: true
 
@@ -37,7 +33,6 @@ jobs:
 
 stages:
   - ui_build
-  - build
   - GitHubRelease
   - BuildDockerImageforRelease
 
