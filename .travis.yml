@@ -21,7 +21,9 @@ jobs:
       install:
         - mvn -Drevision=${TRAVIS_TAG#v} install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       script: mvn -Drevision=${TRAVIS_TAG#v} clean package -Dmaven.test.skip=true
-      before_deploy: cp KafkaCenter-Core/target/KafkaCenter-Core-${TRAVIS_TAG#v}-release.tar.gz KafkaCenter-Core/target/deploy
+      before_deploy:
+        - mkdir -p $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/deploy
+        - cp $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/deploy
       deploy:
         provider: releases
         api_key: $API_KEY
@@ -38,9 +40,12 @@ jobs:
       script: ./docker/docker-build-release.sh
 
 stages:
-  - ui_build
-  - GitHubRelease
-  - BuildDockerImageforRelease
+  - name: ui_build
+    if: tag =~ /^v\d+\.\d+\.\d+.*$/
+  - name: GitHubRelease
+    if: tag =~ /^v\d+\.\d+\.\d+.*$/
+  - name: BuildDockerImageforRelease
+    if: tag =~ /^v\d+\.\d+\.\d+.*$/
 
 notifications:
   email: true
