@@ -1,6 +1,9 @@
-Language: :us::[cn](./README_zh.md):
-
+Language: :us::[cn](./README_zh.md): 
 # KafkaCenter
+
+![](https://img.shields.io/badge/java-1.8+-green.svg)
+![](https://img.shields.io/badge/maven-3.5+-green.svg)
+
 KafkaCenter is a unified one-stop platform for Kafka cluster management and maintenance, producer / consumer monitoring, and use of ecological components.
 - [KafkaCenter](#kafkacenter)
   - [Main Features](#main-features)
