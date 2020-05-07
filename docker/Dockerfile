@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:jre-11.0.6_10-alpine
+FROM adoptopenjdk/openjdk8:jre8u252-b09-alpine
 LABEL author="Turman.P.Du"
 ENV PROJECT_BASE_DIR /opt/app/kafka-center/
 WORKDIR ${PROJECT_BASE_DIR}
