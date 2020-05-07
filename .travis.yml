@@ -1,7 +1,6 @@
 language: java
 jdk:
   - openjdk8
-before_cache: rm -rf $TRAVIS_BUILD_DIR
 
 cache:
   directories:
@@ -15,11 +14,12 @@ jobs:
     - stage: ui_build
       language: node_js
       node_js: 10.15.2
+      before_script: rm -rf $TRAVIS_BUILD_DIR
       script: cd KafkaCenter-Frontend && npm install && npm run build
 
     - stage: GitHubRelease
       install:
-        - mvn -Drevision=${TRAVIS_TAG#v} install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+        - echo GitHubRelease
       script: mvn -Drevision=${TRAVIS_TAG#v} clean package -Dmaven.test.skip=true
       before_deploy:
         - mkdir -p $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/deploy
