@@ -53,7 +53,7 @@ down [application.properties](KafkaCenter-Core/src/main/resources/application.pr
 - Docker run(**recommend**)
 
 ```
-docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.0.1
+docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.1.0
 ```
 
 - Local run
@@ -64,7 +64,7 @@ $ git clone https://github.com/xaecbd/KafkaCenter.git
 $ cd KafkaCenter
 $ mvn clean package -Dmaven.test.skip=true
 $ cd KafkaCenter\KafkaCenter-Core\target
-$ java -jar KafkaCenter-Core-2.0.1-SNAPSHOT.jar
+$ java -jar KafkaCenter-Core-2.1.0-SNAPSHOT.jar
 ```
 
 ### 3.view system
