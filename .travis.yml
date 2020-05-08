@@ -29,6 +29,7 @@ jobs:
         provider: releases
         api_key: $API_KEY
         file_glob: true
+        skip_cleanup: true
         file: deploy/*.tar.gz
         on:
           tags: true
