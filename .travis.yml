@@ -21,16 +21,18 @@ jobs:
         - echo GitHubRelease
       script: mvn -Drevision=${TRAVIS_TAG#v} clean package -Dmaven.test.skip=true
       before_deploy:
-        - mkdir -p $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/deploy
-        - cp $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/deploy
+        - mkdir -p $TRAVIS_BUILD_DIR/deploy
+        - cp $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz $TRAVIS_BUILD_DIR/deploy
         - rm -f $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz
+        - ls -l $TRAVIS_BUILD_DIR/deploy
       deploy:
         provider: releases
         api_key: $API_KEY
         file_glob: true
-        file: KafkaCenter-Core/target/deploy/*
+        file: deploy/*.tar.gz
         on:
           tags: true
+      after_deploy: rm -rf $TRAVIS_BUILD_DIR/deploy
 
     - stage: BuildDockerImageforRelease
       install:
