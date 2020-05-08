@@ -1,4 +1,4 @@
-Language: :us::[cn](./README_zh.md):
+Language: :[us](./README.md)::cn:
 
 # KafkaCenter
 
