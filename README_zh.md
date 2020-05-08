@@ -1,6 +1,10 @@
-Language: :us::[cn](./README_zh.md):
+Language: :[us](./README.md)::cn:
 
 # KafkaCenter
+
+![](https://img.shields.io/badge/java-1.8+-green.svg)
+![](https://img.shields.io/badge/maven-3.5+-green.svg)
+
 KafkaCenter是Kafka 集群管理和维护，生产/消费监控，生态组件使用的统一一站式平台。
 
 [GitHub地址](https://github.com/xaecbd/KafkaCenter) 第一时间更新，请移步查看！
@@ -56,18 +60,18 @@ elasticsearch(7.0+)|非必须|监控信息，例如集群metirc,消费lag可视�
 - Docker run(**推荐**)
 
 ```
-docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.0.1
+docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.1.0
 ```
 
 - Local run
 
-**Important**: 项目运行依赖jre11
+**Important**: 项目运行依赖jre1.8
 ```
 $ git clone https://github.com/xaecbd/KafkaCenter.git
 $ cd KafkaCenter
 $ mvn clean package -Dmaven.test.skip=true
 $ cd KafkaCenter\KafkaCenter-Core\target
-$ java -jar KafkaCenter-Core-2.0.1-SNAPSHOT.jar
+$ java -jar KafkaCenter-Core-2.1.0-SNAPSHOT.jar
 ```
 
 ### 3.最后访问系统

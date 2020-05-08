@@ -15,33 +15,40 @@ jobs:
       language: node_js
       node_js: 10.15.2
       script: cd KafkaCenter-Frontend && npm install && npm run build
-    - stage: build
+
+    - stage: GitHubRelease
       install:
-        - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-      script: mvn ${TRAVIS_TAG#v} clean package -Dmaven.test.skip=true
-    - stage: Build Docker Image for Release
-      script: ./scripts/docker-build-release.sh
-    - stage: GitHub Release
-      script: echo "Deploying to GitHub releases ..." && pwd
+        - echo GitHubRelease
+      script: mvn -Drevision=${TRAVIS_TAG#v} clean package -Dmaven.test.skip=true
+      before_deploy:
+        - mkdir -p $TRAVIS_BUILD_DIR/deploy
+        - cp $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz $TRAVIS_BUILD_DIR/deploy
+        - rm -f $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz
+        - ls -l $TRAVIS_BUILD_DIR/deploy
       deploy:
         provider: releases
-        api_key:
-          secure: "$API_KEY"
+        api_key: $API_KEY
         file_glob: true
-        file: $TRAVIS_BUILD_DIR/KafkaCenter-Core/target/*.gz
         skip_cleanup: true
+        file: deploy/*.tar.gz
         on:
           tags: true
-stages:
-  - ui_build
-  - build
-  - name: GitHub Release
-    if: tag =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
-  - name: Build Docker Image for Release
-    if: tag =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+      after_deploy: rm -rf $TRAVIS_BUILD_DIR/deploy
 
-branches:
-  only:
-    - master
+    - stage: BuildDockerImageforRelease
+      install:
+        - echo Build Docker Image for Release
+      before_script:
+        - chmod +x ./docker/docker-build-release.sh
+      script: ./docker/docker-build-release.sh
+
+stages:
+  - name: ui_build
+    if: tag =~ /^v\d+\.\d+\.\d+.*$/
+  - name: GitHubRelease
+    if: tag =~ /^v\d+\.\d+\.\d+.*$/
+  - name: BuildDockerImageforRelease
+    if: tag =~ /^v\d+\.\d+\.\d+.*$/
+
 notifications:
   email: true

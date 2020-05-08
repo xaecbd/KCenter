@@ -1,3 +1,8 @@
+# 2.1.0 (2020-5-207)
+### Features / Enhancements
+* support jdk1.8
+* add ci support
+* fix bug
 # 2.0.0 (2020-3-25)
 ### Features / Enhancements
 * add ksql feature

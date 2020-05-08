@@ -1,6 +1,9 @@
-Language: :us::[cn](./README_zh.md):
-
+Language: :us::[cn](./README_zh.md): 
 # KafkaCenter
+
+![](https://img.shields.io/badge/java-1.8+-green.svg)
+![](https://img.shields.io/badge/maven-3.5+-green.svg)
+
 KafkaCenter is a unified one-stop platform for Kafka cluster management and maintenance, producer / consumer monitoring, and use of ecological components.
 - [KafkaCenter](#kafkacenter)
   - [Main Features](#main-features)
@@ -50,7 +53,7 @@ down [application.properties](KafkaCenter-Core/src/main/resources/application.pr
 - Docker run(**recommend**)
 
 ```
-docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.0.1
+docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.1.0
 ```
 
 - Local run
@@ -61,7 +64,7 @@ $ git clone https://github.com/xaecbd/KafkaCenter.git
 $ cd KafkaCenter
 $ mvn clean package -Dmaven.test.skip=true
 $ cd KafkaCenter\KafkaCenter-Core\target
-$ java -jar KafkaCenter-Core-2.0.1-SNAPSHOT.jar
+$ java -jar KafkaCenter-Core-2.1.0-SNAPSHOT.jar
 ```
 
 ### 3.view system
