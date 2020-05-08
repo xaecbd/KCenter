@@ -35,6 +35,10 @@ public class ElasticsearchService {
     private String monitorElasticsearchHost;
     @Value("${monitor.elasticsearch.index:}")
     private String monitorElasticsearchIndexName;
+    @Value("${monitor.elasticsearch.authuser:}")
+    private String monitorElasticsearchAuthUser;
+    @Value("${monitor.elasticsearch.authpassword:}")
+    private String monitorElasticsearchAuthPassword;
 
 
     @Autowired
@@ -45,7 +49,11 @@ public class ElasticsearchService {
 
     @PostConstruct
     public void init() {
-        elasticsearchUtil = new ElasticsearchUtil(monitorElasticsearchHost);
+        if (monitorElasticsearchAuthUser != "" && monitorElasticsearchAuthUser != null){
+            elasticsearchUtil = new ElasticsearchUtil(monitorElasticsearchHost, monitorElasticsearchAuthUser, monitorElasticsearchAuthPassword);
+        } else {
+            elasticsearchUtil = new ElasticsearchUtil(monitorElasticsearchHost);
+        }
     }
 
     public ElasticsearchUtil getESDB() {

@@ -15,6 +15,12 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.*;
 
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
@@ -28,6 +34,8 @@ public class ElasticsearchUtil implements Closeable {
 	private RestHighLevelClient client = null;
 
 	public ElasticsearchUtil(String hosts) {
+		this(hosts, "", "");
+		/*
 		if(!"".equalsIgnoreCase(hosts) && null!=hosts){
 			String[] addressArray = hosts.split(",", -1);
 			HttpHost[] httpHosts = new HttpHost[addressArray.length];
@@ -38,7 +46,34 @@ public class ElasticsearchUtil implements Closeable {
 			}
 			client = new RestHighLevelClient(RestClient.builder(httpHosts));
 		}
+		 */
+	}
 
+	public ElasticsearchUtil(String hosts, String user, String password) {
+		if(!"".equalsIgnoreCase(hosts) && null!=hosts){
+			String[] addressArray = hosts.split(",", -1);
+			HttpHost[] httpHosts = new HttpHost[addressArray.length];
+
+			for (int i = 0; i < addressArray.length; i++) {
+				String[] hostAndPort = addressArray[i].split(":", -1);
+				httpHosts[i] = new HttpHost(hostAndPort[0], Integer.parseInt(hostAndPort[1]), "http");
+			}
+
+			if (user == ""){
+				client = new RestHighLevelClient(RestClient.builder(httpHosts));
+				return;
+			}
+
+			final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+			credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, password));
+			client = new RestHighLevelClient(RestClient.builder(httpHosts)
+				.setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
+					public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+						httpClientBuilder.disableAuthCaching();
+						return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+					}
+				}));
+		}
 	}
 
 	public boolean batchInsertES(List<JSONObject> datas, String index) throws IOException {

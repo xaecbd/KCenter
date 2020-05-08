@@ -12,7 +12,6 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.ConnectException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
@@ -122,27 +121,28 @@ public class JmxCollector{
                 }
             }
             return jsonObject.toJavaObject(MeterMetric.class);
-        }catch (Exception e){
-            LOG.error("collect this metric info faild:",e);
+        } catch (InstanceNotFoundException e){
+            return new MeterMetric();
+        } catch (Exception e){
+            LOG.error("collect this metric info faild:", e);
             return new MeterMetric();
         }
-
-
-
-
-
     }
 
 
     private MeterMetric mergeMetric(MeterMetric old, MeterMetric newVal){
-        if(old==null){
+        if (old == null || old.getCount() == null) {
             return newVal;
         }
-        if(newVal==null){
-            return  old;
+        if (newVal == null || newVal.getCount() == null) {
+            return old;
         }
-        return new MeterMetric(old.getCount()+newVal.getCount(),old.getMeanRate()+newVal.getMeanRate(),old.getOneMinuteRate()+newVal.getOneMinuteRate(),
-                old.getFiveMinuteRate()+newVal.getFiveMinuteRate(),old.getFifteenMinuteRate()+newVal.getFifteenMinuteRate());
+        return new MeterMetric(old.getCount()+ newVal.getCount(),
+                old.getMeanRate()+ newVal.getMeanRate(),
+                old.getOneMinuteRate()+ newVal.getOneMinuteRate(),
+                old.getFiveMinuteRate()+ newVal.getFiveMinuteRate(),
+                old.getFifteenMinuteRate()+ newVal.getFifteenMinuteRate()
+        );
 
     }
 
