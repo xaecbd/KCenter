@@ -27,7 +27,7 @@ You have a Kafka cluster* and want to
 - let your users request topics and monitor them themselves in a simple web UI
 - access the Kafka ecosystem (Kafka, KSQL, Kafka Connect, Kafka Manager) in one combined UI
 
-All you need is a MySQL DB in the background where KafkaCenter can store it's configuration. If you want to use the monitoring functionalities, you additionally need an Elasticsearch installation.
+All you need is a MySQL DB in the background where KafkaCenter can store its configuration. If you want to use the monitoring functionalities, you additionally need an Elasticsearch installation.
 Then, just download our Docker image (see HowTo below) and off you go!
 
 *\* Note: KafkaCenter does not yet support authenticating to a secured Kafka cluster (SASL or OAuth), we're working on it though.*
