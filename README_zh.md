@@ -1,4 +1,4 @@
-Language: :[us](./README.md)::cn:
+Language: :[us](./README.md): - :cn:
 
 # KafkaCenter
 
@@ -82,7 +82,7 @@ $ java -jar KafkaCenter-Core-2.1.0-SNAPSHOT.jar
 You might want to build KafkaCenter locally to contribute some code, test out the latest features, or try
 out an open PR:
 
-- [CONTRIBUTING.md](CONTRIBUTING.md) will help you get KafkaCenter up and running.
+- [CONTRIBUTING_zh.md](CONTRIBUTING_zh.md) will help you get KafkaCenter up and running.
 
 ## 文档
 
