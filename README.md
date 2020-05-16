@@ -49,7 +49,7 @@ Then, just download our Docker image (see HowTo below) and off you go!
 
 
 ## Application Config
-The main application configuration is done via the [application.properties](KafkaCenter-Core/src/main/resources/application.properties).
+The main application configuration is done in a central `application.properties` file. Have look at our [detailed example here](KafkaCenter-Core/src/main/resources/application.properties).
 
 
 ## Getting Started

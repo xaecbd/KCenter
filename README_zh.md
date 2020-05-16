@@ -40,7 +40,7 @@ KafkaCenter是Kafka 集群管理和维护，生产/消费监控，生态组件�
 此模块用于管理员对集群的正常维护操作。
 
 ## 配置
-[application.properties](KafkaCenter-Core/src/main/resources/application.properties)
+[application.properties](KafkaCenter-Core/src/main/resources/application_zh.properties)
 
 ## 快速开始
 
@@ -55,7 +55,7 @@ elasticsearch(7.0+)|非必须|监控信息，例如集群metirc,消费lag可视�
 #### 创建数据库及表
 在数据库中执行[table_script.sql](KafkaCenter-Core/sql/table_script.sql)
 #### 初始化配置
-下载[application.properties](KafkaCenter-Core/src/main/resources/application.properties),按自己需求修改相应的配置
+下载[application.properties](KafkaCenter-Core/src/main/resources/application_zh.properties),按自己需求修改相应的配置
 ### 2.其次运行服务
 - Docker run(**推荐**)
 
