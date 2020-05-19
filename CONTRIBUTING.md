@@ -1,68 +1,70 @@
-# CONTRIBUTING
+Language: :us: - :[cn](./CONTRIBUTING_zh.md):
 
-## 代码规范
+# Contributing to KafkaCenter
+We are very happy that you want to contribute to our project, awesome!
 
-### 规约
+Below are some guidelines to get you started. Feel free to reach out in case anything is unclear.
 
-#### API设计
+## Code Specifications
 
-针对需要和后端交互的场景，后端API应与前端路由地址保持一致，如果一个页面存在多个网络请求按树形结构划分，例如：
-Monitor>Topic模块
+### API Design Principles
+For scenarios that require interaction with the backend, the backend endpoint should be consistent with the frontend routing address. If there are different requests for one page, these should be under the same parent in the tree. 
+
+Here's an example for the *Monitoring* module:
+
+Monitor > Topic:
 ```
-前端路由：/#/monitor/topic
+Frontend routing：/#/monitor/topic
+
 API:
-- 查询所有Topic /monitor/topic
+- Search all topics: /monitor/topic
 ```
 
-Monitor>Alert模块
+Monitor > Alert:
 ```
-前端路由：/#/monitor/alert
+Frontend routing：/#/monitor/alert
+
 API:
-- 查询所有alert /monitor/alert
-- 新增alert /monitor/alert/add
+- Search all alerts: /monitor/alert
+- Add alert: /monitor/alert/add
 ```
 
-### 前端规范
+### Frontend Specifications
+- File line break: `LF`
+- `ESLint` must be used
+- If a subcomponent is used across multiple components, it must be moved up in the hierarchy and used jointly
 
-- 文件换行符`LF`
-- 必须安装ESLint,检查代码规范
-- 能公用组件，必须提升成公用组件
+### Backend Specifications
+Please adhere to the [Alibaba-Java-Coding-Guidelines](https://alibaba.github.io/Alibaba-Java-Coding-Guidelines/).
 
-### 后端代码规范
+## Frontend Development
+[Visual Studio Code](https://code.visualstudio.com/) is recommended for development on the frontend. Since the frontend of the project depends on the backend service, you can either start the backend services locally or modify package.json `proxyConfig` in `package.json` to an address where the backend services are available.
 
-使用[阿里java 规范手册约束](https://alibaba.github.io/Alibaba-Java-Coding-Guidelines/)
+Have a look at the separate [frontend README](./KafkaCenter-Frontend/README.md) for more details.
 
-## 前端开发
+### 1. Install *nodejs*
+*Self-explanatory...*
 
-推荐使用VS Code 开发前端代码,前端项目依赖后端服务，可以先启动后端服务，或者修改`package.json`中`proxyConfig`，将其中的地址改为可用的后端服务地址。更多内容[详见地址](./KafkaCenter-Frontend/README.md)
-
-### 安装node
-
-略
-
-### 运行
-
+### 2. Run
 ```
 $ cd KafkaCenter/KafkaCenter-Frontend
 $ npm install
 $ npm start
 ```
 
-### 发布
-
+### 3. Release
 ```
 $ cd KafkaCenter/KafkaCenter-Frontend
 $ npm run build
 ```
-编译后的代码会发布到`../KafkaCenter-Core/src/main/resources/static`
-## 后端开发
+The compiled code will be posted to: `../KafkaCenter-Core/src/main/resources/static`
 
-### 安装jdk 11/maven3.5+
+## Backend Development
 
-略
+### 1. Install *jdk 11* & *maven3.5+*
+*Self-explanatory...*
 
-### 编译/运行
-
+### 2. Compile / Run
 ```
 $ cd KafkaCenter
 $ mvn clean package -Dmaven.test.skip=true
@@ -70,8 +72,7 @@ $ cd KafkaCenter\KafkaCenter-Core\target
 $ java -jar KafkaCenter-Core-0.0.1-SNAPSHOT.jar
 ```
 
-### 发布
-
+### 3. Release
 ```
 $ cd KafkaCenter
 $ mvn clean package -Dmaven.test.skip=true
