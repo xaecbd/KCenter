@@ -1,4 +1,4 @@
-Language: :[us](./README.md)::cn:
+Language: :[us](./README.md): - :cn:
 
 # KafkaCenter
 
@@ -42,6 +42,7 @@ KafkaCenter是Kafka 集群管理和维护，生产/消费监控，生态组件�
 ## 配置
 [application.properties](KafkaCenter-Core/src/main/resources/application.properties)
 
+中文配置详解: [docs/application_zh.properties](docs/application_zh.properties)
 ## 快速开始
 
 **Important**: 项目配置信息存储在**mysql**中，因此必须mysql数据库.
@@ -79,10 +80,9 @@ $ java -jar KafkaCenter-Core-2.1.0-SNAPSHOT.jar
 访问`http://localhost:8080`,管理员用户与密码默认：**admin/admin**
 ### 贡献代码
 
-You might want to build KafkaCenter locally to contribute some code, test out the latest features, or try
-out an open PR:
+如果你对**KafkaCenter**感兴趣，欢迎加入我们，可以贡献代码、文档、问题等。
 
-- [CONTRIBUTING.md](CONTRIBUTING.md) will help you get KafkaCenter up and running.
+- [CONTRIBUTING_zh.md](CONTRIBUTING_zh.md) 可以帮助你运行代码，了解我们的开发规范.
 
 ## 文档
 
