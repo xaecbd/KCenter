@@ -9,7 +9,7 @@ appName=`ls|grep .jar$`
 echo start to run $appName
 
 if [ -n "$JAVA_OPTIONS" ];then
-	java $JAVA_OPTIONS -jar $appName   $@
+	exec java $JAVA_OPTIONS -jar $appName   $@
 else
-    java -jar $appName   $@
+    exec java -jar $appName   $@
 fi
