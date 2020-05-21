@@ -63,11 +63,10 @@ public class BrokerInfo {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) { return true; };
-		if (o == null || getClass() != o.getClass()) { return false; };
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
 		BrokerInfo brokerInfo = (BrokerInfo) o;
-		return 	Objects.equals(brokerInfo.getHost().toLowerCase(), brokerInfo.getHost().toLowerCase()) &&
-				Objects.equals(brokerInfo.getBid(), brokerInfo.getBid()) &&
-				Objects.equals(brokerInfo.getPort(), brokerInfo.getHost());
+		return 	(host == brokerInfo.getHost()) || (host != null && host.equalsIgnoreCase(brokerInfo.getHost())) &&
+				bid == brokerInfo.getBid() && port == brokerInfo.getPort() && jmxPort == brokerInfo.getJmxPort();
 	}
 }

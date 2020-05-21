@@ -158,10 +158,10 @@ public class MeterMetric {
 		}
 		;
 		MeterMetric meterMetric = (MeterMetric) o;
-		return Objects.equals(meterMetric.getBroker().toLowerCase(), meterMetric.getBroker().toLowerCase()) &&
-				Objects.equals(meterMetric.getMetricName().toLowerCase(), meterMetric.getMetricName().toLowerCase()) &&
-				Objects.equals(meterMetric.getClusterID().toLowerCase(), meterMetric.getClusterID().toLowerCase()) &&
-				Objects.equals(meterMetric.getPort().toLowerCase(), meterMetric.getPort().toLowerCase());
+		return (broker == meterMetric.getBroker()) || (broker != null && broker.equalsIgnoreCase(meterMetric.getBroker())) &&
+				(metricName == meterMetric.getMetricName()) || (metricName != null && metricName.equalsIgnoreCase(meterMetric.getMetricName())) &&
+				(clusterID == meterMetric.getClusterID()) || (clusterID != null && clusterID.equalsIgnoreCase(meterMetric.getClusterID())) &&
+				(port == meterMetric.getPort()) || (port != null && port.equalsIgnoreCase(meterMetric.getPort()));
 	}
 	@Override
 	public String toString() {

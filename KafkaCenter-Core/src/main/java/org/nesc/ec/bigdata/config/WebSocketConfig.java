@@ -26,11 +26,6 @@ public class WebSocketConfig {
      */
     @Bean
     public TomcatContextCustomizer tomcatContextCustomizer() {
-        return new TomcatContextCustomizer() {
-            @Override
-            public void customize(Context context) {
-                context.addServletContainerInitializer(new WsSci(), null);
-            }
-        };
+        return context -> context.addServletContainerInitializer(new WsSci(), null);
     }
 }

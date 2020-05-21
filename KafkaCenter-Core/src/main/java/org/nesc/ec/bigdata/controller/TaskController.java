@@ -100,7 +100,7 @@ public class TaskController extends BaseController {
                 }
             }
             if (clusterNames.length() != 0) {
-                task.setClusterNames(clusterNames.substring(2).toString());
+                task.setClusterNames(clusterNames.substring(2));
             }
         }
     }

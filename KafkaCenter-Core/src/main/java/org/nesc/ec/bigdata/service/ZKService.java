@@ -96,9 +96,7 @@ public class ZKService {
         ZKUtil zkUtil = null;
         try {
             zkUtil = new ZKUtil(zkAddress, 1000 * 20, 1000 * 20);
-            if (zkUtil != null) {
-                flag = true;
-            }
+            flag = true;
         } catch (Exception e) {
             LOGGER.warn("connect zk error.", e);
         } finally {

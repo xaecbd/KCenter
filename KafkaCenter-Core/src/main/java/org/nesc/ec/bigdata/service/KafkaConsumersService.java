@@ -112,7 +112,7 @@ public class KafkaConsumersService {
                 }
                 consumer.close();
             } catch (IOException e) {
-                LOGGER.error("close consumer error! ");
+                LOGGER.error("close consumer error! ", e);
             }
         }
         return result;

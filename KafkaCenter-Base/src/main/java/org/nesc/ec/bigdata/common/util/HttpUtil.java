@@ -40,8 +40,7 @@ public class HttpUtil {
                 result += line;
             }
         } catch (Exception e) {
-            System.out.println("发送GET请求出现异常！" + e);
-            e.printStackTrace();
+            logger.error("发送GET请求出现异常！", e);
         }
         // 使用finally块来关闭输入流
         finally {
@@ -50,7 +49,7 @@ public class HttpUtil {
                     in.close();
                 }
             } catch (Exception e2) {
-                e2.printStackTrace();
+                logger.error("", e2);
             }
         }
         return result;
@@ -82,7 +81,7 @@ public class HttpUtil {
                 System.out.println("返回空");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("", e);
         } finally {
             try {
                 instr.close();

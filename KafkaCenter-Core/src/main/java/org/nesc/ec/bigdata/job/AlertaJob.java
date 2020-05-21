@@ -154,7 +154,7 @@ public class AlertaJob {
             headers.add(Constants.KeyStr.CONTENT_TYPE, Constants.KeyStr.APPLICATION_JSON);
             HttpEntity<String> httpEntity = new HttpEntity<>(object.toString(), headers);
             ResponseEntity<String> response = restTemplate.postForEntity(alertService, httpEntity, String.class);
-            JSONObject respObj = JSONObject.parseObject(Objects.requireNonNull(response.getBody()).toString());
+            JSONObject respObj = JSONObject.parseObject(Objects.requireNonNull(response.getBody()));
             if(respObj.containsKey(AlertConfig.STATUS) &&
                     respObj.getString(AlertConfig.STATUS).equalsIgnoreCase(Constants.Status.OK)){
                 CollectorAndAlertJob.cachedLastSendTime.put(key, System.currentTimeMillis());

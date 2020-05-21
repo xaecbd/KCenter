@@ -42,7 +42,7 @@ public class TeamUserService {
     }
     
     public List<TeamUser> getTeamUsers(Long userID){
-        return teamUserMapper.selectList(new EntityWrapper<TeamUser>().eq("user_id", userID));
+        return teamUserMapper.selectList(new EntityWrapper<TeamUser>().eq(USER_TEAM_TABLE_USER_ID, userID));
     }
 
     public boolean update(TeamUser teamUser) {

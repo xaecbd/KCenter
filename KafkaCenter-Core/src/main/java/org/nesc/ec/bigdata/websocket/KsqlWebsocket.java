@@ -43,7 +43,7 @@ public class KsqlWebsocket {
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        throwable.printStackTrace();
+        LOGGER.error("", throwable);
     }
 
     @OnMessage

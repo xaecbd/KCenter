@@ -26,7 +26,7 @@ public class SqliteUtil{
 			Class.forName("org.sqlite.JDBC");
 			conn = DriverManager.getConnection(dbUrl);
 		} catch (ClassNotFoundException | SQLException e) {
-			LOG.error("Sqlite connect error " + e);
+			LOG.error("Sqlite connect error ", e);
 		}
 	}
 
@@ -45,13 +45,13 @@ public class SqliteUtil{
 			}
 			return exists;
 		} catch (SQLException ex) {
-			LOG.error("Sqlite check exists table error " + ex);
+			LOG.error("Sqlite check exists table error ", ex);
 		} finally {
 			if (rs != null) {
 				try {
 					rs.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					LOG.error("", e);
 				}
 			}
 		}
@@ -61,10 +61,10 @@ public class SqliteUtil{
 
 	public static void createTable(String sql) {
 		try (Statement stmt = conn.createStatement();) {
-			LOG.info("Creating Table: " + sql);
+			LOG.info("Creating Table: {}", sql);
 			stmt.executeUpdate(sql);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOG.error("" , e);
 		}
 	}
 
@@ -75,7 +75,7 @@ public class SqliteUtil{
 				conn = null;
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOG.error("", e);
 		}
 	}
 
@@ -83,8 +83,7 @@ public class SqliteUtil{
 		List<String> sqlList = new ArrayList<>();
 		BufferedReader input = null;
 		try {
-			System.out.println(fileName);
-			input = new BufferedReader(new FileReader(new File(fileName))); 
+			input = new BufferedReader(new FileReader(new File(fileName)));
 			String str = "";
 			while ((str=input.readLine())!=null) {
 				sqlList.add(str);
@@ -97,7 +96,7 @@ public class SqliteUtil{
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("", e);
 			}
 		}
 		return sqlList;

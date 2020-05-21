@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/monitor")
 public class MonitorController extends BaseController {	
-	private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);	
+	private static final Logger LOG = LoggerFactory.getLogger(MonitorController.class);
 	@Autowired
 	MonitorService monitorService;
 	@Autowired
@@ -56,25 +56,23 @@ public class MonitorController extends BaseController {
 
 	@RequestMapping(value = "/topic", method = RequestMethod.GET)
 	public List<MonitorTopic> getTopicList(@RequestParam("cluster") String clusterId) {
-		List<MonitorTopic> monitorTopics = new ArrayList<>();
 		List<ClusterInfo> clusterInfos = "-1".equalsIgnoreCase(clusterId)?clusterService.getTotalData():
 				new ArrayList<ClusterInfo>() {{
 					add(clusterService.selectById(Long.parseUnsignedLong(clusterId)));
 				}};
 		UserInfo user = getCurrentUser();
-		monitorTopics = monitorService.getTopicList(clusterInfos,user, Constants.KeyStr.MONITOR_TOPIC);
+		List<MonitorTopic> monitorTopics = monitorService.getTopicList(clusterInfos,user, Constants.KeyStr.MONITOR_TOPIC);
 		return monitorTopics;
 	}
 
 	@RequestMapping(value = "/favorite", method = RequestMethod.GET)
 	@ResponseBody
 	public RestResponse getCollectionList(@PathParam(value= Constants.JsonObject.TYPE) String type,@RequestParam("cluster") String clusterId) {
-		List<MonitorTopic> monitorTopics = new ArrayList<>();
 		UserInfo user = getCurrentUser();
 		if(Constants.Role.ADMIN.equalsIgnoreCase(user.getName())){
 			user.setId(0L);
 		}
-		monitorTopics = "-1".equalsIgnoreCase(clusterId)?monitorService.listUserFavorite(user,type):
+		List<MonitorTopic> monitorTopics = "-1".equalsIgnoreCase(clusterId)?monitorService.listUserFavorite(user,type):
 					monitorService.listUserFavorite(user,type).stream().filter(topic->{
 						return topic.getClusterID().toString().equalsIgnoreCase(clusterId);
 					}).collect(Collectors.toList());

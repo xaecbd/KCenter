@@ -124,13 +124,10 @@ public class TeamInfoService {
 	public List<TeamInfo> getTeamsByTeamIDs(List<Long> teamIDs) {
     	EntityWrapper<TeamInfo> queryWrapper = new EntityWrapper<>();
     	if (teamIDs == null || teamIDs.isEmpty()){
-			List<TeamInfo> teamInfos= null;
-    		return teamInfos;
-
-		}else {
-			queryWrapper.in(TEAM_TABLE_TEAM_ID, teamIDs);
-			return teamInfoMapper.selectList(queryWrapper);
+			return null;
 		}
+		queryWrapper.in(TEAM_TABLE_TEAM_ID, teamIDs);
+		return teamInfoMapper.selectList(queryWrapper);
 	}
 
 	public boolean isRelatedTopic(Long teamId) {
