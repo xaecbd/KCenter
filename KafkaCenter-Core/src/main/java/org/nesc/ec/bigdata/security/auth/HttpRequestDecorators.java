@@ -3,8 +3,6 @@ package org.nesc.ec.bigdata.security.auth;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.support.HttpRequestWrapper;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 /**
  * @author lg99

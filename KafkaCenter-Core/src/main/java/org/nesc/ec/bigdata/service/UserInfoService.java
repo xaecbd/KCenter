@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import org.nesc.ec.bigdata.common.RoleEnum;
 import org.nesc.ec.bigdata.constant.Constants;
 import org.nesc.ec.bigdata.model.UserInfo;

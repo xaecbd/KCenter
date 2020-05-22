@@ -9,6 +9,8 @@ import org.apache.kafka.common.config.TopicConfig;
 import org.nesc.ec.bigdata.common.model.GroupTopicConsumerState;
 import org.nesc.ec.bigdata.common.model.PartitionAssignmentState;
 import org.nesc.ec.bigdata.common.model.TopicConsumerGroupState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class KafkaAdmins implements Closeable {
 
-	//	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaAdmins.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaAdmins.class);
 
 	private int DEFAULT_TIME_OUT_SECOND = 60;
 
@@ -124,7 +126,7 @@ public class KafkaAdmins implements Closeable {
 			try {
 				result.put(res.name(), topicConfig.get(res));
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error("", e);
 			}
 		}
 		return result;
@@ -141,7 +143,7 @@ public class KafkaAdmins implements Closeable {
 			try {
 				result.put(topicName, describeFutures.get(topicName).get());
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error("", e);
 			}
 		}
 		return result;
@@ -272,7 +274,7 @@ public class KafkaAdmins implements Closeable {
 			createTopicResult.values().get(topicName).isCompletedExceptionally();
 			success = true;
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("", e);
 		}
 		return success;
 	}
@@ -291,7 +293,7 @@ public class KafkaAdmins implements Closeable {
 				map.get(topic.name()).get();
 				sucess = true;
 			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
+				LOGGER.error("", e);
 			}
 			result.put(topic.name(), sucess);
 		}
@@ -320,7 +322,7 @@ public class KafkaAdmins implements Closeable {
 				kafkaFutrue.get();
 				flag = true;
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error("", e);
 			}
 			result.put(topicName, flag);
 		}
@@ -345,7 +347,7 @@ public class KafkaAdmins implements Closeable {
 			alterResult.all().get();
 			sucess = true;
 		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
+			LOGGER.error("", e);
 		}
 		return sucess;
 	}
@@ -388,10 +390,8 @@ public class KafkaAdmins implements Closeable {
 			try {
 				adminClient.listConsumerGroupOffsets(groupId).partitionsToOffsetAndMetadata().get().keySet().stream()
 				.filter(tp -> tp.topic().equals(topic)).forEach(tp -> filteredGroups.add(groupId));
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+			} catch (InterruptedException | ExecutionException e) {
+				LOGGER.error("" , e);
 			}
 		});
 		return filteredGroups;
@@ -433,13 +433,8 @@ public class KafkaAdmins implements Closeable {
 				consumerPatitionOffsets = this.adminClient.listConsumerGroupOffsets(groupId)
 						.partitionsToOffsetAndMetadata().get(DEFAULT_TIME_OUT_SECOND, TimeUnit.SECONDS).entrySet().stream()
 						.filter(entry -> topic.equalsIgnoreCase(entry.getKey().topic())).collect(Collectors.toSet());
-				;
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			} catch (TimeoutException e) {
-				e.printStackTrace();
+			} catch (InterruptedException | ExecutionException | TimeoutException e) {
+				LOGGER.error("", e);
 			}
 			consumerGroupOffsets.put(groupId, consumerPatitionOffsets);
 		});
@@ -499,10 +494,8 @@ public class KafkaAdmins implements Closeable {
 					consumerPatitionOffsetMap.put(groupId, thisTopicPartitionsToOffsetAndMetadataSet);
 				}
 
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+			} catch (InterruptedException | ExecutionException e) {
+				LOGGER.error("", e);
 			}
 		});
 
@@ -580,7 +573,7 @@ public class KafkaAdmins implements Closeable {
 				groupConsumerState.setConsumerGroupState(description.state());
 				groupConsumerState.setSimpleConsumerGroup(description.isSimpleConsumerGroup());
 				Set<Entry<TopicPartition, OffsetAndMetadata>> consumerPatitionOffsets = oneTopic.getValue().entrySet();
-				List<PartitionAssignmentState> partitionAssignmentStates = new ArrayList<>();
+				List<PartitionAssignmentState> partitionAssignmentStates;
 
 				if (!description.members().isEmpty()) {
 					// 获取存在consumer(memeber存在的情况)

@@ -1,6 +1,5 @@
 package org.nesc.ec.bigdata.config;
 
-import org.apache.catalina.Context;
 import org.apache.tomcat.websocket.server.WsSci;
 import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -26,11 +25,6 @@ public class WebSocketConfig {
      */
     @Bean
     public TomcatContextCustomizer tomcatContextCustomizer() {
-        return new TomcatContextCustomizer() {
-            @Override
-            public void customize(Context context) {
-                context.addServletContainerInitializer(new WsSci(), null);
-            }
-        };
+        return context -> context.addServletContainerInitializer(new WsSci(), null);
     }
 }

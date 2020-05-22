@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.temporal.TemporalUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class KafkaConsumersService {

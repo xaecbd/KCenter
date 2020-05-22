@@ -1,10 +1,14 @@
 package org.nesc.ec.bigdata.common.util;
 
 import org.nesc.ec.bigdata.common.constant.Constant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
 
 public class MD5Util {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MD5Util.class);
     /***
      * MD5加密
      * 使用JDK自带 MessageDigest
@@ -15,8 +19,7 @@ public class MD5Util {
         try{
             md5 = MessageDigest.getInstance(Constant.ENCRYPTION.MD5);
         }catch (Exception e){
-            System.out.println(e.toString());
-            e.printStackTrace();
+            LOGGER.error("", e);
             return "";
         }
         char[] charArray = inStr.toCharArray();
