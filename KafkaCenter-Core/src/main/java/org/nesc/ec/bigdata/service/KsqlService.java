@@ -259,14 +259,14 @@ public class KsqlService {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.error("", e);
                 }
             }
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.error("", e);
                 }
             }
             if (connection != null) {
@@ -326,7 +326,7 @@ public class KsqlService {
                     try {
                         session.getBasicRemote().sendText(line);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.error("", e);
                     }
                 }
             }
@@ -337,14 +337,14 @@ public class KsqlService {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.error("", e);
                 }
             }
             if (eventStream != null) {
                 try {
                     eventStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.error("", e);
                 }
             }
             if (connection != null) {
@@ -431,7 +431,7 @@ public class KsqlService {
 
     private JSONArray explainQuery(String ksqlID, JSONArray streamOrTables) {
         JSONArray jsonArray = new JSONArray();
-        if (streamOrTables.size() != 0 || streamOrTables != null) {
+        if (streamOrTables != null) {
             for (int i = 0; i < streamOrTables.size(); i++) {
                 JSONObject query = (JSONObject) streamOrTables.get(i);
                 String queryStringNoEnter = ((String) query.get("queryString")).replaceAll("\\n", " ");
@@ -483,7 +483,7 @@ public class KsqlService {
     }
 
     public boolean checkResult(Integer result) {
-        return result > 0 ? true : false;
+        return result > 0;
     }
 
 }

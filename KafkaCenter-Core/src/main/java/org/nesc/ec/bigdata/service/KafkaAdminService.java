@@ -73,8 +73,8 @@ public class KafkaAdminService {
 			props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, brokerAddr);
 		    admin = new KafkaAdmins(props);
 			if(admin!=null) {
-                flag = true;
-            }
+				flag = true;
+			}
 		} catch (Exception e) {
 			LOGGER.warn("connect kafka error.",e);
 		}finally {

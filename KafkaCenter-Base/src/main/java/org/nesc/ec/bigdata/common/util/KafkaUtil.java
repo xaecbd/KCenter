@@ -1,6 +1,5 @@
 package org.nesc.ec.bigdata.common.util;
 
-import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -142,7 +141,7 @@ public class KafkaUtil<K, V>  implements Closeable{
 			try {
 				result.put(res.name(), topicConfig.get(res));
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error("", e);
 			}
 		}
 		return result;
@@ -159,7 +158,7 @@ public class KafkaUtil<K, V>  implements Closeable{
 			try {
 				result.put(topicName, describeFutures.get(topicName).get());
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error("", e);
 			}
 		}
 		return result;
@@ -253,7 +252,7 @@ public class KafkaUtil<K, V>  implements Closeable{
         	createTopicResult.values().get(topicName).isCompletedExceptionally();
         	success = true;
 		} catch (Exception e) {
-			 e.printStackTrace();
+			LOGGER.error("", e);
 		}
         return  success;
 	}
@@ -273,7 +272,7 @@ public class KafkaUtil<K, V>  implements Closeable{
 				map.get(topic.name()).get();
 				sucess = true;
 			} catch (InterruptedException|ExecutionException e) {
-				e.printStackTrace();
+				LOGGER.error("", e);
 			}
 			result.put(topic.name(), sucess);
 		}
@@ -294,7 +293,7 @@ public class KafkaUtil<K, V>  implements Closeable{
 				KafkaFuture<Void> kafkaFutrue = deleteFutures.get(topicName);
 				flag = true;  
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error("", e);
 			}
 			result.put(topicName, flag);
 		}
@@ -321,7 +320,7 @@ public class KafkaUtil<K, V>  implements Closeable{
 		    alterResult.all().get();
 		    sucess = true;
 		} catch (InterruptedException|ExecutionException e) {
-			e.printStackTrace();
+			LOGGER.error("", e);
 		}
 		return  sucess;
 	}
@@ -343,7 +342,7 @@ public class KafkaUtil<K, V>  implements Closeable{
 		    alterResult.all().get();
 		    sucess = true;
 		} catch (InterruptedException|ExecutionException e) {
-			e.printStackTrace();
+			LOGGER.error("", e);
 		}
 		return  sucess;
 	}

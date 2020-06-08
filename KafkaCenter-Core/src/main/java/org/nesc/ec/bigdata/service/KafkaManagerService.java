@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Service
 public class KafkaManagerService {
@@ -622,10 +621,8 @@ public class KafkaManagerService {
 	public Set<String> getTopicByGroup(String clusterId,String group){
 		try {
 			return kafkaAdminService.getKafkaAdmins(clusterId).listTopics(group);
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			LOGGER.error("", e);
 		}
 		return new HashSet<>();
 	}
