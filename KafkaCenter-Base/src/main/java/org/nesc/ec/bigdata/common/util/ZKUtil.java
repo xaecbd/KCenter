@@ -203,7 +203,7 @@ public class ZKUtil implements Closeable {
 		try {
 			data = zkClient.readData(path, stat);
 		} catch (Exception e) {
-			//			LOG.warn("Path: " + path + " do not exits in ZK!" + e.getMessage());
+			LOGGER.warn("zk read data error." ,e);
 		}
 		return new ZkDataAndStat(data, stat);
 	}
@@ -399,7 +399,6 @@ public class ZKUtil implements Closeable {
 
 	/**
 	 * 获取所有消费组
-	 * @param path
 	 * @return
 	 */
 	public Set<String> listConsumerGroups() {

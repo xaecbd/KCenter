@@ -19,7 +19,7 @@ public class MD5Util {
         try{
             md5 = MessageDigest.getInstance(Constant.ENCRYPTION.MD5);
         }catch (Exception e){
-            LOGGER.error("", e);
+            LOGGER.warn("", e);
             return "";
         }
         char[] charArray = inStr.toCharArray();
