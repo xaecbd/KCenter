@@ -150,7 +150,7 @@ export default class User extends Component {
   }
 
    validateEmail = (rule, value, callback) => {
-     const reg = /^[A-Za-z0-9\\_\\-\\.]+@[A-Za-z0-9\\_\\-\\.]+\.[A-Za-z]{2,}$/;
+     const reg = /^[A-Za-z0-9\_\-\.]+@[A-Za-z0-9\_\-]+\.[A-Za-z]{2,}$/;
      if (!reg.test(value)) {
        return callback(new Error('email address is invaild,please check!'));
      }
