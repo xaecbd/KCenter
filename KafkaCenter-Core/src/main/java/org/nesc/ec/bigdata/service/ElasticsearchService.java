@@ -179,7 +179,11 @@ public class ElasticsearchService {
         try {
             responseObj = elasticsearchUtil.searchES(searchQuery, monitorElasticsearchIndexName + "*");
             if (responseObj != null) {
-                JSONArray json = responseObj.getJSONObject(Constants.EleaticSearch.AGGREGATIONS).getJSONObject(Constants.Number.TWO).getJSONArray(Constants.EleaticSearch.BUCKETS);
+                JSONObject aggs = responseObj.getJSONObject(Constants.EleaticSearch.AGGREGATIONS);
+                if(aggs==null){
+                   return list;
+                }
+                JSONArray json = aggs.getJSONObject(Constants.Number.TWO).getJSONArray(Constants.EleaticSearch.BUCKETS);
                 json.forEach(obj -> {
                     JSONObject objs = (JSONObject) obj;
                     Long timeStamp = objs.getJSONObject("3").getLong(Constants.JsonObject.VALUE);
