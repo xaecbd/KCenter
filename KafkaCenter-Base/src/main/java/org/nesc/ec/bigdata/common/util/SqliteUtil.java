@@ -51,7 +51,7 @@ public class SqliteUtil{
 				try {
 					rs.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					LOG.error("", e);
 				}
 			}
 		}
@@ -64,7 +64,7 @@ public class SqliteUtil{
 			LOG.info("Creating Table: " + sql);
 			stmt.executeUpdate(sql);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOG.error("", e);
 		}
 	}
 
@@ -75,7 +75,7 @@ public class SqliteUtil{
 				conn = null;
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOG.error("", e);
 		}
 	}
 
@@ -83,8 +83,7 @@ public class SqliteUtil{
 		List<String> sqlList = new ArrayList<>();
 		BufferedReader input = null;
 		try {
-			System.out.println(fileName);
-			input = new BufferedReader(new FileReader(new File(fileName))); 
+			input = new BufferedReader(new FileReader(new File(fileName)));
 			String str = "";
 			while ((str=input.readLine())!=null) {
 				sqlList.add(str);
@@ -97,7 +96,7 @@ public class SqliteUtil{
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("", e);
 			}
 		}
 		return sqlList;
@@ -110,9 +109,7 @@ public class SqliteUtil{
 		}
 		SqliteUtil.connect(dbPath);
         List<String> sqlList = loadSql(sqlPath);
-        sqlList.forEach((sql)->{
-        	SqliteUtil.createTable(sql);        	
-        });
+        sqlList.forEach(SqliteUtil::createTable);
         SqliteUtil.close();		
 	}
 

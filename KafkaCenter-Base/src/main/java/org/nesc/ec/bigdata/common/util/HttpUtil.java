@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -40,8 +41,7 @@ public class HttpUtil {
                 result += line;
             }
         } catch (Exception e) {
-            System.out.println("发送GET请求出现异常！" + e);
-            e.printStackTrace();
+            logger.error("发送GET请求出现异常！", e);
         }
         // 使用finally块来关闭输入流
         finally {
@@ -50,7 +50,7 @@ public class HttpUtil {
                     in.close();
                 }
             } catch (Exception e2) {
-                e2.printStackTrace();
+                logger.error("", e2);
             }
         }
         return result;
@@ -77,15 +77,17 @@ public class HttpUtil {
             printout.close();
             instr = urlCon.getInputStream();
             byte[] bis = IOUtils.toByteArray(instr);
-            ResponseString = new String(bis, "UTF-8");
+            ResponseString = new String(bis, StandardCharsets.UTF_8);
             if ((ResponseString == null) || ("".equals(ResponseString.trim()))) {
                 System.out.println("返回空");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("", e);
         } finally {
             try {
-                instr.close();
+                if (instr != null) {
+                    instr.close();
+                }
             } catch (Exception ex) {
                 logger.error("Http close failed",ex);
             }
