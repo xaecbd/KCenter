@@ -1,23 +1,17 @@
 package org.nesc.ec.bigdata.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import com.alibaba.fastjson.JSONObject;
 import org.nesc.ec.bigdata.common.RoleEnum;
 import org.nesc.ec.bigdata.constant.Constants;
+import org.nesc.ec.bigdata.mapper.UserInfoMapper;
+import org.nesc.ec.bigdata.model.TeamUser;
 import org.nesc.ec.bigdata.model.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSONObject;
-import org.nesc.ec.bigdata.mapper.UserInfoMapper;
-import org.nesc.ec.bigdata.model.TeamUser;
+import java.util.*;
+import java.util.Map.Entry;
 
 @Service
 public class UserInfoService {

@@ -1,23 +1,18 @@
 package org.nesc.ec.bigdata.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.nesc.ec.bigdata.common.model.OffsetInfo;
 import org.nesc.ec.bigdata.config.InitConfig;
 import org.nesc.ec.bigdata.constant.Constants;
+import org.nesc.ec.bigdata.mapper.AlertMapper;
+import org.nesc.ec.bigdata.model.AlertGoup;
 import org.nesc.ec.bigdata.model.ClusterGroup;
 import org.nesc.ec.bigdata.model.EmailEntity;
 import org.nesc.ec.bigdata.model.MonitorNoticeInfo;
 import org.nesc.ec.bigdata.model.vo.AlertMailDataVo;
-
-import org.nesc.ec.bigdata.mapper.AlertMapper;
-import org.nesc.ec.bigdata.model.AlertGoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 /**
  * 
@@ -129,7 +124,7 @@ public class AlertService {
 		alertMailDataVo.setPublicURL(initConfig.getApproveURL());
 		Map<String, Object> alertMap = new HashMap<>();
 		alertMap.put("alertInfo", alertMailDataVo);
-		
+		alertMap.put("clusterName", alertGroup.getCluster().getName());
 		mailMap.put("emailEntity", emailEntity);
 		mailMap.put("emailContent", alertMap);
 		return mailMap;

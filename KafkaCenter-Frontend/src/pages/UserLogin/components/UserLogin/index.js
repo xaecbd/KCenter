@@ -47,7 +47,7 @@ class UserLogin extends Component {
         'Content-Type': 'application/json',
       },
     }).then((res) => {
-      if (res.data.code === 200 && res.data.data != null) {
+      if (res.data.code === 200 && res.data !=null && res.data.data != null && res.data!=undefined && res.data.data !=undefined) {
         // this.loginCheck();
         this.systemConfig(res.data.data);
       } else {
@@ -91,7 +91,7 @@ class UserLogin extends Component {
   // 检测用户时候已经登录
   loginCheck = () => {
     axios.get('/login/check').then((res) => {
-      if (res.data.code === 200 && res.data.data != null) {
+      if (res.data.code === 200 && res.data !=null && res.data.data != null && res.data!=undefined && res.data.data !=undefined) {
         const user = res.data.data;
         this.redirectToHome(user);
       } else {
@@ -103,8 +103,6 @@ class UserLogin extends Component {
   };
 
     systemConfig = (user) => {
-      const userJson = JSON.stringify(user);
-      sessionStorage.setItem('user', userJson);
       const role = user.role;
       if (role) {
         if (role.toLocaleLowerCase() === 'admin') {

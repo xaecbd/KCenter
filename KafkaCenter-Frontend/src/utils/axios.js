@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const axiosInstance = axios.create();
 // 覆写库的超时默认值 现在，在超时前，所有请求都会等待 1分钟
-axiosInstance.defaults.timeout = 60000;
+axiosInstance.defaults.timeout = 120000;
 
 // axiosInstance.defaults.baseURL = 'http://localhost:8080';
 

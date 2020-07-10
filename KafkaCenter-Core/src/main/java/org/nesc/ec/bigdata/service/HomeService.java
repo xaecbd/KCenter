@@ -2,6 +2,8 @@ package org.nesc.ec.bigdata.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.kafka.clients.admin.DescribeClusterResult;
+import org.apache.kafka.common.Node;
 import org.nesc.ec.bigdata.cache.HomeCache;
 import org.nesc.ec.bigdata.common.model.BrokerInfo;
 import org.nesc.ec.bigdata.common.model.MeterMetric;
@@ -10,8 +12,6 @@ import org.nesc.ec.bigdata.common.util.JmxCollector;
 import org.nesc.ec.bigdata.constant.BrokerConfig;
 import org.nesc.ec.bigdata.constant.Constants;
 import org.nesc.ec.bigdata.model.ClusterInfo;
-import org.apache.kafka.clients.admin.DescribeClusterResult;
-import org.apache.kafka.common.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
 public class HomeService {
@@ -88,6 +87,7 @@ public class HomeService {
             pageCache.setClusterSize(pageCache.getClusterSize()==0?clusterInfoList.size():pageCache.getClusterSize());
             pageCache.setTopicSize(pageCache.getTopicSize()==0?this.getTopicList(clusterInfoList):pageCache.getTopicSize());
             pageCache.setGroupSize(pageCache.getGroupSize()==0?calcGroup(clusterInfoList):pageCache.getGroupSize());
+            pageCache.setBrokerSize(pageCache.getBrokerSize()==0?this.getBrokerSize(clusterInfoList):pageCache.getBrokerSize());
         } catch (Exception e2) {
             LOG.error("Get Cluster Date Faild!,{}",e2.getMessage());
         }
@@ -136,6 +136,19 @@ public class HomeService {
             });
         });
         return metricSet;
+    }
+
+    public int getBrokerSize(List<ClusterInfo> clusterInfoList) {
+        int size = 0;
+        for (ClusterInfo clusterInfo : clusterInfoList) {
+            try {
+                List<BrokerInfo> brokerInfos = zkService.getZK(clusterInfo.getId().toString()).getBrokers();
+                size += brokerInfos.size();
+            } catch (Exception e) {
+                LOG.error("get broker size failed, clusterName: " + clusterInfo.getName(), e);
+            }
+        }
+        return size;
     }
 
     public Map<String,JSONArray>  trendClusterData(long start,long end,long clientId) {

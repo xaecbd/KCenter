@@ -2,11 +2,7 @@ import React, { Component } from 'react';
 import { Grid, Loading, Select, Message } from '@alifd/next';
 import dayjs from 'dayjs';
 import axios from '@utils/axios.js';
-import {
-  transToNumer,
-  bytesToSize,
-  formatSizeUnits,
-} from '@utils/dataFormat';
+import { transToNumer, bytesToSize, formatSizeUnits } from '@utils/dataFormat';
 import IceContainer from '@icedesign/container';
 import { View } from '@antv/data-set';
 import byteIn from '@images/in.svg';
@@ -14,6 +10,7 @@ import byteOut from '@images/out.svg';
 import msgIn from '@images/mesg.svg';
 import { Chart, Geom, Axis, Tooltip, Legend } from 'bizcharts';
 import ClusterGroupDatePicker from '../GroupDatePicker';
+import ClusterInfo from '../ClusterInfo';
 
 const { Row, Col } = Grid;
 const Option = Select.Option;
@@ -29,6 +26,8 @@ export default class SummaryChart extends Component {
       isLoading: false,
       metricData: [],
       metricLoading: false,
+      contLoading: false,
+      mockData: [],
     };
   }
 
@@ -52,6 +51,7 @@ export default class SummaryChart extends Component {
       end: this.state.endTime,
       interval: this.state.interval,
     };
+    this.fetchCountData();
     this.fetchData(data);
     this.fetchMetric();
   }
@@ -123,6 +123,39 @@ export default class SummaryChart extends Component {
     );
   };
 
+  fetchCountData = () => {
+    this.setState(
+      {
+        contLoading: true,
+      },
+      () => {
+        axios
+          .get('/home/page/cluster_info')
+          .then((response) => {
+            const result = response.data.data;
+            if (response.data.code === 200) {
+              if (this.mounted) {
+                this.setState({
+                  mockData: result,
+                  contLoading: false,
+                });
+              }
+            } else {
+              Message.error(response.data.message);
+            }
+            if (this.mounted) {
+              this.setState({
+                contLoading: false,
+              });
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    );
+  };
+
   renderItem = (data) => {
     const resp = [];
     data.map((obj) => {
@@ -171,20 +204,19 @@ export default class SummaryChart extends Component {
     });
   };
 
-   sortMetric = (data) =>{
+  sortMetric = (data) => {
     const result = [];
-    data.map(obj=>{
-        if(obj.metricName==='MessagesInPerSec'){
-            result.splice(0,0,obj);
-        }else if(obj.metricName==='BytesInPerSec'){
-            result.splice(1,0,obj);
-        }else{
-            result.splice(2,0,obj);
-        }
+    data.forEach((obj) => {
+      if (obj.metricName === 'MessagesInPerSec') {
+        result.splice(0, 0, obj);
+      } else if (obj.metricName === 'BytesInPerSec') {
+        result.splice(1, 0, obj);
+      } else {
+        result.splice(2, 0, obj);
+      }
     });
     return result;
-   
-}
+  };
 
   handleChange = (value) => {
     this.setState({
@@ -197,7 +229,7 @@ export default class SummaryChart extends Component {
     };
     this.fetchData(data);
     this.fetchMetric();
-  }
+  };
 
   render() {
     const data = this.state.data;
@@ -242,7 +274,6 @@ export default class SummaryChart extends Component {
       },
     };
 
-
     const msgScale = {
       time: {
         type: 'time',
@@ -256,24 +287,36 @@ export default class SummaryChart extends Component {
       },
     };
 
-
-
-    const custom = (<div style={{ marginLeft: '30px' }}><span style={{ marginRight: '5px' }}>Interval:</span><Select id="Interval: "
-      onChange={this.handleChange}
-      value={this.state.interval}
-    > <Option value="10m" >10m</Option>
-      <Option value="30m">30m</Option>
-      <Option value="1h">1h</Option>
-      <Option value="6h">6h</Option>
-      <Option value="12h">12h</Option>
-      <Option value="1d">1d</Option>
-      <Option value="7d">7d</Option>
-    </Select>
-                    </div>);
+    const custom = (
+      <div style={{ marginLeft: '30px' }}>
+        <span style={{ marginRight: '5px' }}>Interval:</span>
+        <Select
+          id="Interval: "
+          onChange={this.handleChange}
+          value={this.state.interval}
+        >
+          {' '}
+          <Option value="10m">10m</Option>
+          <Option value="30m">30m</Option>
+          <Option value="1h">1h</Option>
+          <Option value="6h">6h</Option>
+          <Option value="12h">12h</Option>
+          <Option value="1d">1d</Option>
+          <Option value="7d">7d</Option>
+        </Select>
+      </div>
+    );
     return (
       <div>
+        <Loading visible={this.state.contLoading} style={styles.loading}>
+          <ClusterInfo mockDate={this.state.mockData} />
+        </Loading>
         <IceContainer>
-          <ClusterGroupDatePicker onDataChange={this.handleApply} custom={custom} startTime={dayjs().subtract(7, 'days').valueOf()} />
+          <ClusterGroupDatePicker
+            onDataChange={this.handleApply}
+            custom={custom}
+            startTime={dayjs().subtract(7, 'days').valueOf()}
+          />
         </IceContainer>
         <Loading visible={this.state.metricLoading} style={styles.loading}>
           <div className="statistical-card" style={styles.statisticalCard}>
@@ -285,8 +328,6 @@ export default class SummaryChart extends Component {
           </div>
         </Loading>
         <Loading visible={this.state.isLoading} style={styles.loading}>
-
-
           {messageIn.length > 0 ? (
             <IceContainer>
               <div>MessageIn</div>
@@ -306,7 +347,7 @@ export default class SummaryChart extends Component {
             </IceContainer>
           ) : null}
 
-            {byteIn.length > 0 ? (
+          {byteIn.length > 0 ? (
             <IceContainer>
               <div>ByteIn</div>
               <Chart height={400} data={byteInDiv} scale={ByteInscale} forceFit>
@@ -351,7 +392,6 @@ export default class SummaryChart extends Component {
               </Chart>
             </IceContainer>
           ) : null}
-         
 
           <span>Interval：{this.state.interval}</span>
         </Loading>

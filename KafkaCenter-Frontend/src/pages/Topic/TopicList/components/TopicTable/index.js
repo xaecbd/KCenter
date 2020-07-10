@@ -318,7 +318,7 @@ export default class TopicTable extends Component {
             <Table.Column title="Create Date" dataIndex="createTime" cell={this.renderTime} />
             <Table.Column title="Owner" dataIndex="owner" cell={this.renderTopic} />
             <Table.Column title="Team" dataIndex="team" cell={this.renderTopic} />
-            <Table.Column title="操作" cell={this.renderOper} />
+            <Table.Column title="Operation" cell={this.renderOper} />
           </Table>
           <CustomPagination dataSource={this.state.filterDataSource} redrawPageData={this.redrawPageData} />
           <Dialog
