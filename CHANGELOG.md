@@ -1,4 +1,10 @@
-# 2.1.0 (2020-5-207)
+# 2.1.1 (2020-7-30)
+###Features / Enhancements
+* add broker size
+* modify alertMail templates
+### Bug Fixes
+* support ksql 0.9.0
+# 2.1.0 (2020-5-20)
 ### Features / Enhancements
 * support jdk1.8
 * add ci support

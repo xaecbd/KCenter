@@ -223,17 +223,7 @@ public class KsqlService {
         HttpURLConnection connection = null;
         BufferedReader reader = null;
         try {
-            URL url = new URL(generatorUrl(ksqlUrl, "/ksql"));
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
-            connection.setUseCaches(false);
-            connection.setInstanceFollowRedirects(true);
-            connection.setRequestProperty("Connection", "Keep-Alive");// 维持长连接
-            connection.setRequestProperty("Charset", "UTF-8");
-            connection.addRequestProperty(Constants.KeyStr.CONTENT_TYPE, Constants.KeyStr.KSQL_APPLICATION_JSON);
-            connection.connect();
+            connection = buildHttpURLConnection(generatorUrl(ksqlUrl, "/ksql"));
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
             if (!"".equals(message)) {
                 out.writeBytes(message);
@@ -300,17 +290,7 @@ public class KsqlService {
         BufferedReader reader = null;
         HttpURLConnection connection = null;
         try {
-            URL url = new URL(generatorUrl(ksqlUrl, "/query"));
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
-            connection.setUseCaches(false);
-            connection.setInstanceFollowRedirects(true);
-            connection.setRequestProperty("Connection", "Keep-Alive");// 维持长连接
-            connection.setRequestProperty("Charset", "UTF-8");
-            connection.addRequestProperty(Constants.KeyStr.CONTENT_TYPE, Constants.KeyStr.KSQL_APPLICATION_JSON);
-            connection.connect();
+            connection = buildHttpURLConnection(generatorUrl(ksqlUrl, "/query"));
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
             if (!"".equals(message.getMessage())) {
                 out.writeBytes(message.getMessage());
@@ -319,11 +299,19 @@ public class KsqlService {
             out.close();
             eventStream = connection.getInputStream();
             reader = new BufferedReader(new InputStreamReader(eventStream));
-
             String line = "";
             while ((line = reader.readLine()) != null && isRunQuery(session.getId())) {
                 if (org.apache.commons.lang3.StringUtils.isNotBlank(line)) {
                     try {
+                        if (line.startsWith("[")){
+                            line = line.substring(1,line.length());
+                        }
+                        if (line.endsWith("]")){
+                            line = line.substring(0,line.length()-1);
+                        }
+                        if (line.endsWith(",")){
+                            line = line.substring(0,line.length()-1);
+                        }
                         session.getBasicRemote().sendText(line);
                     } catch (IOException e) {
                         LOGGER.error("", e);
@@ -431,13 +419,16 @@ public class KsqlService {
 
     private JSONArray explainQuery(String ksqlID, JSONArray streamOrTables) {
         JSONArray jsonArray = new JSONArray();
-        if (streamOrTables != null) {
+        if (streamOrTables.size() != 0 || streamOrTables != null) {
             for (int i = 0; i < streamOrTables.size(); i++) {
                 JSONObject query = (JSONObject) streamOrTables.get(i);
                 String queryStringNoEnter = ((String) query.get("queryString")).replaceAll("\\n", " ");
                 query.put("queryString", queryStringNoEnter);
                 JSONObject getQueryId = new JSONObject();
                 String queryId = (String) query.get("id");
+                if (queryId.contains("_confluent-ksql")){
+                    continue;
+                }
                 getQueryId.put("ksql", "EXPLAIN " + queryId + ";");
                 getQueryId.put("id", ksqlID);
                 JSONObject explainQuery = (JSONObject) JSONObject.parseArray(executeKsql(getQueryId.toJSONString(), ksqlID)).get(0);
@@ -483,7 +474,29 @@ public class KsqlService {
     }
 
     public boolean checkResult(Integer result) {
-        return result > 0;
+        return result > 0 ? true : false;
+    }
+
+    /**
+     * 构建 HttpURLConnection
+     * @param urlString
+     * @return
+     * @throws Exception
+     */
+    private HttpURLConnection buildHttpURLConnection(String urlString) throws IOException{
+        HttpURLConnection connection = null;
+        URL url = new URL(urlString);
+        connection = (HttpURLConnection) url.openConnection();
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        connection.setRequestMethod("POST");
+        connection.setUseCaches(false);
+        connection.setInstanceFollowRedirects(true);
+        connection.setRequestProperty("Connection", "Keep-Alive");// 维持长连接
+        connection.setRequestProperty("Charset", "UTF-8");
+        connection.addRequestProperty(Constants.KeyStr.CONTENT_TYPE, Constants.KeyStr.KSQL_APPLICATION_JSON);
+        connection.connect();
+        return connection;
     }
 
 }

@@ -1,22 +1,20 @@
 package org.nesc.ec.bigdata.common.util;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.*;
-
+import com.alibaba.fastjson.JSONObject;
+import kafka.utils.ZKStringSerializer;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.exception.ZkMarshallingError;
 import org.I0Itec.zkclient.serialize.ZkSerializer;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
-
-import com.alibaba.fastjson.JSONObject;
 import org.nesc.ec.bigdata.common.model.BrokerInfo;
 import org.nesc.ec.bigdata.common.model.TopicInfo;
-
-import kafka.utils.ZKStringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author Truman.P.Du

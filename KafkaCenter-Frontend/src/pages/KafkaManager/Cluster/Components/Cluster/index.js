@@ -449,7 +449,7 @@ export default class Cluster extends Component {
           style={simpleFormDialog}
           title={this.state.title}
           okProps={okProps}
-          cancelProps={cancelProps}
+          cancelProps={cancelProps}          
         >
 
           <IceFormBinderWrapper ref={(form) => {
@@ -482,7 +482,7 @@ export default class Cluster extends Component {
                   <IceFormBinder name="zkAddress" required triggerType="onBlur" validator={this.checkZK}>
                     <Input
                       style={styles.inputItem}
-                      placeholder="ip+port eg:127.0.0.1:8181"
+                      placeholder="ip+port eg:192.168.238.103:8181"
                     />
                   </IceFormBinder>
                   <IceFormError name="zkAddress" />
@@ -498,7 +498,7 @@ export default class Cluster extends Component {
                     <Input
                       style={styles.inputItem}
 
-                      placeholder="ip+port eg:127.0.0.1:9092"
+                      placeholder="ip+port eg:192.168.238.103:8181"
                     />
                   </IceFormBinder>
                   <IceFormError name="broker" />

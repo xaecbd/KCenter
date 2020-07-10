@@ -133,6 +133,9 @@ export default class ConsumerGroup extends Component {
                 loading: false,
               });
               const newData = this.state.alertData;
+              if (obj.consummerApi !== newData.consummerApi) {
+                newData.consummerApi = 'ALL';
+              }
               const newObj = Object.create(newData);
               newObj.clusterId = newData.clusterId;
               newObj.consummerGroup = newData.consummerGroup;

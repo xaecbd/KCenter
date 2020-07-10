@@ -1,20 +1,21 @@
 package org.nesc.ec.bigdata.service;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.*;
-
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.nesc.ec.bigdata.common.util.KafkaAdmins;
+import org.nesc.ec.bigdata.mapper.ClusterInfoMapper;
 import org.nesc.ec.bigdata.model.ClusterInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import org.nesc.ec.bigdata.common.util.KafkaAdmins;
-import org.nesc.ec.bigdata.mapper.ClusterInfoMapper;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 
 @Service		 
 public class KafkaAdminService {

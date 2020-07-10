@@ -120,35 +120,41 @@ export default class ClusterInfo extends Component {
         <IceContainer style={styles.container}>
           <Loading visible={this.state.contLoading} style={styles.loading}>
             <Row wrap gutter="20" style={{ justifyContent: 'center' }}>
-              <Col l="4">
+              <Col l="3">
                 <div style={styles.item}>
                   <img src={box} alt="" />
                 </div>
               </Col>
-              <Col l="4">
-                  <div style={styles.item}>
-                    <p style={styles.itemTitle}>Cluster</p>
-                    <p style={styles.itemValue}>{mockDate.clusterSize}</p>
-                  </div>
-                </Col>
-                <Col l="4">
-                  <div style={styles.item}>
-                    <p style={styles.itemTitle}>Topics</p>
-                    <p style={styles.itemValue}>{mockDate.topicSize}</p>
-                  </div>
-                </Col>
-                <Col l="4" >
-                  <div style={styles.item}>
-                    <p style={styles.itemTitle}>Groups</p>
-                    <p style={styles.itemValue}>{mockDate.groupSize}</p>
-                  </div>
-                </Col>
-                <Col l="4">
-                  <div style={styles.item}>
-                    <p style={styles.itemTitle}>Alert</p>
-                    <p style={styles.itemValue}>{mockDate.alertSize}</p>
-                  </div>
-                </Col>
+              <Col l="3">
+                <div style={styles.item}>
+                  <p style={styles.itemTitle}>Cluster</p>
+                  <p style={styles.itemValue}>{mockDate.clusterSize}</p>
+                </div>
+              </Col>
+              <Col l="3">
+                <div style={styles.item}>
+                  <p style={styles.itemTitle}>Broker</p>
+                  <p style={styles.itemValue}>{mockDate.brokerSize}</p>
+                </div>
+              </Col>
+              <Col l="3">
+                <div style={styles.item}>
+                  <p style={styles.itemTitle}>Topics</p>
+                  <p style={styles.itemValue}>{mockDate.topicSize}</p>
+                </div>
+              </Col>
+              <Col l="3" >
+                <div style={styles.item}>
+                  <p style={styles.itemTitle}>Groups</p>
+                  <p style={styles.itemValue}>{mockDate.groupSize}</p>
+                </div>
+              </Col>
+              <Col l="3">
+                <div style={styles.item}>
+                  <p style={styles.itemTitle}>Alert</p>
+                  <p style={styles.itemValue}>{mockDate.alertSize}</p>
+                </div>
+              </Col>
               {/* {mockDate.map((item, index) => {
               return (
                 <Col l="4" key={index}>
@@ -159,7 +165,7 @@ export default class ClusterInfo extends Component {
                 </Col>
               );
             })} */}
-              <Col l="4">
+              <Col l="3">
                 <div style={styles.item}>
                   <p style={styles.itemTitles} >Summary</p>
                   <img src={chart} alt="" onClick={e => this.handleCluster()} style={{ cursor: 'pointer' }} />

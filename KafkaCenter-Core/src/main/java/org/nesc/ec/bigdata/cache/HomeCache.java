@@ -15,6 +15,7 @@ public class HomeCache {
 		private int topicSize;
 		private int groupSize;
 		private int alertSize;
+		private int brokerSize;
 
 		public int getClusterSize() {
 			return clusterSize;
@@ -46,6 +47,14 @@ public class HomeCache {
 
 		public void setClusterSize(int clusterSize) {
 			this.clusterSize = clusterSize;
+		}
+
+		public int getBrokerSize() {
+			return brokerSize;
+		}
+
+		public void setBrokerSize(int brokerSize) {
+			this.brokerSize = brokerSize;
 		}
 	}
 }
