@@ -462,7 +462,7 @@ export default class Cluster extends Component {
             <div style={styles.formContent}>
               <Row style={styles.formItem} >
                 <Col span={`${isMobile ? '6' : '6'}`} style={styles.label}>
-                  ClusterName:
+                  Cluster Name:
                 </Col>
                 <Col span={`${isMobile ? '18' : '16'}`}>
                   <IceFormBinder name="name" required validator={this.checkbland}>
@@ -535,7 +535,7 @@ export default class Cluster extends Component {
               </Row>
               <Row style={styles.formItem}>
                 <Col span={`${isMobile ? '6' : '6'}`} style={styles.label}>
-                  Advance:
+                Advanced:
                 </Col>
                 <Col span={`${isMobile ? '18' : '16'}`}>
                   <IceFormBinder name="enable">

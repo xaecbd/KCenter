@@ -12,7 +12,7 @@ const asideMenuConfig = [
     icon: <CustomIcon type="iconhome"/>,
   },
   {
-    name: 'My Favorite',
+    name: 'Favorites',
     path: '/favorite',
     icon: <CustomIcon type="iconFavoritestarrate" />,
   },
@@ -25,7 +25,7 @@ const asideMenuConfig = [
         name: 'Topic List',
         path: '/topic/list',
       },
-      { name: 'My Task', path: '/topic/task'},
+      { name: 'My Tasks', path: '/topic/task'},
       { name: 'Queries', path: '/topic/queries' },
     ],
   },
@@ -75,7 +75,7 @@ const asideMenuConfig = [
     ],
   },
   {
-    name: 'Setting',
+    name: 'Settings',
     path: '/setting',
     icon: <CustomIcon type="iconsetting"/>,
     authority: 'admin',
