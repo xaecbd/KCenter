@@ -3,7 +3,6 @@ import { Avatar, Card, Form, Input, Message, ResponsiveGrid, Box, Switch } from 
 import axios from '@utils/axios';
 import styles from './index.module.scss';
 import { withRouter } from 'react-router-dom';
-import { removeAuthority } from '../../../../utils/authority';
 
 
 const { Cell } = ResponsiveGrid;
@@ -60,9 +59,8 @@ export default class UserInfo extends Component {
      axios.put('/users/modifty', value).then((res) => {
        if (res.data.code === 200) {
          sessionStorage.clear();
-         removeAuthority();
-         window.location.href = '/login/logout';
          Message.success(`${res.data.message},please login again`);
+         window.location.href = '/login/logout';
        } else {
          Message.error(res.data.message);
        }

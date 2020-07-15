@@ -11,7 +11,7 @@ export default class MyTask extends Component {
         text: 'Topic',
       },
       {
-        link: 'javascript:window.location.reload();',
+        link: '',
         text: 'My Task',
       },
     ];

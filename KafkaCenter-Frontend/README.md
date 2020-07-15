@@ -1,21 +1,18 @@
-# Kafka Center Frontend
+
+## Kafka Center Frontend
+
 
 ## 使用
 
-- 安装依赖： `npm install`
-- 启动调试服务: `npm start`
-- 构建 dist: `npm run build`
+```bash
+# 安装依赖
+$ npm install
 
-## 目录结构
+# 启动服务
+$ npm start  # visit http://localhost:3333
+```
 
-- react-router @4.x 默认采用 hashHistory 的单页应用
-- 入口文件: `src/index.js`
-- 导航配置: `src/menuConfig.js`
-- 路由配置: `src/routerConfig.js`
-- 路由入口: `src/router.jsx`
-- 布局文件: `src/layouts`
-- 通用组件: `src/components`
-- 页面文件: `src/pages`
+[More docs](https://ice.work/docs/guide/about).
 
 ## 效果图
 

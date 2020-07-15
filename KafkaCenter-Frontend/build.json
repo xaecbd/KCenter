@@ -1,0 +1,40 @@
+{
+  "alias": {
+    "@utils": "./src/utils/",
+    "@components": "./src/components",
+    "@images": "./public/images"
+  },
+  "outputDir": "../KafkaCenter-Core/src/main/resources/static",
+  "proxy": {
+    "/**": {
+      "enable": true,
+      "target": "http://127.0.0.1:8080"
+    }
+  },
+  "plugins": [
+    [
+      "build-plugin-fusion",
+      {
+        "themePackage": "@alifd/theme-design-pro"
+      }
+    ],
+    [
+      "build-plugin-ice-auth"
+    ],
+    [
+      "build-plugin-moment-locales",
+      {
+        "locales": [
+          "zh-cn"
+        ]
+      }
+    ],
+    [
+      "build-plugin-css-assets-local",
+      {
+          "outputPath": "assets",
+          "relativeCssPath": "/"
+      }
+  ]
+  ]
+}

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Message, Tab, Dialog, Grid, Select } from '@alifd/next';
+import { Table, Message, Dialog, Grid, Select } from '@alifd/next';
 import FoundationSymbol from '@icedesign/foundation-symbol';
 import dayjs from 'dayjs';
 import {
@@ -8,17 +8,16 @@ import {
   FormError as IceFormError,
 } from '@icedesign/form-binder';
 import axios from '@utils/axios';
+import Auth from '@components/Auth'
 import { sortData, sortDataByOrder } from '@utils/dataFormat';
 import CustomPagination from '@components/CustomPagination';
 import CustomTableFilter from '@components/CustomTableFilter';
-import RenderAuthorized from '@components/Authorized';
-import { getAuthority } from '@utils/authority';
+
 import { getPersonalityCluster } from '@utils/cookies';
 import Producer from '../Producer';
 import DetailDialog from '../DetailDialog';
 
 
-const Authorized = RenderAuthorized(getAuthority());
 const { Row, Col } = Grid;
 
 export default class TopicTable extends Component {
@@ -45,6 +44,7 @@ export default class TopicTable extends Component {
     this.mounted = true;
     // this.fetchData();
   }
+
   componentWillUnmount = () => {
     this.mounted = false;
   }
@@ -194,15 +194,14 @@ export default class TopicTable extends Component {
             Mock
           </a>
         </span>
-        <Authorized authority="admin">
+        <Auth rolename="admin">
           <span style={styles.separator} />
           <span title="Modify" style={styles.operBtn} >
             <a style={styles.link} onClick={() => this.handleUpdate(record)}>
               Modify
             </a>
           </span>
-        </Authorized>
-
+        </Auth>
       </div>
     );
   };
@@ -337,9 +336,9 @@ export default class TopicTable extends Component {
             cancelProps={cancelProps}
           >
             <IceFormBinderWrapper ref={(ref) => {
-            this.refForm = ref;
-          }}
-              value={this.state.value}
+              this.refForm = ref;
+            }}
+            value={this.state.value}
             >
               <div >
                 <Row style={styles.formRow} >
@@ -372,8 +371,8 @@ export default class TopicTable extends Component {
                         placeholder="please select team"
                         style={{ width: '100%' }}
                         onChange={(value, action, item) => {
-                      this.onTeamChange(value, action, item);
-                    }}
+                          this.onTeamChange(value, action, item);
+                        }}
                         disabled={this.state.value.disabled}
                       />
                     </IceFormBinder>

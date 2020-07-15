@@ -1,0 +1,57 @@
+.headerAvatar {
+  height: 100%;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.avatarPopup {
+  min-width: 260px;
+  padding: 4px 0;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .5);
+}
+
+.menu {
+  line-height: 40px;
+  border: 0;
+
+  :global {
+    .next-menu-item {
+      color: $color-text1-3;
+    }
+    .next-menu-item-inner {
+      height: 40px;
+    }
+    .next-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+.profile {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: flex-start;
+  min-width: 250px;
+  padding: 8px 16px 4px 16px;
+  font-size: 0;
+}
+
+.avatar {
+  margin-right: 12px;
+}
+
+.content {
+  flex: 1 0 auto;
+  h4 {
+    margin: 0;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 22px;
+  }
+  span {
+    color: $color-text1-3;
+    font-size: 12px;
+  }
+}

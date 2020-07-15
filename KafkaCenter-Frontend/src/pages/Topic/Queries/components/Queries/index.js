@@ -24,10 +24,10 @@ const consumer = {
   groupID: 'TestGroup',
   waitTime: 10000,
   recordNum: 1,
-  isCommit: false,
+  isCommit: 0,
   clusterName: '',
   topicName: '',
-  isByPartition: '',
+  isByPartition: 0,
 };
 
 export default class Queries extends Component {
@@ -52,18 +52,20 @@ export default class Queries extends Component {
   componentDidMount() {
     this.fecthClusters();
   }
+
   componentWillMount() {
     this.setState({
       consumer: {
         groupID: 'TestGroup',
         waitTime: 10000,
         recordNum: 1,
-        isCommit: false,
-        isByPartition: false,
+        isCommit: 0,
+        isByPartition: 0,
       },
     });
     this.mounted = true;
   }
+
   componentWillUnmount = () => {
     this.mounted = false;
   };
@@ -117,6 +119,7 @@ export default class Queries extends Component {
         Message.error('Create Task has error.');
       });
   }
+
   // 级联获取topic所属的partition
   fetchPartition(value) {
     axios.get(`/topic/query/partition?clusterId=${this.state.clusterId}&topicName=${value}`)
@@ -146,6 +149,7 @@ export default class Queries extends Component {
     });
     return dataSource;
   };
+
   resoucePartitionData = (data) => {
     const dataSource = [];
     data.forEach((obj) => {
@@ -174,18 +178,21 @@ export default class Queries extends Component {
     });
     this.fetchPartition(value);
   };
+
   onPartionChange = (value) => {
     this.setState({
       partitionValue: value,
     });
   };
+
   onOffsetChange = (value) => {
     this.setState({
       offset: value,
     });
   };
+
   onByConsumerChange = (value) => {
-    let consumer = this.state.consumer;
+    const consumer = this.state.consumer;
     consumer.isByPartition = value;
     consumer.groupID = 'TestGroup';
     consumer.waitTime=10000;
@@ -227,11 +234,11 @@ export default class Queries extends Component {
         .then((response) => {
           if (response.data.code === 200) {
             if(response.data.data.length===0){
-               Message.success({ content:"topic has not consumer data", duration: 5000 });
+              Message.success({ content:'topic has not consumer data', duration: 5000 });
             }
             this.setState({
-                    consumerResult: Object.assign({}, response.data.data),
-                    visible: false,
+              consumerResult: { ...response.data.data},
+              visible: false,
             });
             
            
@@ -416,7 +423,7 @@ export default class Queries extends Component {
                               placeholder="please select partition"
                               style={{ width: '80%' }}
                               onChange={(value) => {
-                              this.onPartionChange(value);
+                                this.onPartionChange(value);
                               }}
                             />
                           </IceFormBinder>

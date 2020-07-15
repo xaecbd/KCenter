@@ -1,0 +1,115 @@
+@import '~@alifd/next/variables.scss';
+
+.LoginBlock {
+    width: 462px;
+    padding: 40px;
+    background: rgb(255, 255, 255);
+    border-radius: 6px;
+    margin: auto;
+    position: relative;
+    top: 50%;
+    opacity: 1 !important;
+}
+
+.innerBlock {
+  width: 356px;
+  margin: 0 auto;
+}
+
+.logo {
+  height: 50px;
+}
+
+.infoLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+}
+
+.infoLeft {
+  color: $color-text1-3;
+  font-size: 14px;
+}
+
+.desc {
+  margin: $s-6 $s-zero;
+  color: $color-text1-2;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.active {
+  color: $color-text1-4;
+  font-weight: $font-weight-3;
+  font-size: 24px;
+}
+
+.line {
+  display: inline-block;
+  width: 1px;
+  height: 12px;
+  background: $color-text1-2;
+}
+
+.innerBeforeInput {
+  margin-left: 10px;
+  color: $color-text1-2;
+  .line {
+    margin-left: 10px;
+  }
+}
+
+.innerAfterInput {
+  margin-right: 10px;
+  color: $color-text1-2;
+  .line {
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+}
+
+.sendCode {
+  max-width: 65px;
+  margin-right: 10px;
+}
+
+.otherLogin {
+  color: #666;
+  font-size: 14px;
+}
+.icon {
+  margin-left: 10px;
+}
+
+.link {
+  color: $color-link-1;
+  font-size: 14px;
+  text-align: left;
+}
+
+.submitBtn {
+  width: 100%;
+}
+
+.login {
+  margin: 0px 0px 40px;
+  color: black;
+  font-size: 28px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.divider {
+  margin: '10px 0';
+  display: 'flex';
+  align-items: 'center';
+}
+.border {
+  flex: 1;
+  border-top: '1px dashed #d3d3d3';
+}
+.text {
+  width: '40px';
+  text-align: 'center';
+}

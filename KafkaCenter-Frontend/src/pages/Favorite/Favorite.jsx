@@ -12,7 +12,7 @@ export default class Favorite extends Component {
         text: 'Monitor',
       },
       {
-        link: 'javascript:window.location.reload();',
+        link: '',
         text: 'My Favorite',
       },
     ];

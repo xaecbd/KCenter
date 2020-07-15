@@ -42,7 +42,7 @@ export default class MonitorDetail extends Component {
       },
       {
         // eslint-disable-next-line no-script-url
-        link: 'javascript:window.location.reload();',
+        link: '',
         text: this.state.cluster.name,
       },
     ];

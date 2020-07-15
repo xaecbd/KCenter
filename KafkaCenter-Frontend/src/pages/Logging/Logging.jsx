@@ -1,19 +1,17 @@
 /* eslint react/no-string-refs:0 */
-import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useAuth } from 'ice';
 import { Message } from '@alifd/next';
-import axios from '../../utils/axios';
-import { setAuthority } from '../../utils/authority';
-import { reloadAuthorized } from '../../utils/Authorized';
 import { getUrlCookie, removeUrl } from '@utils/cookies';
+import axios from '../../utils/axios';
+
 import './Logging.scss';
 
+const Logging = () =>{
 
-@withRouter
-class Logging extends Component {
-  redirectToHome = () => {
-    reloadAuthorized();
-    // window.location.href = '/#/home/page';
+  const [auth, setAuth] = useAuth();
+  const redirectToHome = () => {
+    
     let urls = getUrlCookie('url');
     if (urls === undefined || urls === null || urls === '') {
       urls = '/#/home/page';
@@ -22,24 +20,20 @@ class Logging extends Component {
     window.location.href = urls;
   }
 
-  writeUserInfo = (user) => {
+  const  writeUserInfo = (user) => {
     const userJson = JSON.stringify(user);
     sessionStorage.setItem('user', userJson);
     const role = user.role;
     if (role) {
-      if (role.toLocaleLowerCase() === 'admin') {
-        setAuthority('admin');
-      } else {
-        setAuthority('member');
-      }
-      this.redirectToHome();
+      setAuth({ role:user.role === 'ADMIN'?'admin':'member' });
+      redirectToHome();
     }
   }
 
-  userInfo = (e) => {
+  const userInfo = (e) => {
     axios.get(`/login/user?code=${e}`).then((res) => {
       if (res.data.code === 200 && res.data.data != null) {
-        this.writeUserInfo(res.data.data);
+        writeUserInfo(res.data.data);
       } else {
         Message.error('Login wish nas error.');
       }
@@ -48,24 +42,22 @@ class Logging extends Component {
     });
   };
 
-  componentWillMount() {
+  useEffect(()=>{
     const href = window.location.href;
-    if (href.indexOf('code=') != -1) {
+    if (href.indexOf('code=') !== -1) {
       const codepre = href.split('=')[1];
       const code = codepre.split('#')[0];
-      this.userInfo(code);
+      userInfo(code);
     }
-  }
+  },[]);
 
-  render() {
-    return (
-      <div className="content">
-        <div className="loader">
-          <span>Loading...</span>
-        </div>
+  return(
+    <div className="content">
+      <div className="loader">
+        <span>Loading...</span>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default Logging;
