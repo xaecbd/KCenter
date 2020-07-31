@@ -2,11 +2,34 @@ import React, { Component } from 'react';
 import { Dialog } from '@alifd/next';
 import IceContainer from '@icedesign/container';
 
+const styles = {
+  simpleFormDialog: { width: '640px' },
+  detailItem: {
+    padding: '15px 0px',
+    display: 'flex',
+    borderTop: '1px solid #EEEFF3',
+  },
+  detailTitle: {
+    marginRight: '30px',
+    textAlign: 'right',
+    width: '120px',
+    color: '#999999',
+  },
+  detailBody: {
+    flex: 1,
+  },
+  errormess: {
+    color: 'red',
+  },
+};
+
 export default class DetailDialog extends Component {
   static displayName = 'Dialog';
+
   state = {
     detailObj: this.props.detail,
   };
+
   constructor(props) {
     super(props);
   }
@@ -18,6 +41,7 @@ export default class DetailDialog extends Component {
       detailObj: nextProps.detail,
     });
   }
+
 handelDetailDialog = () => {
   const data = this.state.detailObj;
   data.viewVisable = !this.state.detailObj.viewVisable;
@@ -32,6 +56,11 @@ render() {
   };
   const okProps = { children: 'OK' };
   const cancelProps = { children: 'Cancel' };
+
+  let approveName = this.state.detailObj.data.approved===0?'':'admin';
+  if(this.state.detailObj.data.approve ){
+    approveName = this.state.detailObj.data.approve.name;
+  }
   return (
     <div>
       <Dialog
@@ -92,7 +121,7 @@ render() {
               </li>
               <li style={styles.detailItem}>
                 <div style={styles.detailTitle}>By Approved:</div>
-                <div style={styles.detailBody}>{this.state.detailObj.data.approve ? this.state.detailObj.data.approve.name : 'admin'}</div>
+                <div style={styles.detailBody}>{approveName}</div>
               </li>
 
               <li style={styles.detailItem}>
@@ -110,23 +139,4 @@ render() {
   );
 }
 }
-const styles = {
-  simpleFormDialog: { width: '640px' },
-  detailItem: {
-    padding: '15px 0px',
-    display: 'flex',
-    borderTop: '1px solid #EEEFF3',
-  },
-  detailTitle: {
-    marginRight: '30px',
-    textAlign: 'right',
-    width: '120px',
-    color: '#999999',
-  },
-  detailBody: {
-    flex: 1,
-  },
-  errormess: {
-    color: 'red',
-  },
-};
+

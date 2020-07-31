@@ -18,6 +18,16 @@ public class GroupTopicConsumerState {
 	private ConsumerGroupState consumerGroupState;
 	private boolean isSimpleConsumerGroup = false ;
 
+	private boolean hasMembers;
+
+	public boolean isHasMembers() {
+		return hasMembers;
+	}
+
+	public void setHasMembers(boolean hasMembers) {
+		this.hasMembers = hasMembers;
+	}
+
 	public String getConsumerMethod() {
 		return consumerMethod;
 	}

@@ -18,8 +18,17 @@ const defaultValue = {
   comments: '',
 };
 
+const styles = {
+  simpleFormDialog: { width: '640px' },
+  dialogContent: {},
+  formRow: { marginTop: 20 },
+  input: { width: '100%' },
+  formLabel: { lineHeight: '26px' },
+};
+
 export default class EditDialog extends Component {
   static displayName = 'EditDialog';
+
   constructor(props) {
     super(props);
     this.state = {
@@ -35,9 +44,11 @@ export default class EditDialog extends Component {
     this.enquireScreenRegister();
     this.fectgClusters();
   }
+
   componentWillMount() {
     this.mounted = true;
   }
+
   componentWillUnmount = () => {
     this.mounted = false;
   }
@@ -84,6 +95,7 @@ export default class EditDialog extends Component {
   handelDialog = () => {
     this.setState({
       createLoading: false,
+      value: {...defaultValue,clusterId:''},
     });
     this.props.handelDialog();
   }
@@ -111,6 +123,7 @@ export default class EditDialog extends Component {
         console.error(error);
       });
   };
+
   resouceData = (data) => {
     const dataSource = [];
     data.map((obj) => {
@@ -158,9 +171,10 @@ export default class EditDialog extends Component {
 
   onFormChange = (value) => {
     this.setState({
-      value,
+      value:{...value},
     });
   };
+
   render() {
     const { isMobile } = this.state;
     const simpleFormDialog = {
@@ -200,7 +214,7 @@ export default class EditDialog extends Component {
                   <label style={styles.formLabel}>Cluster Name:</label>
                 </Col>
                 <Col span={`${isMobile ? '18' : '16'}`}>
-                  <IceFormBinder name="clusterName" required>
+                  <IceFormBinder name="clusterId" required>
                     <Select
                       showSearch
                       dataSource={this.state.clusterInfo}
@@ -209,7 +223,7 @@ export default class EditDialog extends Component {
                       disabled={this.state.value.disabled}
                     />
                   </IceFormBinder>
-                  <IceFormError name="clusterName" />
+                  <IceFormError name="clusterId" />
                 </Col>
               </Row>
               <Row style={styles.formRow}>
@@ -304,10 +318,4 @@ export default class EditDialog extends Component {
     );
   }
 }
-const styles = {
-  simpleFormDialog: { width: '640px' },
-  dialogContent: {},
-  formRow: { marginTop: 20 },
-  input: { width: '100%' },
-  formLabel: { lineHeight: '26px' },
-};
+

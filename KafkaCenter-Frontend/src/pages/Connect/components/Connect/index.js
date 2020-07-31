@@ -40,5 +40,6 @@ const styles = {
   iframe: {
     border: 'none',
     overflow: 'hidden',
+    minHeight: '600px',
   },
 };

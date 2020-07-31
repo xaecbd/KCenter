@@ -16,14 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author Lola.L.Gou
  */
 @Service
 public class TopicInfoService {
-
+	@Autowired
+	ClusterService clusterService;
 	@Autowired
 	TopicInfoMapper topicInfoMapper;
 	@Autowired
@@ -70,8 +70,11 @@ public class TopicInfoService {
 		return result > 0;
 	}
 
-	public Boolean adminCreateTopic(TopicInfo topicInfo, UserInfo userInfo) throws ExecutionException, InterruptedException {
+	public Boolean adminCreateTopic(TopicInfo topicInfo, UserInfo userInfo) throws Exception {
 		boolean flag = true;
+		if(exitsTopic(topicInfo.getTopicName(),Long.parseLong(topicInfo.getClusterId()))){
+			throw new Exception(" Topic already exists in the " + clusterService.selectById(Long.parseLong(topicInfo.getClusterId())).getName() + " .");
+		}
 		try {
 			if(KafkaAdminCreateTopic(topicInfo)){
 				TopicInfo topicInfo1 = topicInfo;
@@ -162,6 +165,7 @@ public class TopicInfoService {
 
 
 
+
 	private Boolean createTopic(TaskInfo task, String clusterId) throws Exception {
 		if(!kafkaAdminService.getKafkaAdmins(clusterId).createTopicIfNotExists(task.getTopicName(), task.getPartition(),task.getReplication(), (task.getTtl() * 3600 * 1000))) {
 			return Boolean.FALSE;
@@ -183,10 +187,10 @@ public class TopicInfoService {
 		return topicInfoMapper.getTopicsByTeamIDs(teamIDs);
 	}
 
-	public boolean exitsTopic(String topic,Long clientId) {
+	public boolean exitsTopic(String topic,Long clusterId) {
 		Map<String,Object> columnMap = new HashMap<>();
 		columnMap.put(Constants.KeyStr.TOPIC_NAME, topic);
-		columnMap.put(Constants.KeyStr.CLUSTER_ID, clientId);
+		columnMap.put(Constants.KeyStr.CLUSTER_ID, clusterId);
 		List<TopicInfo> topicList = topicInfoMapper.selectByMap(columnMap);
 		return !topicList.isEmpty();
 	}

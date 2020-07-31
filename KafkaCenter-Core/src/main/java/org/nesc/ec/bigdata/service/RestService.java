@@ -8,11 +8,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * @author lg99
@@ -37,6 +39,15 @@ public class RestService {
 			LOG.error("Request Remote Location Has Error,",e);
 		}
 		return data;
+	}
+
+	public JSONArray queryRemoteQueryByGet(String remote,Map<String, String> queryMap){
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(remote);
+		queryMap.forEach(builder::queryParam);
+		JSONObject responseBody = restTemplate.getForEntity(builder.build().encode().toUriString(),JSONObject.class).getBody();
+		return responseBody.getJSONArray(Constants.KeyStr.DATA);
+		//return exchange(builder.build().encode().toUriString(),HttpMethod.GET,new HttpEntity<>(null,null));
+
 	}
 
 	private JSONObject tranMapToJson( Map<String, String> queryMap) {

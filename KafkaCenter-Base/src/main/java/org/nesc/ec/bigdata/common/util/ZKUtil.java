@@ -95,23 +95,26 @@ public class ZKUtil implements Closeable {
 		String ownersPath = rootPath + "/consumers/" + groupId + "/owners/" + topic;
 		if (zkClient.exists(ownersPath)) {
 			List<String> owners = zkClient.getChildren(ownersPath);
-			owners.forEach(patition -> {
-				try {
+			if(owners!=null && !owners.isEmpty()){
+				owners.forEach(patition -> {
 					try {
-						String owner = zkClient.readData(ownersPath + "/" + patition, true);
-						if (owner != null) {
-							Map<String, String> map = result.get(patition);
-							map.put("owner", owner);
-							result.put(patition, map);
+						try {
+							String owner = zkClient.readData(ownersPath + "/" + patition, true);
+							if (owner != null) {
+								Map<String, String> map = result.get(patition);
+								map.put("owner", owner);
+								result.put(patition, map);
+							}
+						} catch (Exception e) {
+							LOGGER.error("", e);
 						}
 					} catch (Exception e) {
 						LOGGER.error("", e);
 					}
-				} catch (Exception e) {
-					LOGGER.error("", e);
-				}
 
-			});
+				});
+			}
+
 		}
 
 		return result;

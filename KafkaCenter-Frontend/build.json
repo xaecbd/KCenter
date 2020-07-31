@@ -25,16 +25,9 @@
       "build-plugin-moment-locales",
       {
         "locales": [
-          "zh-cn"
+          "en-au"
         ]
       }
-    ],
-    [
-      "build-plugin-css-assets-local",
-      {
-          "outputPath": "assets",
-          "relativeCssPath": "/"
-      }
-  ]
+    ]
   ]
 }

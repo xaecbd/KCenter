@@ -614,8 +614,8 @@ public class KafkaManagerService {
 		return kafkaManagerBrokers;
 	}
 	
-	public boolean restOffset(String clusterId, String group, String topic) {
-		return kafkaConsumersService.commitOffsetLastest(clusterId,group,topic);
+	public boolean resetOffset(String clusterId, String group, String topic) {
+		return kafkaConsumersService.commitOffsetLatest(clusterId,group,topic);
 	}
 
 	public Set<String> getTopicByGroup(String clusterId,String group){

@@ -3,6 +3,13 @@ import UserLayout from '@/layouts/UserLayout';
 import Login from '@/pages/Login';
 
 import BasicLayout from '@/layouts/BasicLayout';
+import Queries from '@/pages/Topic/Queries';
+// Approve page
+import ApproveTask from '@/pages/ApproveTask';
+import managerUpdateConfig from '@/pages/KafkaManager/Topic/TopicDetail/Config';
+import consumerTopicDetail from '@/pages/Monitor/Consumer/Topic/TopicDetail';
+
+import consumerGroupDetail from '@/pages/Monitor/Consumer/Group/GroupDetail';
 
 
 const Empty = lazy(() => import('@/pages/Exception'));
@@ -15,7 +22,6 @@ const MyProfile = lazy(() => import('@/pages/UserInfo'));
 // Topic page
 const TopicList = lazy(() => import('@/pages/Topic/TopicList'));
 const TopicTask = lazy(() => import('@/pages/Topic/MyTask'));
-const Queries = lazy(() => import('@/pages/Topic/Queries'));
 // Home page
 const HomeCluster = lazy(() => import('./pages/Home/ClusterInfo'));
 const MonitorDetail = lazy(() => import('@/pages/Home/MonitorDetail'));
@@ -23,13 +29,10 @@ const SummaryChart = lazy(() => import('@/pages/Home/Summary'));
 // Setting page
 const Team = lazy(() => import('@/pages/Setting/Team'));
 const User = lazy(() => import('@/pages/Setting/User'));
-// Approve page
-const ApproveTask = lazy(() => import('@/pages/ApproveTask'));
 // kafka-manager
 const managerTopic = lazy(() => import('@/pages/KafkaManager/Topic/TopicList'));
 const managerGroup = lazy(() => import('@/pages/KafkaManager/Group'));
 const managerTopiDetail = lazy(() => import('@/pages/KafkaManager/Topic/TopicDetail/Detail'));
-const managerUpdateConfig = lazy(() => import('@/pages/KafkaManager/Topic/TopicDetail/Config'));
 const Cluster = lazy(() => import('@/pages/KafkaManager/Cluster'));
 const managerBroker = lazy(() => import('@/pages/KafkaManager/Broker'));
 
@@ -39,10 +42,7 @@ const ProducerTable = lazy(() => import('@/pages/Monitor/Producer/Topic'));
 const ProducerMetric = lazy(() => import('@/pages/Monitor/Producer/Metric'));
 
 const consumerList = lazy(() => import('@/pages/Monitor/Consumer'));
-const consumerTopicDetail = lazy(() => import('@/pages/Monitor/Consumer/Topic/TopicDetail'));
 const consumerChart = lazy(() => import('@/pages/Monitor/Consumer/Topic/ConsumerChart'));
-
-const consumerGroupDetail = lazy(() => import('@/pages/Monitor/Consumer/Group/GroupDetail'));
 const AlertList = lazy(() => import('@/pages/Monitor/Alert'));
 const ConsumerLag = lazy(() => import('@/pages/Monitor/Lag'));
 // connect page

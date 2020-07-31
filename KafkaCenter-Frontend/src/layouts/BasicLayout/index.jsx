@@ -70,7 +70,7 @@ export default function BasicLayout({ children }) {
         </Shell.Branding>
         <Shell.Navigation direction="hoz">
           <a target="_blank" rel="noreferrer" href="https://github.com/xaecbd/KafkaCenter/issues/new" className={styles.feedback}><Icon type="email" /> Feedback</a>
-          <a target="_blank" rel="noreferrer" href="https://github.com/xaecbd/KafkaCenter" className={styles.help}><Icon type="help" /> Help</a>
+          <a target="_blank" rel="noreferrer" href="https://github.com/xaecbd/KafkaCenter#documentation" className={styles.help}><Icon type="help" /> Help</a>
         </Shell.Navigation>
         <Shell.Action>
           <HeaderAvatar />

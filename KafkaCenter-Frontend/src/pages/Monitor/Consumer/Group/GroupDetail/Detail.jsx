@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import { Button, Loading, Message } from '@alifd/next';
 import { withRouter } from 'react-router-dom';
 import FoundationSymbol from '@icedesign/foundation-symbol';
@@ -8,71 +8,21 @@ import ConsumberGroup from './ConsumerGroup';
 
 import './GroupDetail.scss';
 
-@withRouter
-export default class Detail extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      brokerMsg: [],
-      zkMsg: [],
-      isConsumberLoading: false,
-      clusterName: this.props.match.params.clusterName,
-      groupName: this.props.match.params.consummerGroup,
-    };
-  }
-  componentDidMount() {
-    const data = {
-      clusterID: this.props.match.params.clusterID,
-      consummerGroup: this.props.match.params.consummerGroup,
-    };
-    this.fetchDetail(data);
-  }
-
-  componentWillMount() {
-    this.mounted = true;
-  }
-  componentWillUnmount = () => {
-    this.mounted = false;
-  }
+function Detail(props) {
+  const[brokerMsg,setBrokerMsg] = useState([]);
+  const[zkMsg,setZkMsg] = useState([]);
+  const[isConsumberLoading,setIsConsumberLoading] = useState(false);
+  const[clusterName,setClusterName] = useState(props.match.params.clusterName);
+  const[groupName,setGroupName] = useState(props.match.params.consummerGroup);
 
 
-  fetchDetail = (data) => {
-    this.setState({
-      isConsumberLoading: true,
-    }, () => {
-      axios.defaults.timeout = 180000;
-      axios.post('/monitor/group/detail', data).then((response) => {
-        if (this.mounted) {
-          if (response.data.code === 200) {
-            this.setState({
-              isConsumberLoading: false,
-            });
-            if (response.data.data.length > 0) {
-              this.restructurConsumberData(response.data.data);
-            }
-          } else {
-            Message.error(response.data.message);
-            this.setState({
-              isConsumberLoading: false,
-            });
-          }
-        }
-      }).catch((error) => {
-        Message.error('Get Consumer Offset has error.');
-        this.setState({
-          isConsumberLoading: false,
-        });
-      });
-    });
-  }
-
-  restructurConsumberData = (data) => {
+  const restructurConsumberData = (data) => {
     const zkResult = [];
     const brokerResult = [];
     const record = {
-      topicName: this.props.match.params.topicName,
-      clusterID: this.props.match.params.clusterID,
-      clusterName: this.props.match.params.clusterName,
+      topicName: props.match.params.topicName,
+      clusterID: props.match.params.clusterID,
+      clusterName: props.match.params.clusterName,
     };
     if (data) {
       data.map((obj) => {
@@ -111,7 +61,7 @@ export default class Detail extends Component {
             };
             brokerResult.push({
               topic: obj.topic,
-              content: <ConsumberGroup datasource={obj.partitionAssignmentStates} config={entry} record={record} groupName={this.state.groupName} consumerMethod={obj.consumerMethod} />,
+              content: <ConsumberGroup datasource={obj.partitionAssignmentStates} config={entry} record={record} groupName={groupName} consumerMethod={obj.consumerMethod} />,
             });
           }
         } else {
@@ -120,7 +70,7 @@ export default class Detail extends Component {
           let lag = 0;
           let offset = 0;
           const isSimpleConsumerGroup = obj.simpleConsumerGroup;
-          const consumerGroupState = '';
+          const consumerGroupState = obj.consumerGroupState;
 
           if (obj.partitionAssignmentStates) {
             obj.partitionAssignmentStates.map((objs) => {
@@ -150,85 +100,112 @@ export default class Detail extends Component {
             };
             zkResult.push({
               topic: obj.topic,
-              content: <ConsumberGroup datasource={obj.partitionAssignmentStates} config={entry} record={record} groupName={this.state.groupName} consumerMethod={obj.consumerMethod} />,
+              content: <ConsumberGroup datasource={obj.partitionAssignmentStates} config={entry} record={record} groupName={groupName} consumerMethod={obj.consumerMethod} />,
             });
           }
         }
       });
     }
-    this.setState({
-      zkMsg: zkResult,
-      brokerMsg: brokerResult,
+    setZkMsg(zkResult);
+    setBrokerMsg(brokerResult);
+  }
+
+  const fetchDetail = (data) => {
+    setIsConsumberLoading(true);
+    axios.defaults.timeout = 180000;
+    axios.post('/monitor/group/detail', data).then((response) => {
+      if (response.data.code === 200) {
+        setIsConsumberLoading(false);
+        if (response.data.data.length > 0) {
+          restructurConsumberData(response.data.data);
+        }
+      } else {
+        Message.error(response.data.message);
+        setIsConsumberLoading(false);
+      }
+    }).catch((error) => {
+      Message.error('Get Consumer Offset has error.');
+      setIsConsumberLoading(false);
     });
   }
 
-  backward = () => {
-    this.props.history.goBack();
-  }
+  
 
-  handleRefresh = () => {
+  useEffect(()=>{
     const data = {
-      clusterID: this.props.match.params.clusterID,
-      consummerGroup: this.props.match.params.consummerGroup,
+      clusterID: props.match.params.clusterID,
+      consummerGroup: props.match.params.consummerGroup,
     };
-    this.fetchDetail(data);
+    fetchDetail(data);
+  },[]);
+  
+
+
+ 
+
+  const backward = () => {
+    props.history.goBack();
   }
 
-
-  render() {
-    return (
-      <div>
-        <Loading
-          visible={this.state.isConsumberLoading}
-          style={styles.loading}
-        >
-
-          <div style={styles.listTitle}><FoundationSymbol onClick={() => this.backward()} style={styles.backward} size="large" type="backward" />
-            cluster:&nbsp;<span style={styles.listTitles}>{this.state.clusterName}</span>&nbsp;&nbsp;Group:&nbsp;<span style={styles.listTitles}>{this.props.match.params.consummerGroup}</span>
-          </div>
-          <div style={{ width: '100%', height: '5px' }}>
-            {' '}
-            <Button
-              type="secondary"
-              style={{float: 'right' }}
-              onClick={(e) => {
-                this.handleRefresh();
-              }}
-            >Refresh&nbsp;&nbsp;
-              <FoundationSymbol size="small" type="exchange" />
-            </Button>
-          </div>
-          {this.state.brokerMsg.length > 0 ?
-            <div><div style={styles.metricTitle}>Consumers Offsets Committed to Broker</div>
-              <div style={{ minHeight: '32rem', padding: '15px', background: '#fff' }} >
-                {
-                  this.state.brokerMsg.map((obj) => {
-                    return <div style={{ marginTop: '10px' }} key={obj.topic}><div >{obj.content}</div></div>;
-                  })
-                }
-              </div>
-            </div> : null}
-
-          {this.state.zkMsg.length > 0 ?
-            <div><div style={styles.metricTitle}>Consumers Offsets Committed to ZK</div>
-              <div style={{ minHeight: '32rem', padding: '15px', background: '#fff' }}>
-                {
-                  this.state.zkMsg.map((obj) => {
-                    return <div style={{ marginTop: '10px' }} key={obj.topic}><div >{obj.content}</div></div>;
-                  })
-                }
-              </div>
-            </div> : null}
-
-          {/* 两种消费信息都为空 显示一个固定大小白框 */}
-          {this.state.zkMsg.length <= 0 && this.state.brokerMsg.length <= 0 ?
-            <div>
-              <div style={{ minHeight: '32rem', padding: '15px', background: '#fff' }} />
-            </div> : null}
-        </Loading>
-      </div>
-    );
+  const handleRefresh = () => {
+    const data = {
+      clusterID: props.match.params.clusterID,
+      consummerGroup: props.match.params.consummerGroup,
+    };
+    fetchDetail(data);
   }
+  return (
+    <div>
+      <Loading
+        visible={isConsumberLoading}
+        style={styles.loading}
+      >
+
+        <div style={styles.listTitle}><FoundationSymbol onClick={() => backward()} style={styles.backward} size="large" type="backward" />
+          cluster:&nbsp;<span style={styles.listTitles}>{clusterName}</span>&nbsp;&nbsp;Group:&nbsp;<span style={styles.listTitles}>{props.match.params.consummerGroup}</span>
+        </div>
+        <div style={{ width: '100%', height: '5px' }}>
+          {' '}
+          <Button
+            type="secondary"
+            style={{float: 'right' }}
+            onClick={(e) => {
+              handleRefresh();
+            }}
+          >Refresh&nbsp;&nbsp;
+            <FoundationSymbol size="small" type="exchange" />
+          </Button>
+        </div>
+        {brokerMsg.length > 0 ?
+          <div><div style={styles.metricTitle}>Consumers Offsets Committed to Broker</div>
+            <div style={{ minHeight: '32rem', padding: '15px', background: '#fff' }} >
+              {
+                brokerMsg.map((obj) => {
+                  return <div style={{ marginTop: '10px' }} key={obj.topic}><div >{obj.content}</div></div>;
+                })
+              }
+            </div>
+          </div> : null}
+
+        {zkMsg.length > 0 ?
+          <div><div style={styles.metricTitle}>Consumers Offsets Committed to ZK</div>
+            <div style={{ minHeight: '32rem', padding: '15px', background: '#fff' }}>
+              {
+                zkMsg.map((obj) => {
+                  return <div style={{ marginTop: '10px' }} key={obj.topic}><div >{obj.content}</div></div>;
+                })
+              }
+            </div>
+          </div> : null}
+
+        {/* 两种消费信息都为空 显示一个固定大小白框 */}
+        {zkMsg.length <= 0 && brokerMsg.length <= 0 ?
+          <div>
+            <div style={{ minHeight: '32rem', padding: '15px', background: '#fff' }} />
+          </div> : null}
+      </Loading>
+    </div>
+  );
 }
 
 const styles = {
@@ -256,3 +233,4 @@ const styles = {
     color: '#0066FF',
   },
 };
+export default withRouter(Detail);

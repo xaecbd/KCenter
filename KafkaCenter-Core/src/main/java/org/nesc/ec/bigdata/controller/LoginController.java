@@ -71,6 +71,7 @@ public class LoginController extends BaseController {
 			String passwd = userJson.getString(Constants.KeyStr.PASSWORD);
 			if(name.equalsIgnoreCase(initConfig.getAdminname())){
 				if (userInfoService.isEqualsConfig(name, passwd)) {
+					user.setId(-1L);
 					user.setName(name);
 					user.setRole(RoleEnum.ADMIN);
 					session.setAttribute(SessionAttr.USER.getValue(), user);

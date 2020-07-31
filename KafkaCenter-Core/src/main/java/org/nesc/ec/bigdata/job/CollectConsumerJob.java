@@ -1,6 +1,7 @@
 package org.nesc.ec.bigdata.job;
 
 import com.alibaba.fastjson.JSONObject;
+import org.nesc.ec.bigdata.cache.HomeCache;
 import org.nesc.ec.bigdata.common.model.OffsetInfo;
 import org.nesc.ec.bigdata.common.model.PartitionAssignmentState;
 import org.nesc.ec.bigdata.config.InitConfig;
@@ -66,7 +67,10 @@ class CollectConsumerJob {
 
                 // 实现对比，查看是否超过设置的alert
                 Map<String,AlertGoup> alertGoupMap = generateAlertGroup(alertGroups);
-                watchAlert(alertGoupMap, toEsMap, offsetInfoMap,clusterInfo);
+                //解析consumer lag，是否超过alert配置的thesold和alerta的thsold
+                watchAlert(alertGoupMap,toEsMap,offsetInfoMap,clusterInfo);
+                //将consumer lag信息放入缓存中
+                putConsumerLagStatusToMap(toEsMap,offsetInfoMap,clusterInfo);
                 // 将监控信息写入ES中
                 try {
                     List<JSONObject> consumerOffsets = new ArrayList<>();
@@ -89,14 +93,14 @@ class CollectConsumerJob {
     }
 
     /**
-     * 监控是否达到预警规则
+     * 解析获取到的consumerLag信息，做不同的操作
      *
      * @param alertMap      <clusterId|topic|group, AlertGoup>
      * @param toEsMap       <clusterId|topic|group|consumerType, JSONObject>
      * @param offsetInfoMap <clusterId|topic|group|consumerType, List<OffsetInfo>>
      */
     private void watchAlert(Map<String, AlertGoup> alertMap, Map<String, JSONObject> toEsMap,
-                            Map<String, List<OffsetInfo>> offsetInfoMap,ClusterInfo clusterInfo) {
+                                      Map<String, List<OffsetInfo>> offsetInfoMap,ClusterInfo clusterInfo){
         offsetInfoMap.forEach((key,offsetInfo)->{
             JSONObject offsetObj = toEsMap.get(key);
             if(offsetObj!=null && !offsetObj.isEmpty()){
@@ -112,7 +116,40 @@ class CollectConsumerJob {
                 }
             }
         });
+
     }
+
+    /**
+     *  consumer lag放入缓存中
+     */
+    private void putConsumerLagStatusToMap(Map<String, JSONObject> toEsMap,
+                                           Map<String, List<OffsetInfo>> offsetInfoMap,ClusterInfo clusterInfo){
+        offsetInfoMap.forEach((key,offsetInfoList)->{
+            try{
+                JSONObject offsetObj = toEsMap.get(key);
+                if(offsetObj!=null && !offsetObj.isEmpty()){
+                    OffsetInfo offsetInfo = offsetInfoList.get(0);
+                    String status = offsetObj.containsKey(Constants.Status.STATUS)?offsetObj.getString(Constants.Status.STATUS):Constants.Status.ACTIVE;
+                    String topic = offsetInfo.getTopic();
+                    String group = offsetInfo.getGroup();
+                    String method = offsetInfo.getConsumerMethod();
+                    long lag =  offsetObj.getLongValue(TopicConfig.LAG);
+                    long offset = offsetInfoList.stream().mapToLong(OffsetInfo::getOffset).sum();
+                    HomeCache.ConsumerLagCache consumerCache = new HomeCache.ConsumerLagCache(group,topic,status,lag,offset,method);
+                    String clusterId = clusterInfo.getId().toString();
+                    String mapKey =clusterId+Constants.Symbol.Vertical_STR+ topic + Constants.Symbol.Vertical_STR +group+Constants.Symbol.Vertical_STR+ method;
+                    HomeCache.consumerLagCacheMap.put(mapKey,consumerCache);
+                }
+            }catch (Exception e){
+                LOG.error("put consumer lag status to cache has error,please check!",e);
+            }
+
+        });
+
+    }
+
+
+
 
     private void sendToQueue(AlertGoup alertGoup,
                              List<OffsetInfo> offsets){

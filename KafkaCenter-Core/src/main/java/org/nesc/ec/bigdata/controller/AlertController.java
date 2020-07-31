@@ -153,7 +153,7 @@ public class AlertController extends BaseController {
 					alterVo.setDisableAlerta(alter.isDisableAlerta());
 					alterVo.setEnable(alter.isEnable());
 					if(alter.getOwner()==null) {
-						alterVo.setOwner(Constants.Role.MASTER);
+						alterVo.setOwner(Constants.Role.ADMIN);
 					}else {
 						alterVo.setOwner(Optional.ofNullable(alter.getOwner().getName()).orElse(""));
 						alterVo.setOwnerId(Optional.ofNullable(alter.getOwner().getId()).orElse(-1L));

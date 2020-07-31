@@ -58,6 +58,11 @@ public class TaskInfoService {
         return checkResult(result);
     }
 
+    public boolean updateTask(TaskInfo taskInfo){
+        Integer result =  taskInfoMapper.updateAllColumnById(taskInfo);
+        return checkResult(result);
+    }
+
     public boolean delete(Long id) {
         Integer result = taskInfoMapper.deleteById(id);
         dbLogService.dbLog("delete task by id:" + id);

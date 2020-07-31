@@ -83,9 +83,9 @@ public class KafkaManagerController extends BaseController{
                 return SUCCESS("Delete Topic Success");
             }
         } catch (Exception e) {
-            LOG.error("Delete Topic Faild,",e);
+            LOG.error("Delete Topic failed,",e);
         }
-        return ERROR("Delete Topic Faild!");
+        return ERROR("Delete Topic failed!");
     }
 
     @PostMapping("/topic/partition")
@@ -100,9 +100,9 @@ public class KafkaManagerController extends BaseController{
                 return SUCCESS("Add Partitions Success");
             }
         } catch (Exception e) {
-            LOG.error("Add Partitions Faild,",e);
+            LOG.error("Add Partitions failed,",e);
         }
-        return ERROR("Add Partitions Faild!");
+        return ERROR("Add Partitions failed!");
     }
 
     @PostMapping("/topic/desconfig")
@@ -112,9 +112,9 @@ public class KafkaManagerController extends BaseController{
             String topicName = queryMap.get(Constants.KeyStr.TOPICNAME);
             return SUCCESS_DATA(kafkaManagerService.descConfig(clusterId, topicName));
         } catch (Exception e) {
-            LOG.error("Describe Topic Config Faild,",e);
+            LOG.error("Describe Topic Config failed,",e);
         }
-        return ERROR("Describe Topic Config Faild!");
+        return ERROR("Describe Topic Config failed!");
     }
 
     @PostMapping("/topic/desconfig/update")
@@ -131,9 +131,9 @@ public class KafkaManagerController extends BaseController{
                 return SUCCESS("Update Config Success");
             }
         } catch (Exception e) {
-            LOG.error("Update Config Faild,",e) ;
+            LOG.error("Update Config failed,",e) ;
         }
-        return ERROR("Update Config Faild!");
+        return ERROR("Update Config failed!");
     }
 
     @PostMapping("/topic/broker_list")
@@ -143,9 +143,9 @@ public class KafkaManagerController extends BaseController{
             JSONArray array  = kafkaManagerService.brokersList(clusterId);
             return SUCCESS_DATA(array);
         } catch (Exception e) {
-            LOG.error("Desc Partition By Broker Faild,",e) ;
+            LOG.error("Desc Partition By Broker failed,",e) ;
         }
-        return ERROR("Desc Partition By Broker Faild");
+        return ERROR("Desc Partition By Broker failed");
     }
 
     @GetMapping(value = "/group")
@@ -180,12 +180,12 @@ public class KafkaManagerController extends BaseController{
     }
 
     @GetMapping("broker")
-    public RestResponse getAllClusterBrokes(@RequestParam("cluster") String clusterId){
+    public RestResponse getAllClusterBrokers(@RequestParam("cluster") String clusterId){
         List<KafkaManagerBroker> kafkaManagerBrokers;
         try {
             kafkaManagerBrokers = kafkaManagerService.getAllClusterBrokes(clusterId);
         } catch (Exception e) {
-            LOG.error("getAllClusterBrokes Error,message:", e);
+            LOG.error("getAllClusterBrokers Error,message:", e);
             return ERROR("error");
         }
         return SUCCESS_DATA(kafkaManagerBrokers);
@@ -196,14 +196,14 @@ public class KafkaManagerController extends BaseController{
             String topic =  map.get(BrokerConfig.TOPIC);
             String group = map.get(BrokerConfig.GROUP);
             String clusterId = map.get(Constants.KeyStr.clusterId);
-            if(kafkaManagerService.restOffset(clusterId,group,topic)){
+            if(kafkaManagerService.resetOffset(clusterId,group,topic)){
                 return SUCCESS("group rest offset success");
             }
         }catch (Exception e){
-            LOG.error("group rest offset faild:", e);
-            return ERROR("group rest offset faild");
+            LOG.error("group rest offset failed:", e);
+            return ERROR("group rest offset failed");
         }
-        return ERROR("group rest offset faild");
+        return ERROR("group rest offset failed");
     }
     @PostMapping("/group/topic")
     public RestResponse getTopicByGroup(@RequestBody Map<String,String> map){
@@ -212,8 +212,8 @@ public class KafkaManagerController extends BaseController{
             String clusterId = map.get(Constants.KeyStr.clusterId);
             return SUCCESS_DATA(kafkaManagerService.getTopicByGroup(clusterId,group));
         }catch (Exception e){
-            LOG.error("getTopicByGroup faild:", e);
-            return ERROR("getTopicByGroup faild");
+            LOG.error("getTopicByGroup failed:", e);
+            return ERROR("getTopicByGroup failed");
         }
     }
 

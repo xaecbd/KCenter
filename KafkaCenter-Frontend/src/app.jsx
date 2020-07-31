@@ -1,13 +1,11 @@
 import * as React from 'react';
 import { createApp } from 'ice';
 import LocaleProvider from '@/components/LocaleProvider';
-import { getLocale } from '@/utils/locale';
 
-const locale = getLocale();
 const appConfig = {
   app: {
     rootId: 'ice-container',
-    addProvider: ({ children }) => <LocaleProvider locale={locale}>{children}</LocaleProvider>,
+    addProvider: ({ children }) => <LocaleProvider locale='en-us'>{children}</LocaleProvider>,
     getInitialData: async () => {
       
       const user = JSON.parse(sessionStorage.getItem('user'));

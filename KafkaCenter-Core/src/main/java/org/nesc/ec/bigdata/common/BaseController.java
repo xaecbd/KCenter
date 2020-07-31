@@ -6,6 +6,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.net.PortUnreachableException;
 
 /**
  * @author：Truman.P.Du
@@ -39,6 +40,9 @@ public class BaseController {
 		return new RestResponse(200, message, data);
 	}
 
+	public RestResponse SUCCESS(int code,String message){
+		return new RestResponse(code, message);
+	}
 	public RestResponse ERROR(String message) {
 		return new RestResponse(500, message);
 	}

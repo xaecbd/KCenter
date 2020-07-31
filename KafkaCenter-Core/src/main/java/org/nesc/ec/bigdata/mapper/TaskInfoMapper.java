@@ -50,6 +50,7 @@ public interface TaskInfoMapper extends BaseMapper<TaskInfo> {
 		@Result(column = "ttl", property = "ttl"),
 		@Result(column = "owner_id", property = "owner",one=@One(select="org.nesc.ec.bigdata.mapper.UserInfoMapper.queryById")),
 		@Result(column = "approved_id", property = "approve",one=@One(select="org.nesc.ec.bigdata.mapper.UserInfoMapper.queryById")),
+			@Result(column = "approved_id", property = "approvedId"),
 		@Result(column="team_id",property="team",one=@One(select="org.nesc.ec.bigdata.mapper.TeamInfoMapper.queryById")),
 		@Result(column = "comments", property = "comments"),
 		@Result(column = "create_time", property = "createTime"),

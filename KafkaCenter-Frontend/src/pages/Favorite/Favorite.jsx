@@ -13,12 +13,12 @@ export default class Favorite extends Component {
       },
       {
         link: '',
-        text: 'My Favorite',
+        text: 'Favorites',
       },
     ];
     return (
       <div>
-        <CustomBreadcrumb items={breadcrumb} title="My Favorite" />
+        <CustomBreadcrumb items={breadcrumb} title="Favorites" />
         <IceContainer style={styles.container} >
           <FavoriteList />
         </IceContainer>

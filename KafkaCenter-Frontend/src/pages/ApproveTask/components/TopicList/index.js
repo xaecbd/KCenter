@@ -34,17 +34,19 @@ export default class TopicList extends Component {
     pageData: [],
     filterDataSource: [],
     detail:{
-        data:{},
-        viewVisable:false,
+      data:{},
+      viewVisable:false,
     }
   };
 
   componentDidMount() {
     this.fetchData();
   }
+
   componentWillMount() {
     this.mounted = true;
   }
+
   componentWillUnmount = () => {
     this.mounted = false;
   }
@@ -71,13 +73,13 @@ export default class TopicList extends Component {
   };
 
   handelDetail = record => () =>{
-      this.setState({
-          detail:{
-              data:record,
-              viewVisable:!this.state.detail.viewVisable,
+    this.setState({
+      detail:{
+        data:record,
+        viewVisable:!this.state.detail.viewVisable,
             
-          }
-      });
+      }
+    });
   }
 
   fetchData = () => {
@@ -178,6 +180,7 @@ export default class TopicList extends Component {
       onOk: () => this.deleteTask(record.id),
     });
   }
+
   redrawPageData=(value) => {
     this.setState({
       pageData: value,
