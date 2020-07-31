@@ -14,7 +14,7 @@
 	<description>Kafka Center Platform</description>
 
 	<properties>
-		<revision>2.1.0</revision>
+		<revision>2.2.0</revision>
 		<elasticsearch.version>7.3.0</elasticsearch.version>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
