@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import { Table, Message, Icon, Dialog, Button, Grid } from '@alifd/next';
 import axios from '@utils/axios';
-import RenderAuthorized from '@components/Authorized';
-import { getAuthority } from '@utils/authority';
+import Auth from '@components/Auth'
 import { sortData, sortDataByOrder } from '@utils/dataFormat';
 import CustomPagination from '@components/CustomPagination';
 import CustomTableFilter from '@components/CustomTableFilter';
 import TeamInfoDialog from '../TeamInfo';
 
 const { Col } = Grid;
-const Authorized = RenderAuthorized(getAuthority());
+
 export default class TeamList extends Component {
   state = {
     isLoading: false,
@@ -28,6 +27,7 @@ export default class TeamList extends Component {
   componentWillMount() {
     this.mounted = true;
   }
+
   componentWillUnmount = () => {
     this.mounted = false;
   }
@@ -146,7 +146,7 @@ export default class TeamList extends Component {
         >
           <Icon size="xs" type="account" onClick={() => { this.handleAddUser(record); }} />
         </span>
-        <Authorized authority="admin">
+        <Auth rolename="admin">
           <span style={styles.separator} />
           <span title="Edit" style={styles.operBtn} >
             <Icon size="xs" type="edit" onClick={() => { this.handleEdit(record); }} />
@@ -155,7 +155,7 @@ export default class TeamList extends Component {
           <span title="Delete" style={styles.operBtn} >
             <Icon size="xs" type="close" onClick={() => { this.handleDelete(record); }} />
           </span>
-        </Authorized>
+        </Auth>
       </div>
     );
   };
@@ -165,9 +165,9 @@ export default class TeamList extends Component {
     const { isLoading } = this.state;
     const team = (
       <Col align="center">
-        <Authorized authority="admin">
+        <Auth rolename="admin">
           <Button type="secondary" onClick={this.addNewTeam} ><Icon type="add" />New Team</Button>
-        </Authorized>
+        </Auth>
       </Col>
     );
     return (

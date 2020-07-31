@@ -163,7 +163,9 @@ public class TaskController extends BaseController {
                 if (user != null) {
                     task.setOwnerId(user.getId());
                 }
-                if (taskInfoService.update(task)) {
+                task.setApprovedId(null);
+                task.setApprovalOpinions("");
+                if (taskInfoService.updateTask(task)) {
                     if (mailEnable) {
                         Map<String, Object> emailMap = taskInfoService.getEmailAllMessage(task, 1);
                         emailService.randerTemplate(emailMap.get("emailEntity"), emailMap.get("emailContent"), 1);
@@ -260,14 +262,19 @@ public class TaskController extends BaseController {
         }
     }
 
-    @GetMapping("/reject/{id}/{approvalOpinions}")
+    @PostMapping("/reject/{id}")
     @ResponseBody
-    public RestResponse reject(@PathVariable Long id, @PathVariable String approvalOpinions) {
+    public RestResponse reject(@PathVariable Long id, @RequestBody Map<String, String> queryMap) {
         try {
+            String approvalComments = queryMap.get(Constants.KeyStr.APPROVAL_COMMENTS);
             TaskInfo task = taskInfoService.selectById(id);
+            UserInfo user = getCurrentUser();
+            if (user != null) {
+                task.setApprovedId(user.getId());
+            }
             task.setApproved(REJECT);
             task.setApprovedTime(new Date());
-            task.setApprovalOpinions(approvalOpinions);
+            task.setApprovalOpinions(approvalComments);
             if (taskInfoService.update(task)) {
                 if (mailEnable) {
                     Map<String, Object> emailMap = taskInfoService.getEmailAllMessage(task, 2);

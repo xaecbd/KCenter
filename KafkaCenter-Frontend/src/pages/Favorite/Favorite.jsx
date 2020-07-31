@@ -12,13 +12,13 @@ export default class Favorite extends Component {
         text: 'Monitor',
       },
       {
-        link: 'javascript:window.location.reload();',
-        text: 'My Favorite',
+        link: '',
+        text: 'Favorites',
       },
     ];
     return (
       <div>
-        <CustomBreadcrumb items={breadcrumb} title="My Favorite" />
+        <CustomBreadcrumb items={breadcrumb} title="Favorites" />
         <IceContainer style={styles.container} >
           <FavoriteList />
         </IceContainer>

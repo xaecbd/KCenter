@@ -1,0 +1,36 @@
+@import "~@alifd/next/variables.scss";
+
+.areaChart {
+  height: 100%;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.subTitle {
+  color: #999;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0;
+}
+
+.value{
+  margin-top: 10px;
+  color: #333;
+  font-weight: $font-weight-3;
+  font-size: 24px;
+  line-height: 28px;
+  letter-spacing: 0;
+}
+
+.cardFoot {
+  padding: 13px 16px;
+  color: #666;
+  font-size: 12px;
+}
+
+.chartColor {
+  background: red;
+}

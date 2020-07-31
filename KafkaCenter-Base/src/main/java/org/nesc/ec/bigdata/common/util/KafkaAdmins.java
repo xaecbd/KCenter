@@ -511,6 +511,8 @@ public class KafkaAdmins implements Closeable {
 			topicConsumerGroupState.setConsumerMethod("broker");
 			topicConsumerGroupState.setConsumerGroupState(description.state());
 			topicConsumerGroupState.setSimpleConsumerGroup(description.isSimpleConsumerGroup());
+			//判断group下是否有members
+			topicConsumerGroupState.setHasMembers(description.members().size()>0);
 			// 获取group下不同patition消费offset信息
 			Set<Entry<TopicPartition, OffsetAndMetadata>> consumerPatitionOffsets = consumerPatitionOffsetMap
 					.get(groupId);
@@ -570,6 +572,7 @@ public class KafkaAdmins implements Closeable {
 			for (Entry<String, Map<TopicPartition, OffsetAndMetadata>> oneTopic : resMap.entrySet()) {
 				GroupTopicConsumerState groupConsumerState = new GroupTopicConsumerState();
 				groupConsumerState.setConsumerMethod("broker");
+//				groupConsumerState.setHasMembers(description.members().size()>0);
 				groupConsumerState.setConsumerGroupState(description.state());
 				groupConsumerState.setSimpleConsumerGroup(description.isSimpleConsumerGroup());
 				Set<Entry<TopicPartition, OffsetAndMetadata>> consumerPatitionOffsets = oneTopic.getValue().entrySet();

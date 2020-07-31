@@ -1,0 +1,25 @@
+@import "~@alifd/next/variables.scss";
+
+.PageHeader {
+  margin-top: -$shell-dark-content-paddingTop;
+  margin-right: -$shell-dark-content-paddingLeft;
+  margin-bottom: 0;
+  margin-left: -$shell-dark-content-paddingLeft;
+  padding: $shell-dark-content-paddingTop $shell-dark-content-paddingLeft;
+  background-color: $color-white;
+}
+
+.Title {
+  display: block;
+  color: $color-text1-4;
+  font-weight: $font-weight-3;
+  font-size: $font-size-title;
+  line-height: 1.5;
+}
+
+.Description {
+  display: block;
+  color: $color-text1-3;
+  font-size: $font-size-body-2;
+  line-height: 1.5;
+}

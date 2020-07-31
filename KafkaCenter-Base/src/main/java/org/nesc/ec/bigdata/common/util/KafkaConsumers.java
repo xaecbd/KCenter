@@ -27,9 +27,10 @@ public class KafkaConsumers<K, V>  implements Closeable{
 	public KafkaConsumers (Properties consumerProps) {
 		this.consumer = new KafkaConsumer(consumerProps);
 	}
+
 	
-	public KafkaConsumer<K, V> subscribe(String toppicName) {
-		this.consumer.subscribe(Collections.singleton(toppicName));
+	public KafkaConsumer<K, V> subscribe(String topicName) {
+		this.consumer.subscribe(Collections.singleton(topicName));
 		return this.consumer;
 	}
 	public KafkaConsumer<K, V> assign(TopicPartition topicPartition) {

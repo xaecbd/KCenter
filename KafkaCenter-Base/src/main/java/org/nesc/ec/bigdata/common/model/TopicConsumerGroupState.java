@@ -26,6 +26,18 @@ public class TopicConsumerGroupState {
 	private ConsumerGroupState consumerGroupState;
 	private boolean isSimpleConsumerGroup = false ;//false：api 根据member信息判断状态,true 状态直接置黄，给提示（"SimpleConsumerGroup无法判断其状态"）低级
 
+	//组内是否有members
+	private boolean hasMembers = true;
+
+
+	public boolean isHasMembers() {
+		return hasMembers;
+	}
+
+	public void setHasMembers(boolean hasMembers) {
+		this.hasMembers = hasMembers;
+	}
+
 	public String getGroupId() {
 		return groupId;
 	}

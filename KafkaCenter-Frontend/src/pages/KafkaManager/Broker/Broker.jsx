@@ -12,7 +12,7 @@ export default class Broker extends Component {
         text: 'Kafka Manager',
       },
       {
-        link: 'javascript:window.location.reload();',
+        link: '',
         text: 'Broker',
       },
     ];

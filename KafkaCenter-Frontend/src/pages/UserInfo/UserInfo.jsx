@@ -12,7 +12,7 @@ class UserInfo extends Component {
         text: 'Setting',
       },
       {
-        link: 'javascript:window.location.reload();',
+        link: '',
         text: 'My Profile',
       },
     ];

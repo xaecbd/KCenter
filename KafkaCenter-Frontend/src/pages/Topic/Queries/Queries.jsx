@@ -12,7 +12,7 @@ export default class Queries extends Component {
       },
       {
         // eslint-disable-next-line no-script-url
-        link: 'javascript:window.location.reload();',
+        link: '',
         text: 'Queries',
       },
     ];

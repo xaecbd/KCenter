@@ -17,7 +17,7 @@ public class SpirngMvcConfig implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry) {
 		SessionTimeOutInterceptor sessionTimeOutInterceptor = new SessionTimeOutInterceptor();
 		String[] allowUrls = {"/monitor/topic/consumer_offsets", "/monitor/topic/consumer_offsets/topic_metric",
-				"/#/user/login", "/index.html",  "/login/user","/login/check","/config/oauth2",
+				"/#/user/login", "/index.html",  "/login/user","/login/check","/config/oauth2","/api/consumer/status",
 				"/favicon.png", "/lag", "/monitor/group/detail", "/monitor/alert/group"};
 		sessionTimeOutInterceptor.setAllowUrls(allowUrls);
 		// 添加拦截器

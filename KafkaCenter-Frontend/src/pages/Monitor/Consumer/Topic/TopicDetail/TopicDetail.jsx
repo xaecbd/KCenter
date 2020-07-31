@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Table, Loading, Message, Button } from '@alifd/next';
+import React, { useState, useEffect } from 'react';
+import { Loading, Message, Button } from '@alifd/next';
 import { withRouter } from 'react-router-dom';
 import axios from '@utils/axios';
 import { formatSizeUnits } from '@utils/dataFormat';
@@ -8,97 +8,22 @@ import ConsumberGroup from './ConsumberGroup';
 
 import './TopicDetail.scss';
 
-@withRouter
-export default class TopicDetail extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      brokerMsg: [],
-      zkMsg: [],
-      isConsumberLoading: false,
-      clusterName: this.props.match.params.clusterName,
-    };
-  }
-  componentDidMount() {
-    const data = {
-      topic: this.props.match.params.topicName,
-      clusterID: this.props.match.params.id,
-    };
-    // this.fetchCluster(data);
-    // this.fetchMetric(data);
-    this.fetchDetail(data);
-  }
 
-  componentWillMount() {
-    this.mounted = true;
-  }
-  componentWillUnmount = () => {
-    this.mounted = false;
-  };
+function TopicDetail(props) {
+
+  const[brokerMsg,setBrokerMsg] = useState([]);
+  const[zkMsg,setZkMsg] = useState([]);
+  const[isConsumberLoading,setIsConsumberLoading] = useState(false);
+  const[clusterName,setClusterName] = useState(props.match.params.clusterName);
 
 
-  fetchDetail = (data) => {
-    this.setState(
-      {
-        isConsumberLoading: true,
-      },
-      () => {
-        axios.defaults.timeout = 180000;
-        axios
-          .post('/monitor/topic/consumer_offsets', data)
-          .then((response) => {
-            if (this.mounted) {
-              if (response.data.code === 200) {
-                this.setState({
-                  isConsumberLoading: false,
-                });
-                if (response.data.data.length > 0) {
-                  this.restructurConsumberData(response.data.data);
-                }
-              } else {
-                Message.error(response.data.message);
-                this.setState({
-                  isConsumberLoading: false,
-                });
-              }
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-            Message.error('Get Consumer Offset has error.');
-            this.setState({
-              isConsumberLoading: false,
-            });
-          });
-      }
-    );
-  };
-
-  fetchCluster = (data) => {
-    axios
-      .get(`/cluster/get?id=${data.clusterID}`)
-      .then((response) => {
-        if (response.data.code === 200) {
-          if (response.data.data) {
-            if (this.mounted) {
-              this.setState({
-                clusterName: response.data.data.name,
-              });
-            }
-          }
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-  restructurConsumberData = (data) => {
+  const restructurConsumberData = (data) => {
     const zkResult = [];
     const brokerResult = [];
     const record = {
-      topicName: this.props.match.params.topicName,
-      clusterID: this.props.match.params.id,
-      clusterName: this.props.match.params.clusterName,
+      topicName: props.match.params.topicName,
+      clusterID: props.match.params.id,
+      clusterName: props.match.params.clusterName,
     };
     if (data) {
       data.map((obj) => {
@@ -152,7 +77,7 @@ export default class TopicDetail extends Component {
           let lag = 0;
           let offset = 0;
           const isSimpleConsumerGroup = obj.simpleConsumerGroup;
-          const consumerGroupState = '';
+          const consumerGroupState = obj.consumerGroupState;
 
           if (obj.partitionAssignmentStates) {
             obj.partitionAssignmentStates.map((objs) => {
@@ -196,110 +121,156 @@ export default class TopicDetail extends Component {
         }
       });
     }
-    this.setState({
-      zkMsg: zkResult,
-      brokerMsg: brokerResult,
-    });
+    setZkMsg(zkResult);
+    setBrokerMsg(brokerMsg);
   };
-  backward = () => {
+
+  const fetchDetail = (data) => {
+    setIsConsumberLoading(true);
+    axios.defaults.timeout = 180000;
+    axios
+      .post('/monitor/topic/consumer_offsets', data)
+      .then((response) => {
+        if (response.data.code === 200) {
+          setIsConsumberLoading(false);
+          if (response.data.data.length > 0) {
+            restructurConsumberData(response.data.data);
+          }
+        } else {
+          Message.error(response.data.message);
+          setIsConsumberLoading(false);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        Message.error('Get Consumer Offset has error.');
+        setIsConsumberLoading(false);
+      });
+  };
+
+
+  useEffect(()=>{
+    const data = {
+      topic: props.match.params.topicName,
+      clusterID: props.match.params.id,
+    };
+    fetchDetail(data);
+  },[]);
+ 
+
+ 
+  const fetchCluster = (data) => {
+    axios
+      .get(`/cluster/get?id=${data.clusterID}`)
+      .then((response) => {
+        if (response.data.code === 200) {
+          if (response.data.data) {
+            setClusterName(response.data.data.name);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+  
+  const backward = () => {
     window.location.href = '#/monitor/consumer';
   };
-  handleRefresh = () => {
+  const handleRefresh = () => {
     const data = {
-      topic: this.props.match.params.topicName,
-      clusterID: this.props.match.params.id,
+      topic: props.match.params.topicName,
+      clusterID: props.match.params.id,
     };
-    this.fetchDetail(data);
+    fetchDetail(data);
   };
 
-  handleProduct=() => {
-    this.props.history.push(`/monitor/producer/metric/${this.props.match.params.id}/${this.state.clusterName}/${this.props.match.params.topicName}`);
+  const handleProduct=() => {
+    props.history.push(`/monitor/producer/metric/${props.match.params.id}/${clusterName}/${props.match.params.topicName}`);
   }
 
-  render() {
-    return (
-      <div style={styles.container}>
-        <div style={styles.listTitle}>
-          <FoundationSymbol
-            onClick={() => this.backward()}
-            style={styles.backward}
-            size="large"
-            type="backward"
-          />
-          cluster:&nbsp;<span style={styles.listTitles}>{this.state.clusterName}</span>&nbsp;&nbsp;topic:&nbsp;<span style={styles.listTitles}>{this.props.match.params.topicName}</span>
-        </div>
-        <div style={{ width: '100%', height: '5px' }}>
-
-          <Button
-            type="secondary"
-            style={{ float: 'right' }}
-            onClick={(e) => {
-                this.handleRefresh();
-              }}
-          >  Refresh&nbsp;&nbsp;
-            <FoundationSymbol size="small" type="exchange" />
-          </Button>
-          {' '}
-          <Button
-            type="secondary"
-            style={{ float: ' right', marginRight: '7px' }}
-            onClick={() => this.handleProduct()}
-          >
-            Producer&nbsp;&nbsp;
-            <FoundationSymbol size="small" type="link" />
-          </Button>
-        </div>
-        <div style={styles.metricTitle}> Consumers Offsets
-        </div>
-        <Loading visible={this.state.isConsumberLoading} style={styles.loading}>
-          {this.state.brokerMsg.length > 0 ? (
-            <div>
-              <div style={styles.metricTitle}>
-                Offsets Committed to Broker
-              </div>
-              <div
-                style={{
-                  minHeight: '15rem',
-                  padding: '15px',
-                  background: '#fff',
-                }}
-              >
-                {this.state.brokerMsg.map((obj) => {
-                  return (
-                    <div style={{ marginTop: '10px' }} key={obj.title}>
-                      <div>{obj.content}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : null}
-          {this.state.zkMsg.length > 0 ? (
-            <div>
-              <div style={styles.metricTitle}>
-                Offsets Committed to ZK
-              </div>
-              <div
-                style={{
-                  minHeight: '15rem',
-                  padding: '15px',
-                  background: '#fff',
-                }}
-              >
-                {this.state.zkMsg.map((obj) => {
-                  return (
-                    <div style={{ marginTop: '10px' }} key={obj.title}>
-                      <div>{obj.content}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : null}
-        </Loading>
+  return (
+    <div style={styles.container}>
+      <div style={styles.listTitle}>
+        <FoundationSymbol
+          onClick={() => backward()}
+          style={styles.backward}
+          size="large"
+          type="backward"
+        />
+        cluster:&nbsp;<span style={styles.listTitles}>{clusterName}</span>&nbsp;&nbsp;topic:&nbsp;<span style={styles.listTitles}>{props.match.params.topicName}</span>
       </div>
-    );
-  }
+      <div style={{ width: '100%', height: '5px' }}>
+
+        <Button
+          type="secondary"
+          style={{ float: 'right' }}
+          onClick={(e) => {
+            handleRefresh();
+          }}
+        >  Refresh&nbsp;&nbsp;
+          <FoundationSymbol size="small" type="exchange" />
+        </Button>
+        {' '}
+        <Button
+          type="secondary"
+          style={{ float: ' right', marginRight: '7px' }}
+          onClick={() => handleProduct()}
+        >
+          Producer&nbsp;&nbsp;
+          <FoundationSymbol size="small" type="link" />
+        </Button>
+      </div>
+      <div style={styles.metricTitle}> Consumers Offsets
+      </div>
+      <Loading visible={isConsumberLoading} style={styles.loading}>
+        {brokerMsg.length > 0 ? (
+          <div>
+            <div style={styles.metricTitle}>
+              Offsets Committed to Broker
+            </div>
+            <div
+              style={{
+                minHeight: '15rem',
+                padding: '15px',
+                background: '#fff',
+              }}
+            >
+              {brokerMsg.map((obj) => {
+                return (
+                  <div style={{ marginTop: '10px' }} key={obj.title}>
+                    <div>{obj.content}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+        {zkMsg.length > 0 ? (
+          <div>
+            <div style={styles.metricTitle}>
+              Offsets Committed to ZK
+            </div>
+            <div
+              style={{
+                minHeight: '15rem',
+                padding: '15px',
+                background: '#fff',
+              }}
+            >
+              {zkMsg.map((obj) => {
+                return (
+                  <div style={{ marginTop: '10px' }} key={obj.title}>
+                    <div>{obj.content}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+      </Loading>
+    </div>
+  );
 }
 
 const styles = {
@@ -334,3 +305,5 @@ const styles = {
     minHeight: '600px',
   },
 };
+
+export default withRouter(TopicDetail);

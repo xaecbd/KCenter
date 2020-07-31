@@ -47,9 +47,9 @@ public class CollectTopicJob {
      * 2.获取第一部分的数据，将topic表中没有的数据集群中有的数据写入表中
      * **/
     void collectionTopicData() {
-        Map<String,Set<String>> clusterTopicMap = topicDescripe();
+        Map<String,Set<String>> clusterTopicMap = topicDescribe();
         Set<Long> delete = this.dbTopic(clusterTopicMap);
-        Map<String,Set<TopicInfo>> map = topicOpertion();
+        Map<String,Set<TopicInfo>> map = topicOperation();
         Set<TopicInfo> needInsert = map.getOrDefault(Constants.Operation.INSERT,new HashSet<>());
         Set<TopicInfo> needUpdate = map.getOrDefault(Constants.Operation.UPDATE,new HashSet<>());
         if(!delete.isEmpty()) {
@@ -57,17 +57,17 @@ public class CollectTopicJob {
         }
         if(!needInsert.isEmpty()) {
             if(!topicInfoService.batchInsert(needInsert)) {
-                LOG.error("batch insert topic table faild,please check");
+                LOG.error("batch insert topic table failed,please check");
             }
         }
         if(!needUpdate.isEmpty()) {
             if(!topicInfoService.batchUpdate(needUpdate)) {
-                LOG.error("batch update topic table faild,please check");
+                LOG.error("batch update topic table failed,please check");
             }
         }
     }
 
-    private Map<String,Set<String>> topicDescripe(){
+    private Map<String,Set<String>> topicDescribe(){
         Map<String,Set<String>> clusterTopicMap = new HashMap<>();
         List<ClusterInfo> clusters = clusterService.getTotalData();
         clusters.forEach(cluster->{
@@ -90,27 +90,27 @@ public class CollectTopicJob {
 
     }
 
-    private Map<String, Set<TopicInfo>> topicOpertion(){
+    private Map<String, Set<TopicInfo>> topicOperation(){
         Map<String, Set<TopicInfo>> map = new HashMap<>();
         Set<TopicInfo> needInsert = new HashSet<>();
         Set<TopicInfo> needUpdate = new HashSet<>();
         descTopicMap.forEach((clusterId,topicInfo)-> topicInfo.forEach((key, value)->{
             List<TopicPartitionInfo>  topicPartitionInfos = value.partitions();
-            int partion = !topicPartitionInfos.isEmpty()?topicPartitionInfos.size():0;
+            int partition = !topicPartitionInfos.isEmpty()?topicPartitionInfos.size():0;
             int nodeSize = !topicPartitionInfos.isEmpty()?(!topicPartitionInfos.get(0).replicas().isEmpty()?topicPartitionInfos.get(0).replicas().size():0):0;
-            String newKey = calacKey(clusterId,key);
-            Map<String, Config> topicDescrip = descConfigsMap.get(clusterId);
+            String newKey = generateKey(clusterId,key);
+            Map<String, Config> topicDescribe = descConfigsMap.get(clusterId);
             if(!dbTopicMap.containsKey(newKey)) {
-                TopicInfo tInfo = this.updateTTL(topicDescrip,  clusterId, new TopicInfo(), key);
-                tInfo.setPartition(partion);
+                TopicInfo tInfo = this.updateTTL(topicDescribe,  clusterId, new TopicInfo(), key);
+                tInfo.setPartition(partition);
                 tInfo.setReplication((short)nodeSize);
                 tInfo.setTopicName(key);
                 tInfo.setClusterId(clusterId);
                 needInsert.add(tInfo);
             }else {
                 //需要更新的topic
-                TopicInfo tInfo = this.updateTTL(topicDescrip,clusterId, dbTopicMap.get(newKey), key);
-                tInfo.setPartition(partion);
+                TopicInfo tInfo = this.updateTTL(topicDescribe,clusterId, dbTopicMap.get(newKey), key);
+                tInfo.setPartition(partition);
                 tInfo.setReplication((short)nodeSize);
                 needUpdate.add(tInfo);
             }
@@ -124,7 +124,7 @@ public class CollectTopicJob {
         List<TopicInfo> topicInfos = topicInfoService.getTotalData();
         Set<Long> result = new HashSet<>();
         topicInfos.forEach(topic->{
-            String key = calacKey(topic.getCluster().getId().toString(),topic.getTopicName());
+            String key = generateKey(topic.getCluster().getId().toString(),topic.getTopicName());
             dbTopicMap.put(key, topic);
             Set<String> topics = clusterTopicMap.get(topic.getCluster().getId().toString());
             if( topics!=null && !topics.contains(topic.getTopicName())) {
@@ -135,10 +135,10 @@ public class CollectTopicJob {
 
     }
 
-    private TopicInfo updateTTL(Map<String, Config> topicDescrip,String clusterId,TopicInfo tInfo,String topicName) {
+    private TopicInfo updateTTL(Map<String, Config> topicDescribe,String clusterId,TopicInfo tInfo,String topicName) {
         try {
-            if(topicDescrip!=null) {
-                Config con = topicDescrip.get(topicName);
+            if(topicDescribe!=null) {
+                Config con = topicDescribe.get(topicName);
                 con.entries().forEach(entry->{
                     if(TopicConfig.DELETE_RETENTION_MS.equalsIgnoreCase(entry.name())) {
                         long ttl = Long.parseLong(entry.value());
@@ -169,7 +169,7 @@ public class CollectTopicJob {
 
 
 
-    private String calacKey(String clusterId,String topicName) {
+    private String generateKey(String clusterId,String topicName) {
         return clusterId+"|"+topicName;
     }
 }

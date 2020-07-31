@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import scala.collection.immutable.Stream;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -59,6 +60,9 @@ public class MonitorService {
 
 	@Autowired
 	ElasticsearchService eService;
+
+	@Autowired
+	ConsumerLagApiService consumerLagApiService;
 
 	public Map<Long,Set<String>> transfromToMap(List<org.nesc.ec.bigdata.model.Collections> collections){
 		Map<Long,Set<String>> xxx = new HashMap<>();
@@ -219,6 +223,8 @@ public class MonitorService {
 			if (topicConsumerGroupStates == null || topicConsumerGroupStates.isEmpty()) {
 				return topicConsumerGroupStates;
 			}
+
+
 			Set<String> groups = new HashSet<>();
 			// 填充lag/logEndOffset
 			topicConsumerGroupStates.forEach(topicConsumerGroupState -> {
@@ -227,6 +233,10 @@ public class MonitorService {
 				List<PartitionAssignmentState> partitionAssignmentStates = topicConsumerGroupState
 						.getPartitionAssignmentStates();
 				partitionAssignmentStates.sort(Comparator.comparingInt(PartitionAssignmentState::getPartition));
+				String key = consumerLagApiService.generateKey(clusterID,groupId,topic,topicConsumerGroupState.getConsumerMethod());
+				ConsumerGroupState state = consumerLagApiService.lagStatus(topicConsumerGroupState.getConsumerGroupState(),partitionAssignmentStates,key,
+						false,topicConsumerGroupState.isSimpleConsumerGroup());
+				topicConsumerGroupState.setConsumerGroupState(state);
 				Map<TopicPartition, Long> logSizeMap = kafkaConsumersService.getLogSize(clusterID, groupId, topic);
 				if (logSizeMap == null || logSizeMap.isEmpty()) {
 					return;
@@ -413,6 +423,9 @@ public class MonitorService {
 
 			partitionAssignmentStates.sort(Comparator.comparingInt(PartitionAssignmentState::getPartition));
 			topicConsumerGroupState.setPartitionAssignmentStates(partitionAssignmentStates);
+			String key = consumerLagApiService.generateKey(clusterID,group,topic,topicConsumerGroupState.getConsumerMethod());
+			ConsumerGroupState state = consumerLagApiService.lagStatus(ConsumerGroupState.STABLE,partitionAssignmentStates,key,true,false);
+			topicConsumerGroupState.setConsumerGroupState(state);
 			topicConsumerGroupStates.add(topicConsumerGroupState);
 		});
 		return topicConsumerGroupStates;
@@ -710,7 +723,7 @@ public class MonitorService {
 	 * @throws ExecutionException
 	 * @throws TimeoutException
 	 */
-	private List<GroupTopicConsumerState> getZKConsumerOffsetsByGroup(String clusterID, String consummerGroup) throws InterruptedException, ExecutionException, TimeoutException {
+	List<GroupTopicConsumerState> getZKConsumerOffsetsByGroup(String clusterID, String consummerGroup) throws InterruptedException, ExecutionException, TimeoutException {
 		Set<String> topics = zkService.getZK(clusterID).listTopicsByGroup(consummerGroup);
 		if(topics == null || topics.isEmpty()) {
 			return null;
@@ -754,6 +767,9 @@ public class MonitorService {
 			});
 			partitionAssignmentStates.sort(Comparator.comparingInt(PartitionAssignmentState::getPartition));
 			groupConsumerState.setPartitionAssignmentStates(partitionAssignmentStates);
+			String key = consumerLagApiService.generateKey(clusterID,consummerGroup,topic,Constants.KeyStr.zk);
+			ConsumerGroupState state = consumerLagApiService.lagStatus(ConsumerGroupState.STABLE,partitionAssignmentStates,key,true,false);
+			groupConsumerState.setConsumerGroupState(state);
 			groupConsumerStates.add(groupConsumerState);
 		}
 		return groupConsumerStates;
@@ -766,7 +782,7 @@ public class MonitorService {
 	 * @param consummerGroup
 	 * @return
 	 */
-	private List<GroupTopicConsumerState> getBrokerConsumerOffsetsByGroup(String clusterID, String consummerGroup) {
+	List<GroupTopicConsumerState> getBrokerConsumerOffsetsByGroup(String clusterID, String consummerGroup) {
 		List<GroupTopicConsumerState> groupConsumerStates = new ArrayList<>();
 		try {
 			groupConsumerStates = kafkaAdminService.getKafkaAdmins(clusterID).describeConsumerGroupsByGroup(consummerGroup);
@@ -779,6 +795,10 @@ public class MonitorService {
 						.getPartitionAssignmentStates();
 				partitionAssignmentStates.sort(Comparator.comparingInt(PartitionAssignmentState::getPartition));
 				String topic = topicConsumerGroupState.getTopic();
+				String key = consumerLagApiService.generateKey(clusterID,consummerGroup,topic,topicConsumerGroupState.getConsumerMethod());
+				ConsumerGroupState state = consumerLagApiService.lagStatus(topicConsumerGroupState.getConsumerGroupState(),partitionAssignmentStates,key,
+						false,topicConsumerGroupState.isSimpleConsumerGroup());
+				topicConsumerGroupState.setConsumerGroupState(state);
 				Map<TopicPartition, Long> logSizeMap = kafkaConsumersService.getLogSize(clusterID, consummerGroup, topic);
 				if (logSizeMap == null || logSizeMap.isEmpty()) {
 					return;

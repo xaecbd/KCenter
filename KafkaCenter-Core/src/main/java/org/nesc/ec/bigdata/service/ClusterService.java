@@ -189,4 +189,9 @@ public class ClusterService {
         }
 		return clusterMess;
 	}
+
+	public  String getBrokers(String clusterId){
+		ClusterInfo cluster =  clusterInfoMapper.selectById(clusterId);
+		return cluster.getBroker();
+	}
 }

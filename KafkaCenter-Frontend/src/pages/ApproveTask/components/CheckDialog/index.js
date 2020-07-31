@@ -7,8 +7,29 @@ import {
   FormBinder as IceFormBinder,
 } from '@icedesign/form-binder';
 
+const styles = {
+  simpleFormDialog: { width: '640px' },
+  detailItem: {
+    padding: '15px 0px',
+    display: 'flex',
+    borderTop: '1px solid #EEEFF3',
+  },
+  detailTitle: {
+    marginRight: '30px',
+    textAlign: 'right',
+    width: '120px',
+    color: '#999999',
+  },
+  detailBody: {
+    flex: 1,
+  },
+  errormess: {
+    color: 'red',
+  },
+};
 export default class CheckDialog extends Component {
   static displayName = 'Dialog';
+
   constructor(props) {
     super(props);
     this.state = {
@@ -36,6 +57,7 @@ export default class CheckDialog extends Component {
       selectValue: value,
     });
   }
+
   // 接受父类props改变，修改子类中的属性
   componentWillReceiveProps(nextProps) {
     const tempList = [];
@@ -71,6 +93,7 @@ export default class CheckDialog extends Component {
         });
     }
   }
+
   handelDialog = () => {
     this.setState({
       errormess: '',
@@ -149,7 +172,7 @@ export default class CheckDialog extends Component {
           RejectLoading: true,
         },
         () => {
-          axios.get(`/topic/task/reject/${this.state.dialogObj.record.id}/${this.state.approvalComments}`).then((response) => {
+          axios.post(`/topic/task/reject/${this.state.dialogObj.record.id}`,{'approvalComments':this.state.approvalComments}).then((response) => {
             if (response.data.code === 200) {
               Message.success(response.data.message);
               this.setState({
@@ -288,23 +311,4 @@ export default class CheckDialog extends Component {
     );
   }
 }
-const styles = {
-  simpleFormDialog: { width: '640px' },
-  detailItem: {
-    padding: '15px 0px',
-    display: 'flex',
-    borderTop: '1px solid #EEEFF3',
-  },
-  detailTitle: {
-    marginRight: '30px',
-    textAlign: 'right',
-    width: '120px',
-    color: '#999999',
-  },
-  detailBody: {
-    flex: 1,
-  },
-  errormess: {
-    color: 'red',
-  },
-};
+

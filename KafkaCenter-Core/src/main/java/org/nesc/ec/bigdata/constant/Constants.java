@@ -51,6 +51,8 @@ public class Constants {
 		public static final String WARN = "warn";
 		public static final String OK = "ok";
 		public static  final String BAD  = "bad";
+		public static final String ACTIVE = "active";
+		public static final String DEAD = "dead";
 
 	}
 
@@ -66,6 +68,7 @@ public class Constants {
 	}
 
 	public static class KeyStr{
+		public static final String API = "api";
 		public static final String COUNT = "Count";
 		public static final String SINGLE = "Single";
 		public static final String CLUSTER ="cluster";
@@ -76,6 +79,8 @@ public class Constants {
 		public static final String CLIENTID = "clientId";
 		public static final String TOPICNAME = "topicName";
 		public static final String TOPIC_NAME = "topic_name";
+
+		public static final String APPROVAL_COMMENTS = "approvalComments";
 
 		public static final String START = "start";
 		public static final String INTERVAL = "interval";
