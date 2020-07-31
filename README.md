@@ -81,7 +81,7 @@ docker run -d \
   -p 8080:8080 \
   --name KafkaCenter \
   -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties \ 
-  xaecbd/kafka-center:2.1.0
+  xaecbd/kafka-center:2.2.0
 ```
 
 #### Option B: Local
@@ -92,7 +92,7 @@ $ git clone https://github.com/xaecbd/KafkaCenter.git
 $ cd KafkaCenter
 $ mvn clean package -Dmaven.test.skip=true
 $ cd KafkaCenter\KafkaCenter-Core\target
-$ java -jar KafkaCenter-Core-2.1.0-SNAPSHOT.jar
+$ java -jar KafkaCenter-Core-2.2.0-SNAPSHOT.jar
 ```
 
 
