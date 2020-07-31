@@ -4,14 +4,14 @@
 ## 消费延迟
 数据准确性存在5分钟延迟（为避免过度调用对集群产生影响）
 ```http request
-GET http://127.0.0.1:8080/api/consumer/status?cluster_id=1&topic=EC_Pf__com_mouse&group=BotDetectionConsumer_Mouse
+GET http://127.0.0.1:8080/api/consumer/status?cluster_id=1&topic=trumandu_topic&group=trumandu_test
 
 {
     "code": 200,
     "data": [
         {
-            "group": "BotDetectionConsumer_Mouse",
-            "topic": "EC_Pf_test_com_mouse",
+            "group": "trumandu_test",
+            "topic": "trumandu_topic",
             "status": "active",
             "lag": 0,
             "method": "zk"
@@ -23,7 +23,7 @@ cluster_id 可以在Monitor/Consumer查看指定group的页面，在地址栏中
 
 例如：如下1即为E4Kafka的cluster_id
 ```http request
-https://127.0.0.1:8080/#/monitor/consumer/topic/consumer_offsets/1/E4Kafka/api-log-topic
+https://127.0.0.1:8080/#/monitor/consumer/topic/consumer_offsets/1/E4Kafka/trumandu_topic
 ```
 
 status有三种状态：active，unknown，dead
