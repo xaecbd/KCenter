@@ -35,9 +35,9 @@ KafkaCenter是Kafka 集群管理和维护，生产/消费监控，生态组件�
 - **Approve**->
 此模块主要用于当普通用户申请创建Topic，管理员进行审批操作。
 - **Setting**->
-此模块主要功能为管理员维护User、Team以及kafka cluster信息
+此模块主要功能为管理员维护User、Team
 - **Kafka Manager**->
-此模块用于管理员对集群的正常维护操作。
+此模块用于管理员对集群的正常维护操作包含：集群管理，topic管理，集群监控，group管理，broker管理等。
 
 ## 配置
 [application.properties](KafkaCenter-Core/src/main/resources/application.properties)
@@ -61,7 +61,7 @@ elasticsearch(7.0+)|非必须|监控信息，例如集群metirc,消费lag可视�
 - Docker run(**推荐**)
 
 ```
-docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.1.0
+docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.2.0
 ```
 
 - Local run
@@ -72,7 +72,7 @@ $ git clone https://github.com/xaecbd/KafkaCenter.git
 $ cd KafkaCenter
 $ mvn clean package -Dmaven.test.skip=true
 $ cd KafkaCenter\KafkaCenter-Core\target
-$ java -jar KafkaCenter-Core-2.1.0-SNAPSHOT.jar
+$ java -jar KafkaCenter-Core-2.2.0-SNAPSHOT.jar
 ```
 
 ### 3.最后访问系统
