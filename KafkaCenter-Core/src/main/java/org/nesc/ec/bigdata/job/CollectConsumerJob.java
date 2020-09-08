@@ -23,6 +23,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component
 class CollectConsumerJob {
@@ -46,50 +48,49 @@ class CollectConsumerJob {
     @Autowired
     AlertaJob alertaJob;
 
-     void collectConsumer(){
-        try {
-            SimpleDateFormat sFormat = new SimpleDateFormat("yyyy-MM-dd");
-            List<ClusterInfo> clusters = clusterService.getTotalData();
-            List<AlertGoup> alertGroups = alertService.getAlertGoups();
-            for (ClusterInfo clusterInfo : clusters) {
+    private ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-                if (initConfig.isMonitorCollectorIncludeEnable() && !clusterInfo.getLocation()
-                        .equalsIgnoreCase(initConfig.getMonitorCollectorIncludelocation())) {
-                    continue;
-                }
-                Map<String, List<PartitionAssignmentState>> consumerGroupsMap = monitorService
-                        .describeConsumerGroups(clusterInfo.getId().toString());
-                Map<String, List<OffsetInfo>> offsetInfoMap = convertToMap(consumerGroupsMap,
-                        clusterInfo.getId());
-
-                Map<String, JSONObject> toEsMap = mergeConsumerGroupsMap(consumerGroupsMap,
-                        clusterInfo.getId());
-
-                // 实现对比，查看是否超过设置的alert
-                Map<String,AlertGoup> alertGoupMap = generateAlertGroup(alertGroups);
-                //解析consumer lag，是否超过alert配置的thesold和alerta的thsold
-                watchAlert(alertGoupMap,toEsMap,offsetInfoMap,clusterInfo);
-                //将consumer lag信息放入缓存中
-                putConsumerLagStatusToMap(toEsMap,offsetInfoMap,clusterInfo);
-                // 将监控信息写入ES中
-                try {
-                    List<JSONObject> consumerOffsets = new ArrayList<>();
-                    toEsMap.forEach((key, value) -> consumerOffsets.add(value));
-                    String index = elasticsearchService.getMonitorElasticsearchIndexName() + "-"
-                            + sFormat.format(new Date());
-                    if(elasticsearchService.getESDB()!=null){
-                        elasticsearchService.getESDB().batchInsertES(consumerOffsets, index);
-                    }
-
-                } catch (IOException e) {
-                    LOG.error("monitor lag message to es error.", e);
-                }
+    void collectConsumer() {
+        SimpleDateFormat sFormat = new SimpleDateFormat("yyyy-MM-dd");
+        List<ClusterInfo> clusters = clusterService.getTotalData();
+        List<AlertGoup> alertGroups = alertService.getAlertGoups();
+        Map<String, AlertGoup> alertGoupMap = generateAlertGroup(alertGroups);
+        for (ClusterInfo clusterInfo : clusters) {
+            if (initConfig.isMonitorCollectorIncludeEnable() && !clusterInfo.getLocation()
+                    .equalsIgnoreCase(initConfig.getMonitorCollectorIncludelocation())) {
+                continue;
             }
+            executorService.execute(() -> {
+                try {
+                    Map<String, List<PartitionAssignmentState>> consumerGroupsMap = monitorService
+                            .describeConsumerGroups(clusterInfo.getId().toString());
+                    Map<String, List<OffsetInfo>> offsetInfoMap = convertToMap(consumerGroupsMap,
+                            clusterInfo.getId());
 
-        } catch (Exception e) {
-            LOG.error("monitor lag  error.", e);
+                    Map<String, JSONObject> toEsMap = mergeConsumerGroupsMap(consumerGroupsMap,
+                            clusterInfo.getId());
+
+                    //解析consumer lag，是否超过alert配置的thesold和alerta的thsold
+                    watchAlert(alertGoupMap, toEsMap, offsetInfoMap, clusterInfo);
+                    //将consumer lag信息放入缓存中
+                    putConsumerLagStatusToMap(toEsMap, offsetInfoMap, clusterInfo);
+                    // 将监控信息写入ES中
+                    try {
+                        List<JSONObject> consumerOffsets = new ArrayList<>();
+                        toEsMap.forEach((key, value) -> consumerOffsets.add(value));
+                        String index = elasticsearchService.getMonitorElasticsearchIndexName() + "-"
+                                + sFormat.format(new Date());
+                        if (elasticsearchService.getESDB() != null) {
+                            elasticsearchService.getESDB().batchInsertES(consumerOffsets, index);
+                        }
+                    } catch (IOException e) {
+                        LOG.error("monitor lag message to es error.", e);
+                    }
+                } catch (Exception e) {
+                    LOG.error("monitor lag  error.", e);
+                }
+            });
         }
-
     }
 
     /**
