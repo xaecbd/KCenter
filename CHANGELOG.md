@@ -1,3 +1,11 @@
+# 2.3.0 (2020-9-26)
+###Features / Enhancements
+* add new home page
+* add topic file size
+* enhance producer monitor
+* rebuilt cluster module
+### Bug Fixes
+* fix some bug
 # 2.2.0 (2020-7-31)
 ###Features / Enhancements
 * add monitor consumer lag api
