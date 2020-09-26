@@ -1,31 +1,28 @@
-import React, { Component } from 'react';
+import React from 'react';
 import IceContainer from '@icedesign/container';
 import CustomBreadcrumb from '@components/CustomBreadcrumb';
 import TopicTable from './TopicTable';
 
+function Topic(){
+  const breadcrumb = [
+    {
+      link: '',
+      text: 'Monitor',
+    },
+    {
+      link: '',
+      text: 'Producer',
+    },
+  ];
+  return (
+    <div>
+      <CustomBreadcrumb items={breadcrumb} title="Producer" />
+      <IceContainer style={styles.container} >
 
-export default class Topic extends Component {
-  render() {
-    const breadcrumb = [
-      {
-        link: '',
-        text: 'Monitor',
-      },
-      {
-        link: '',
-        text: 'Producer',
-      },
-    ];
-    return (
-      <div>
-        <CustomBreadcrumb items={breadcrumb} title="Producer" />
-        <IceContainer style={styles.container} >
-
-          <TopicTable />
-        </IceContainer>
-      </div>
-    );
-  }
+        <TopicTable />
+      </IceContainer>
+    </div>
+  );
 }
 
 const styles = {
@@ -35,3 +32,5 @@ const styles = {
     minHeight: '600px',
   },
 };
+
+export default Topic;

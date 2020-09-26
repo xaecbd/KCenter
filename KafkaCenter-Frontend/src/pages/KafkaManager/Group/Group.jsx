@@ -18,7 +18,7 @@ export default class Topic extends Component {
     ];
     return (
       <div>
-        <CustomBreadcrumb items={breadcrumb} title="Group List" />
+        <CustomBreadcrumb items={breadcrumb} title=''/>
         <IceContainer style={styles.container}>
           <GroupList />
         </IceContainer>
@@ -28,7 +28,7 @@ export default class Topic extends Component {
 }
 const styles = {
   container: {
-    margin: '20px',
+    margin: '5px',
     padding: '10px 20px 20px',
     minHeight: '600px',
   },

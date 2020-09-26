@@ -1,10 +1,10 @@
 package org.nesc.ec.bigdata.service;
 
+import org.nesc.ec.bigdata.config.InitConfig;
 import org.nesc.ec.bigdata.model.EmailEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -22,8 +22,8 @@ public class EmailService {
 	private JavaMailSender javaMailSender;
 	@Autowired
 	private TemplateEngine templateEngine;
-	@Value("${mail.enable:true}")
-	private Boolean enable;
+    @Autowired
+	InitConfig initConfig;
 
 	private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
@@ -35,24 +35,25 @@ public class EmailService {
 	 * @param mailType
 	 * @throws Exception
 	 */
-	public void randerTemplate(Object emailEntity, Object mailContent, int mailType) throws Exception {
+	public void renderTemplateAndSend(Object emailEntity, Object mailContent, int mailType) throws Exception {
 		try {
-			EmailEntity mailEntity = (EmailEntity) emailEntity;
-			@SuppressWarnings("unchecked")
-			Map<String, Object> mailContentMap = (Map<String, Object>) mailContent;
-			Context context = new Context();
-			context.setVariables(mailContentMap);
-			String emailContent;
-			if (mailType == 1) {
-				emailContent = templateEngine.process("mail/toAdminApproveMail", context);
-			} else if (mailType == 3) {
-				emailContent = templateEngine.process("mail/toUserApproveMail", context);
-			} else if (mailType == 2) {
-				emailContent = templateEngine.process("mail/toUserRejectMail", context);
-			} else {
-				emailContent = templateEngine.process("mail/toAlertMail", context);
-			}
-			if (enable) {
+			if (initConfig.getMailEnable()) {
+				EmailEntity mailEntity = (EmailEntity) emailEntity;
+				@SuppressWarnings("unchecked")
+				Map<String, Object> mailContentMap = (Map<String, Object>) mailContent;
+				Context context = new Context();
+				context.setVariables(mailContentMap);
+				String emailContent;
+				if (mailType == 1) {
+					emailContent = templateEngine.process("mail/toAdminApproveMail", context);
+				} else if (mailType == 3) {
+					emailContent = templateEngine.process("mail/toUserApproveMail", context);
+				} else if (mailType == 2) {
+					emailContent = templateEngine.process("mail/toUserRejectMail", context);
+				} else {
+					emailContent = templateEngine.process("mail/toAlertMail", context);
+				}
+
 				sendTemplateMail(mailEntity, emailContent);
 			}
 		} catch (Exception e) {

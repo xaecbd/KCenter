@@ -17,12 +17,28 @@ export default class CustomPagination extends Component {
   componentDidUpdate(prevProps) {
     if (prevProps.dataSource !== this.props.dataSource) {
       this.initData(this.props.dataSource);
+      this.setPageSizeAndPageList();
     } else {
       // 此处逻辑是为了避免引用修改数据造成无法刷新的问题
       // eslint-disable-next-line no-lonely-if
       if (!this.arrayIsEqual(this.state.dataSource, this.props.dataSource)) {
         this.initData(this.props.dataSource);
+        this.setPageSizeAndPageList();
       }
+    }
+  }
+
+
+  setPageSizeAndPageList(){
+    if(this.props.pageList){
+      this.setState({
+        pageList:this.props.pageList
+      });
+    }
+    if(this.props.pageSize){
+      this.setState({
+        pageSize:this.props.pageSize
+      });
     }
   }
 

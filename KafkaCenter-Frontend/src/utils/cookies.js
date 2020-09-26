@@ -5,9 +5,9 @@ const dayjs = require('dayjs');
 export function setPersonalityCluster(moduleName, cluster) {
   let cookie = getPersonalityCookie();
 
-//   if (getPersonalityCluster(moduleName).cluster === cluster.cluster) {
-//     return;
-//   }
+  //   if (getPersonalityCluster(moduleName).cluster === cluster.cluster) {
+  //     return;
+  //   }
 
   if (cookie == null || typeof (cookie) === 'undefined') {
     cookie = {};
@@ -23,8 +23,8 @@ export function setPersonalityCluster(moduleName, cluster) {
 
 export function getPersonalityCluster(moduleName) {
   const cookie = getPersonalityCookie();
- // let cluster = {cluster:'ALL',id:-1};.
- let cluster = {};
+  // let cluster = {cluster:'ALL',id:-1};.
+  const cluster = {};
   if (cookie == null || typeof (cookie) === 'undefined') {
     return cluster;
   }
@@ -40,43 +40,43 @@ export function getPersonalityCluster(moduleName) {
 }
 
 export function setUrl(name,url) {
-    try {
-     const data = dayjs().add(3, 'minute').toDate();
-     Cookies.set(name, url,{
+  try {
+    const data = dayjs().add(3, 'minute').toDate();
+    Cookies.set(name, url,{
+      path: '/',
+      expires: data,
+    });
+  } catch (error) {
+    console.error(error);
+    return '';
+  }
+}
+
+export function removeUrl(name) {
+  try {
+    // return cookie;
+    Cookies.remove(name);
+  } catch (error) {
+    console.error(error);
+    return '';
+  }
+}
+
+export function getUrlCookie(name) {
+  try {
+    let json = Cookies.get(name);
+    if(json ===  '' || json===undefined){
+      json = '/#/home/page';
+      Cookies.set(name, json,{
         path: '/',
-        expires: data,
+        maxAge: 60*1
       });
-    } catch (error) {
-      console.error(error);
-      return '';
-    }
+    }      
+    return json;
+  } catch (error) {
+    return null;
   }
-
-  export function removeUrl(name) {
-    try {
-     // return cookie;
-      Cookies.remove(name);
-    } catch (error) {
-      console.error(error);
-      return '';
-    }
-  }
-
-  export function getUrlCookie(name) {
-    try {
-      const json = Cookies.get(name);
-      if(json ===  '' || json===undefined){
-          json = '/#/home/page';
-          Cookies.set(name, json,{
-            path: '/',
-            maxAge: 60*1
-          });
-      }      
-      return json;
-    } catch (error) {
-      return null;
-    }
-  }
+}
 
 export function getPersonalityCookie() {
   try {

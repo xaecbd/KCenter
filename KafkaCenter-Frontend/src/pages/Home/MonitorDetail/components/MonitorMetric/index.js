@@ -10,18 +10,21 @@ import IceContainer from '@icedesign/container';
 import { withRouter } from 'react-router-dom';
 import MonitorChart from '../MonitorChart';
 
-import '../../../Cluster.scss';
 
 
 @withRouter
 export default class MonitorMetric extends Component {
-  state = {
-    id: this.props.id,
-    data: [],
-    clusterData: [],
-    isLoading: false,
-
-  };
+  constructor(props){
+    super(props);
+    this.state = {
+      id: this.props.id,
+      data: [],
+      clusterData: [],
+      isLoading: false,
+  
+    };
+  }
+  
 
 
   componentWillMount() {

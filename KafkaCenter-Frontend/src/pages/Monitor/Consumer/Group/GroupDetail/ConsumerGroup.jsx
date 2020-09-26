@@ -10,7 +10,7 @@ import green from '@images/green.svg';
 import error from '@images/error.svg';
 import alert from '@images/alert.svg';
 import axios from '@utils/axios';
-import './GroupDetail.scss';
+import style from './index.module.scss';
 import EditDialog from '../../Alert';
 
 function ConsumerGroup(props) {
@@ -65,14 +65,14 @@ function ConsumerGroup(props) {
   };
 
   useEffect(() => {
-    let taryger;
-    if (isZk) {
-      taryger = document.getElementsByClassName('zktest')[0];
-    } else {
-      taryger = document.getElementsByClassName('custom-table')[0];
-    }
-    taryger.getElementsByTagName('thead')[0].style.display =
-      'table-header-group';
+    // let taryger;
+    // if (isZk) {
+    //   taryger = document.getElementsByClassName('zktest')[0];
+    // } else {
+    //   taryger = document.getElementsByClassName('customTable')[0];
+    // }
+    // taryger.getElementsByTagName('thead')[0].style.display =
+    //   'table-header-group';
   }, []);
 
   const handelGroupChart = (record) => {
@@ -108,7 +108,7 @@ function ConsumerGroup(props) {
             if (response.data.code === 200) {
               setAlertData(response.data.data);
               setLoading(false);
-              const newData = alertData;
+              const newData = response.data.data;
               if (obj.consummerApi !== newData.consummerApi) {
                 newData.consummerApi = 'ALL';
               }
@@ -227,7 +227,7 @@ function ConsumerGroup(props) {
           >
             {value}
           </a>
-          <span title="SimpleConsumerGroup" className="onMeous">
+          <span title="SimpleConsumerGroup" className={style.onMeous}>
             <FoundationSymbol type="customize" size="small" />
           </span>
         </div>
@@ -245,15 +245,15 @@ function ConsumerGroup(props) {
       </div>
     );
   };
-  const renderYellowObj = (value) => {
+  const renderYellowObj = () => {
     return renderIceImag(warning, 'SimpleConsumerGroup无法判断其状态');
   };
-  const StopObj = (value) => {
+  const StopObj = () => {
     return renderIceImag(error, props.config.consumerGroupState);
   };
 
   let result = null;
-  if (props.config.consumerGroupState === 'STABLE') {
+  if (props.config.kafkaCenterGroupState === 'ACTIVE') {
     result = (
       <Table.Column
         title="Status"
@@ -262,7 +262,7 @@ function ConsumerGroup(props) {
         width={10}
       />
     );
-  } else if (props.config.consumerGroupState === 'DEAD') {
+  } else if (props.config.kafkaCenterGroupState === 'DEAD') {
     result = (
       <Table.Column
         title="Status"
@@ -283,7 +283,7 @@ function ConsumerGroup(props) {
   }
 
   return (
-    <div className={isZk ? 'zktest' : ''}>
+    <div className={isZk ? 'style.zktest' : ''}>
       <Loading visible={loading} style={styles.loading}>
         <EditDialog
           visible={visible}
@@ -293,9 +293,10 @@ function ConsumerGroup(props) {
         />
       </Loading>
       <Table
-        className="custom-table"
+        className={style.customTable}
         dataSource={data}
         cellProps={getCellProps}
+        hasHeader={props.config.hasHeard}
       >
         <Table.Column
           title="Topic"
@@ -303,7 +304,7 @@ function ConsumerGroup(props) {
           cell={render}
           width={190}
         />
-        <Table.Column title="Partition" dataIndex="partition" width={50} />
+        <Table.Column title="Partition" dataIndex="partition" width={60} />
         <Table.Column
           title="Offset"
           dataIndex="offset"

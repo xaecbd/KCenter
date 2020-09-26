@@ -54,6 +54,13 @@ public class MonitorController extends BaseController {
 	@Autowired
 	HttpServletRequest request;
 
+
+	/**
+	 * Monitor模块下producer和consumer获取所有的topic,并且填充该topic是否被收藏。
+	 * 该方法返回数据为实时从集群获取
+	 * @param clusterId
+	 * @return
+	 */
 	@RequestMapping(value = "/topic", method = RequestMethod.GET)
 	public List<MonitorTopic> getTopicList(@RequestParam("cluster") String clusterId) {
 		List<MonitorTopic> monitorTopics = new ArrayList<>();
@@ -66,12 +73,18 @@ public class MonitorController extends BaseController {
 		return monitorTopics;
 	}
 
+	/**
+	 * 收藏topic
+	 * @param type
+	 * @param clusterId
+	 * @return
+	 */
 	@RequestMapping(value = "/favorite", method = RequestMethod.GET)
 	@ResponseBody
 	public RestResponse getCollectionList(@PathParam(value= Constants.JsonObject.TYPE) String type,@RequestParam("cluster") String clusterId) {
 		UserInfo user = getCurrentUser();
 		if(Constants.Role.ADMIN.equalsIgnoreCase(user.getName())){
-			user.setId(0L);
+			user.setId(-1L);
 		}
 		List<MonitorTopic> monitorTopics = "-1".equalsIgnoreCase(clusterId)?monitorService.listUserFavorite(user,type):
 					monitorService.listUserFavorite(user,type).stream().filter(topic->{
@@ -79,10 +92,19 @@ public class MonitorController extends BaseController {
 					}).collect(Collectors.toList());
 		return SUCCESS_DATA(monitorTopics);
 	}
+
+	/**
+	 * 获取收藏列表
+	 * @param name
+	 * @param collection
+	 * @param clusterId
+	 * @param type
+	 * @return
+	 */
 	@GetMapping("/topic/collection")
 	@ResponseBody
 	public RestResponse collections(@PathParam(value = Constants.JsonObject.NAME) String name, @PathParam(value= Constants.KeyStr.COLLECTION) String collection
-			, @PathParam(value= Constants.KeyStr.clusterId) String clusterId, @PathParam(value=Constants.JsonObject.TYPE) String type) {
+			, @PathParam(value= Constants.KeyStr.LOWER_CLUSTER_ID) String clusterId, @PathParam(value=Constants.JsonObject.TYPE) String type) {
 		try {
 			UserInfo user = getCurrentUser();
 			if(Constants.Role.ADMIN.equalsIgnoreCase(user.getName())){
@@ -108,10 +130,10 @@ public class MonitorController extends BaseController {
 					return SUCCESS("Collection  SUCCESS!");
 				}
 			}} catch (Exception e) {
-				LOG.error("Collection Topic Faild,message:",e);
-				return ERROR("Collection Topic Faild!");
+				LOG.error("Collection Topic Failed,message:",e);
+				return ERROR("Collection Topic Failed!");
 			}
-		return ERROR("Collection Topic Faild!");
+		return ERROR("Collection Topic Failed!");
 	}
 
 
@@ -134,30 +156,13 @@ public class MonitorController extends BaseController {
 			JSONArray data = restService.queryRemoteQuery(url, queryMap);
 			return SUCCESS_DATA(data);
 		} else {
-			List<TopicConsumerGroupState> topicGroups = monitorService.describeConsumerGroups(topic, clusterID);
+			List<TopicConsumerGroupState> topicGroups = monitorService.describeConsumerGroups(topic, info);
 			topicGroups.sort((o1, o2) -> o1.getGroupId().compareToIgnoreCase(o2.getGroupId()));
 			return SUCCESS_DATA(topicGroups);
 		}
 
 	}
 
-	@RequestMapping(value = "/topic_group", method = RequestMethod.POST)
-	public RestResponse listGroup(@RequestBody Map<String, String> queryMap) {
-		String topic = queryMap.get(BrokerConfig.TOPIC);
-		String clusterID = queryMap.get(Constants.KeyStr.CLUSTERID);
-
-		if (StringUtils.isBlank(clusterID) || StringUtils.isBlank(topic)) {
-			return ERROR("clusterID and topic must not blank.");
-		}
-		Set<String> topicGroups = new HashSet<>();
-		try {
-			topicGroups = monitorService.listGroups(topic, clusterID);
-		} catch (Exception e) {
-			LOG.error("GET Topic Groups Faild,message:{}",e.getMessage());
-			return ERROR("error");
-		}
-		return SUCCESS_DATA(topicGroups);
-	}
 
 	@RequestMapping(value = "/topic/consumer_offsets/topic_metric", method = RequestMethod.POST)
 	public RestResponse topicMetric(@RequestBody Map<String, String> queryMap) {
@@ -177,11 +182,26 @@ public class MonitorController extends BaseController {
 		} else {
 			Set<MeterMetric> result = monitorService.getBrokerMetric(clusterID,topic);
 			if (result == null) {
-				return SUCCESS("please confirm your jmx enable alreay open!");
+				return SUCCESS("please confirm your jmx enable already open!");
 			}
 			return SUCCESS_DATA(result);
 		}
 
+	}
+
+	/**return the topic metric chart data*/
+	@GetMapping("/topic/metric")
+	public RestResponse topicMetricTrend(@RequestParam(value = "clusterId")String clusterId,@RequestParam(value = "topic") String topic,@RequestParam(value = "metric")String metricName,
+										 @RequestParam(value = "start")String start,@RequestParam(value = "end")String end){
+		List<JSONObject> result = elasticsearchService.getTopicMetric(Long.parseLong(start),Long.parseLong(end),clusterId,topic,metricName);
+		return  SUCCESS_DATA(result);
+
+	}
+
+	/**return the topic fileSize and logSize*/
+	@GetMapping("/topic/offset")
+	public RestResponse  topicOffsetAndLogSize(@RequestParam(value = "clusterId")String clusterId,@RequestParam(value = "topic") String topic){
+	   return SUCCESS_DATA(monitorService.selectTopicLogSizeAndOffset(clusterId,topic));
 	}
 
 	/**
@@ -239,33 +259,10 @@ public class MonitorController extends BaseController {
 		return SUCCESS_DATA(list);
 	}
 
-	@GetMapping("/cluster")
-	@ResponseBody
-	public RestResponse getCluster() {
-		try {
-			List<ClusterInfo> clusters = clusterService.getTotalData();
-			return SUCCESS_DATA(clusters);
-		} catch (Exception e) {
-			LOG.error("GET CLUSTER DATA FAILD,message:",e);
-			return ERROR("GET CLUSTER DATA FAILD!");
-		}
 
-	}
-
-
-	@PostMapping("/group")
-	public RestResponse getGroupByCluster(@RequestBody Map<String, String> queryMap) {
-		String clusterID = queryMap.get(Constants.KeyStr.CLUSTERID);
-		String topic = queryMap.get(BrokerConfig.TOPIC);
-		try {
-			return SUCCESS_DATA(monitorService.listGroups(topic, clusterID));
-		} catch (Exception e) {
-			LOG.error("List Group error,{}",e.getMessage());
-		}
-		return null;
-	}
-	
-	// 查询所有集群的所有group信息
+	/**
+	 * 查询所有集群的所有group信息
+ 	 */
 	@RequestMapping(value = "/group", method = RequestMethod.GET)
 	public RestResponse getClusterAllGroup(@RequestParam("cluster") String clusterId) {
 		List<ClusterInfo> clusters = "-1".equalsIgnoreCase(clusterId)?clusterService.getTotalData():
@@ -283,18 +280,18 @@ public class MonitorController extends BaseController {
 	
 	/**
 	 * 
-	 * 根据group查询相关topic整体信息
+	 * 根据group查询相关topic消费情况
 	 * 
 	 * @param queryMap
 	 * @return
 	 */
 	@RequestMapping(value = "/group/detail", method = RequestMethod.POST)
-	public RestResponse grouptopic(@RequestBody Map<String, String> queryMap) {
+	public RestResponse groupTopic(@RequestBody Map<String, String> queryMap) {
 		String consummerGroup = queryMap.get(TopicConfig.CONSUMMERGROUP);
 		String clusterID = queryMap.get(Constants.KeyStr.CLUSTERID);
 		
 		if (StringUtils.isBlank(clusterID) || StringUtils.isBlank(consummerGroup)) {
-			return ERROR("clusterID and consummerGroup must not blank.");
+			return ERROR("clusterID and consumerGroup must not blank.");
 		}
 		
 		List<GroupTopicConsumerState> topicGroups = new ArrayList<>();
@@ -308,10 +305,10 @@ public class MonitorController extends BaseController {
 			return SUCCESS_DATA(data);
 		} else {
 			try {
-				topicGroups = monitorService.describeConsumerGroupByGroup(consummerGroup,clusterID);
+				topicGroups = monitorService.describeConsumerGroupByGroup(consummerGroup,info);
 			} catch (Exception e) {
-				LOG.error("Get Topic Detail By Group Error,msg:",e);
-				return ERROR("get topic info by topic");
+				LOG.error("Get topic consumer By Group Error,msg:",e);
+				return ERROR("get topic consumer status by group has error.");
 			} 
 			return SUCCESS_DATA(topicGroups);
 		}

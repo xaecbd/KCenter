@@ -1,0 +1,140 @@
+
+
+.test:hover {
+    cursor:context-menu;
+}
+
+.test{
+  //  margin: 0 0 8px;
+
+    font-size: 13px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-Space: nowrap;
+
+
+}
+
+.test1{
+    padding-left: 0 !important;
+    font-size: 13px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-Space: nowrap;
+
+}
+.test:hover {
+    cursor:context-menu;
+}
+
+.tags{
+  margin-left:10px;
+
+  background-color: #ecf5ff !important;
+  border-color: #d9ecff !important;
+  color: #409eff !important;
+}
+
+
+.pribtn{
+  border-radius: 50% !important;
+  height: 28px;
+  width: 28px;
+  display: inline-block;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #dcdfe6;
+  -webkit-appearance: none !important;
+  text-align: center;
+  box-sizing: border-box;
+  outline: 0;
+  padding:1px !important;
+  margin: 0;
+  transition: .1s;
+//  font-weight: 500;
+  margin-left: 10px;
+    border-color:#36a3f7 !important;
+    background-color:#36a3f7 !important;
+    color:#fff !important;
+}
+
+.warnbtn{
+  border-radius: 50% !important;
+  height: 28px;
+  width: 28px;
+  display: inline-block;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #dcdfe6;
+  -webkit-appearance: none !important;
+  text-align: center;
+  box-sizing: border-box;
+  outline: 0;
+  padding:1px !important;
+  margin: 0;
+  transition: .1s;
+//  font-weight: 500;
+  margin-left: 10px;
+    color: #fff;
+    background-color: #e6a23c;
+    border-color: #e6a23c;
+}
+
+.deletBtn{
+  border-radius: 50% !important;
+  height: 28px;
+  width: 28px;
+  display: inline-block;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #dcdfe6;
+  -webkit-appearance: none !important;
+  text-align: center;
+  box-sizing: border-box;
+  outline: 0;
+  padding:1px !important;
+  margin: 0;
+  transition: .1s;
+//  font-weight: 500;
+  margin-left: 10px;
+    color: #fff;
+    background-color: #f56c6c;
+    border-color: #f56c6c;
+}
+
+
+.icon{
+    -webkit-text-stroke-width:0px !important;
+}
+
+.sidemenu{
+    display: none !important;
+}
+
+
+.yellowcircle {
+    border-radius: 50%;
+    width: 9px;
+    height: 9px;
+    background-color: #ffd876
+  }
+
+  .redcircle {
+    border-radius: 50%;
+    width: 9px;
+    height: 9px;
+    background-color: #ff3b1f
+  }
+
+  .greencircle {
+    border-radius: 50%;
+    width: 9px;
+    height: 9px;
+    background-color: #40a339
+  }

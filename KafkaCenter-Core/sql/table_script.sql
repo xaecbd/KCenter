@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS `team_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
   `own` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `alarm_group` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
@@ -120,6 +121,7 @@ CREATE TABLE IF NOT EXISTS `topic_info` (
   `team_id` int(11) DEFAULT NULL,
   `comments` varchar(1000) COLLATE utf8_bin NOT NULL DEFAULT '',
   `create_time` datetime DEFAULT NULL,
+  `file_size` bigint(20) NOT NULL DEFAULT -1,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 

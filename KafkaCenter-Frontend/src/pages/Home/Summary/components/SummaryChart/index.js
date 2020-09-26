@@ -393,7 +393,7 @@ export default class SummaryChart extends Component {
             </IceContainer>
           ) : null}
 
-          <span>Interval：{this.state.interval}</span>
+          {/* <span>Interval：{this.state.interval}</span> */}
         </Loading>
       </div>
     );

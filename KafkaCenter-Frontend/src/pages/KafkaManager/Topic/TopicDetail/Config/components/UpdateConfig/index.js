@@ -87,7 +87,7 @@ export default class UpdateConfig extends Component {
   }
 
   handleCancel = () => {
-    this.props.history.push(`/kafka-manager/topic/${this.state.clusterId}/${this.state.topicName}`);
+    this.props.history.push(`/cluster/topic/${this.state.clusterId}/${this.props.match.params.clusterName}/${this.state.topicName}`);
   }
 
   render() {

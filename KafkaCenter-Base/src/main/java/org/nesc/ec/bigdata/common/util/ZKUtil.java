@@ -18,7 +18,7 @@ import java.util.*;
 
 /**
  * @author Truman.P.Du
- * @date 2019年4月12日 上午10:19:35
+ * @date 2019年4月12日 上午10:19:35O
  * @version 1.0
  */
 public class ZKUtil implements Closeable {
@@ -27,9 +27,9 @@ public class ZKUtil implements Closeable {
 	private ZkClient zkClient;
 	private int SESSIONT_IMEOUT = 1000 * 60;
 	private int CONNECTION_TIMEOUT = 1000 * 60;
-	private static final java.lang.String brokerPath = "/brokers/topics/";
-	private static final String TopicConfigChangesPath = "/config/changes";
-	private static final String TopicConfigChangeZnodePrefix = "config_change_";
+	private static final java.lang.String BROKER_PATH = "/brokers/topics/";
+	private static final String TOPIC_CONFIG_CHANGES_PATH = "/config/changes";
+	private static final String TOPIC_CONFIG_CHANGE_ZNODE_PREFIX = "config_change_";
 	private String rootPath = "";
 	public ZKUtil(String zkServers) {
 		String lastChar = zkServers.substring(zkServers.length()-1, zkServers.length());
@@ -102,8 +102,10 @@ public class ZKUtil implements Closeable {
 							String owner = zkClient.readData(ownersPath + "/" + patition, true);
 							if (owner != null) {
 								Map<String, String> map = result.get(patition);
-								map.put("owner", owner);
-								result.put(patition, map);
+								if(map != null){
+									map.put("owner", owner);
+									result.put(patition, map);
+								}
 							}
 						} catch (Exception e) {
 							LOGGER.error("", e);
@@ -271,14 +273,14 @@ public class ZKUtil implements Closeable {
 	public boolean createNofity(String topicName) {
 		boolean flag = false;
 		try {
-			if(!zkClient.exists(TopicConfigChangesPath)) {
-				zkClient.createPersistent(TopicConfigChangesPath);
+			if(!zkClient.exists(TOPIC_CONFIG_CHANGES_PATH)) {
+				zkClient.createPersistent(TOPIC_CONFIG_CHANGES_PATH);
 			}
 			Map<String,Object> map = new LinkedHashMap<>();
 			map.put("version", 1);
 			map.put("entity_type","topics");
 			map.put("entity_name", topicName);
-		    zkClient.create(rootPath+TopicConfigChangesPath+"/"+TopicConfigChangeZnodePrefix, 
+		    zkClient.create(rootPath+ TOPIC_CONFIG_CHANGES_PATH +"/"+ TOPIC_CONFIG_CHANGE_ZNODE_PREFIX,
 					JSONObject.toJSONString(map), CreateMode.PERSISTENT_SEQUENTIAL);
 			flag = true;
 		} catch (Exception e) {
@@ -299,11 +301,11 @@ public class ZKUtil implements Closeable {
 	}
 
 	public String getTopicPath(String topic) {
-		return brokerPath+topic;
+		return BROKER_PATH +topic;
 	}
 
 	public String getPartitionPath(String topic) {
-		return brokerPath+topic+"/partitions";
+		return BROKER_PATH +topic+"/partitions";
 	}
 
 	public Map<Integer, TopicInfo> readPartition(String topicName) {

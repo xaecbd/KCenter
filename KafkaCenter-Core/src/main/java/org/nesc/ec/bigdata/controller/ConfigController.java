@@ -29,7 +29,7 @@ public class ConfigController extends BaseController{
 
 	@Autowired
 	GenericOauthService genericOauthService;
-	
+	/** return the basic information to UI*/
 	@GetMapping("")
 	@ResponseBody
 	public RestResponse getConfigInfo(){
@@ -43,6 +43,7 @@ public class ConfigController extends BaseController{
 		return SUCCESS_DATA(map);
 	}
 
+	/** return the oauth2 config*/
 	@GetMapping("/oauth2")
 	@ResponseBody
 	public Object oauth2Config(){

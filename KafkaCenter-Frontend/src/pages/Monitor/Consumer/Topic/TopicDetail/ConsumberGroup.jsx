@@ -1,4 +1,3 @@
-/* eslint-disable indent */
 import React, { useState, useEffect } from 'react';
 import { Table, Icon, Loading } from '@alifd/next';
 import { withRouter } from 'react-router-dom';
@@ -10,7 +9,7 @@ import green from '@images/green.svg';
 import error from '@images/error.svg';
 import alert from '@images/alert.svg';
 import axios from '@utils/axios';
-import './TopicDetail.scss';
+import style from './index.module.scss';
 import EditDialog from '../../Alert';
 
 function ConsumerGroup(props) {
@@ -25,24 +24,39 @@ function ConsumerGroup(props) {
   const [alertData, setAlertData] = useState({});
   const [isZk, setIsZk] = useState(props.config.isZk);
 
+  const styles = {
+    topicLink: {
+      margin: '0 5px',
+      color: '#1111EE',
+      cursor: 'pointer',
+      textDecoration: 'none',
+    },
+    alertIcon: {
+      cursor: 'pointer',
+    },
+    loading: {
+      width: '100%',
+    },
+  };
+
   useEffect(() => {
     // Update the document title using the browser API
-    let taryger;
-    if (isZk) {
-      taryger = document.getElementsByClassName('zktest')[0];
-    } else {
-      taryger = document.getElementsByClassName('custom-table')[0];
-    }
-    // taryger.getElementsByTagName('thead');
-    taryger.getElementsByTagName('thead')[0].style.display =
-      'table-header-group';
+    //  let taryger;
+    // if (isZk) {
+    //   taryger = document.getElementsByClassName(`${style.zktest}`)[0];
+    // } else {
+    //   taryger = document.getElementsByClassName(`${style.customTable}`)[0];
+    // }
+    // // taryger.getElementsByTagName('thead');
+    // taryger.getElementsByTagName(`${style.thead}`)[0].style.display =
+    //   'table-header-group';
   });
 
   const onClick = () => {
     setDisplay(!display);
   };
 
-  const renderHost = (value, index, record) => {
+  const renderHost = (value) => {
     if (value) {
       return value.toString().replace('/', '');
     }
@@ -132,7 +146,7 @@ function ConsumerGroup(props) {
         if (response.data.code === 200) {
           setAlertData(response.data.data);
           setLoading(false);
-          const newData = alertData;
+          const newData = response.data.data;
           if (obj.consummerApi !== newData.consummerApi) {
             newData.consummerApi = 'ALL';
           }
@@ -214,7 +228,7 @@ function ConsumerGroup(props) {
     );
     data = data.slice(0, 1);
   }
-  const renderObj = (value) => {
+  const renderObj = () => {
     return renderIceImag(green, props.config.consumerGroupState);
   };
   const render = (value, index, record) => {
@@ -228,7 +242,7 @@ function ConsumerGroup(props) {
           <a style={styles.topicLink} onClick={() => handelGroupChart(record)}>
             {value}
           </a>
-          <span title="SimpleConsumerGroup" className="onMeous">
+          <span title="SimpleConsumerGroup" className={style.onMeous}>
             <FoundationSymbol type="customize" size="small" />
           </span>
         </div>
@@ -247,15 +261,20 @@ function ConsumerGroup(props) {
       </div>
     );
   };
-  const renderYellowObj = (value) => {
-    return renderIceImag(warnning, 'SimpleConsumerGroup无法判断其状态');
+  const renderYellowObj = () => {
+    if(props.config.isSimpleConsumerGroup){
+      return renderIceImag(warnning, 'SimpleConsumerGroup无法判断其状态');
+    }else{
+      return renderIceImag(warnning, props.config.consumerGroupState);
+    }
+   
   };
-  const StopObj = (value) => {
+  const StopObj = () => {
     return renderIceImag(error, props.config.consumerGroupState);
   };
 
   let result = null;
-  if (props.config.consumerGroupState === 'STABLE') {
+  if (props.config.kafkaCenterGroupState === 'ACTIVE') {
     result = (
       <Table.Column
         title="Status"
@@ -264,7 +283,7 @@ function ConsumerGroup(props) {
         width={10}
       />
     );
-  } else if (props.config.consumerGroupState === 'DEAD') {
+  } else if (props.config.kafkaCenterGroupState === 'DEAD') {
     result = (
       <Table.Column
         title="Status"
@@ -285,7 +304,7 @@ function ConsumerGroup(props) {
   }
 
   return (
-    <div className={isZk ? 'zktest' : ''}>
+    <div className={isZk ? 'style.zktest' : ''}>
       <Loading visible={loading} style={styles.loading}>
         <EditDialog
           visible={visible}
@@ -295,9 +314,10 @@ function ConsumerGroup(props) {
         />
       </Loading>
       <Table
-        className="custom-table"
+        className={style.customTable}
         dataSource={data}
         cellProps={getCellProps}
+        hasHeader={props.config.hasHeard}
       >
         <Table.Column
           title="Consumer Group"
@@ -346,19 +366,6 @@ function ConsumerGroup(props) {
   );
 }
 
-const styles = {
-  topicLink: {
-    margin: '0 5px',
-    color: '#1111EE',
-    cursor: 'pointer',
-    textDecoration: 'none',
-  },
-  alertIcon: {
-    cursor: 'pointer',
-  },
-  loading: {
-    width: '100%',
-  },
-};
+
 
 export default withRouter(ConsumerGroup);

@@ -18,11 +18,11 @@ public class SpirngMvcConfig implements WebMvcConfigurer {
 		SessionTimeOutInterceptor sessionTimeOutInterceptor = new SessionTimeOutInterceptor();
 		String[] allowUrls = {"/monitor/topic/consumer_offsets", "/monitor/topic/consumer_offsets/topic_metric",
 				"/#/user/login", "/index.html",  "/login/user","/login/check","/config/oauth2","/api/consumer/status",
-				"/favicon.png", "/lag", "/monitor/group/detail", "/monitor/alert/group"};
+				"/favicon.png", "/lag", "/monitor/group/detail", "/monitor/alert/group","/manager/group/status","/home/topic/consumer/alert"};
 		sessionTimeOutInterceptor.setAllowUrls(allowUrls);
 		// 添加拦截器
 		registry.addInterceptor(sessionTimeOutInterceptor).addPathPatterns("/**").
-		   excludePathPatterns("/login/**","/static/**","/css/**","/js/**","/assets/**","/remote/**","/font/**");
+		   excludePathPatterns("/login/**","/user/verify","/static/**","/css/**","/js/**","/assets/**","/remote/**","/font/**");
 	}
 	
 	@Override

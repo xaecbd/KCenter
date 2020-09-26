@@ -188,11 +188,11 @@ export default class EditDialog extends Component {
 
               <Row style={styles.formRow}>
                 <Col span={`${isMobile ? '6' : '6'}`}>
-                  <label style={styles.formLabel}>Diapause:</label>
+                  <label style={styles.formLabel}>Time Window:</label>
                 </Col>
                 <Col span={`${isMobile ? '18' : '16'}`}>
                   <IceFormBinder name="dispause" required>
-                    <NumberPicker min={1} style={{ width: '100%' }} placeholder="Diapause(Minutes)" />
+                    <NumberPicker min={1} style={{ width: '100%' }} placeholder="Time Window(Minutes)" />
                   </IceFormBinder>
                   <IceFormError name="dispause" />
                 </Col>

@@ -2,9 +2,13 @@ package org.nesc.ec.bigdata.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.kafka.clients.admin.ConfigEntry;
+import org.apache.kafka.clients.admin.ListTopicsOptions;
+import org.apache.kafka.clients.admin.NewPartitions;
+import org.apache.kafka.clients.admin.TopicDescription;
+import org.apache.kafka.common.Node;
+import org.apache.kafka.common.TopicPartitionInfo;
 import org.nesc.ec.bigdata.common.model.BrokerInfo;
-import org.nesc.ec.bigdata.common.model.MeterMetric;
-import org.nesc.ec.bigdata.common.util.JmxCollector;
 import org.nesc.ec.bigdata.common.util.KafkaAdmins;
 import org.nesc.ec.bigdata.constant.BrokerConfig;
 import org.nesc.ec.bigdata.constant.Constants;
@@ -12,13 +16,6 @@ import org.nesc.ec.bigdata.constant.TopicConfig;
 import org.nesc.ec.bigdata.model.ClusterInfo;
 import org.nesc.ec.bigdata.model.KafkaManagerBroker;
 import org.nesc.ec.bigdata.model.TopicInfo;
-import org.apache.kafka.clients.admin.ConfigEntry;
-import org.apache.kafka.clients.admin.ListTopicsOptions;
-import org.apache.kafka.clients.admin.NewPartitions;
-import org.apache.kafka.clients.admin.TopicDescription;
-import org.apache.kafka.common.Node;
-import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.TopicPartitionInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +88,7 @@ public class KafkaManagerService {
 			Map<String,Object> summary = recombineMap(partitionInfo, partitionBroker);
 			result.put(TopicConfig.PARTITION,partitions==null?new JSONArray():partitions);
 			result.put(BrokerConfig.BROKER,partitionByBroker==null?new JSONArray():partitionByBroker);
-			result.put(Constants.JsonObject.SUMMARY, ConvertMapToArr(summary));
+			result.put(Constants.JsonObject.SUMMARY, convertMapToArray(summary));
 
 		} catch (InterruptedException | ExecutionException e) {
 			LOGGER.error("get topic and partition info has error",e);
@@ -100,7 +97,7 @@ public class KafkaManagerService {
 	}
 
 
-	public JSONArray ConvertMapToArr(Map<String,Object> summary) {
+	public JSONArray convertMapToArray(Map<String,Object> summary) {
 		JSONArray array = new JSONArray();
 		summary.forEach((k,v)->{
 			JSONObject obj = new JSONObject();
@@ -152,7 +149,7 @@ public class KafkaManagerService {
 			map.put(TopicConfig.PARTITION, array);
 
 		} catch (Exception e) {
-			LOGGER.error("get partitions infor has error",e);
+			LOGGER.error("get partitions inform has error",e);
 			return map;
 		}
 		return map;
@@ -234,8 +231,8 @@ public class KafkaManagerService {
 		boolean delete = false;
 		KafkaAdmins admins = kafkaAdminService.getKafkaAdmins(clusterId);
 		try {	
-			boolean isclusterDelete = admins.delete(topicName);
-			if(isclusterDelete) {
+			boolean isClusterDelete = admins.delete(topicName);
+			if(isClusterDelete) {
 				boolean dataBaseDelete = topicInfoService.isDelete(topicName,clusterId);
 				if(dataBaseDelete){
 					delete = true;
@@ -247,22 +244,6 @@ public class KafkaManagerService {
 		return delete;
 	}
 
-	public Map<Integer,Long> getEndOffset(String clusterId,String topicName) {
-		Map<Integer,Long> partitionMap = new HashMap<>();
-		String group= BrokerConfig.GROUP_NAME;
-		Map<TopicPartition, Long> logSizeMap =  kafkaConsumersService.getLogSize(clusterId, group, topicName);
-		for (TopicPartition partitions : logSizeMap.keySet()) {
-			if(partitionMap.containsKey(partitions.partition())) {
-				Long endOffset = partitionMap.get(partitions.partition());
-				Long newEndOffset = logSizeMap.get(partitions);
-				Long logSize = endOffset>newEndOffset?endOffset:newEndOffset;
-				partitionMap.put(partitions.partition(), logSize);
-			}else {
-				partitionMap.put(partitions.partition(), logSizeMap.get(partitions));
-			}
-		}
-		return partitionMap;
-	}
 
 	public boolean addPartition(String clusterId,String topicName,int partitions,String broker,int oldPartition) {
 		boolean flag = false;
@@ -270,10 +251,10 @@ public class KafkaManagerService {
 		topicNames.add(topicName);
 		TopicDescription topicDescription = kafkaAdminService.getKafkaAdmins(clusterId).descTopics(topicNames).get(topicName);
 		List<String> brokerList = new ArrayList<>(Arrays.asList(broker.split(Constants.Symbol.COMMA)));
-		Map<Integer,List<Integer>> partitiosMap = this.assignReplicasToBrokers(brokerList, partitions-topicDescription.partitions().size(),
+		Map<Integer,List<Integer>> partitionMap = this.assignReplicasToBrokers(brokerList, partitions-topicDescription.partitions().size(),
 				topicDescription.partitions().get(0).replicas().size(), oldPartition);
 		List<List<Integer>> newAssignments = new ArrayList<>();
-		partitiosMap.forEach((k,v)->{
+		partitionMap.forEach((k,v)->{
 			newAssignments.add(v);
 		});
 		NewPartitions newPartitions = NewPartitions.increaseTo(partitions, newAssignments);
@@ -283,7 +264,7 @@ public class KafkaManagerService {
 			kafkaAdminService.getKafkaAdmins(clusterId).createPartitions(map);
 			flag = true;
 		} catch (InterruptedException | ExecutionException e) {
-			flag = zkService.getZK(clusterId).createPartitionPath(topicName, oldPartition, partitiosMap);
+			flag = zkService.getZK(clusterId).createPartitionPath(topicName, oldPartition, partitionMap);
 		}
 		return flag;
 	}
@@ -349,6 +330,11 @@ public class KafkaManagerService {
 		return list;
 	}
 
+	/**
+	 * 从集群实时获取Topic，并且关联owner,team,FileSize
+	 * @param clusterId
+	 * @return
+	 */
 	public JSONArray topicList(String clusterId) {
 		Map<String, TopicInfo> topicMap = new HashMap<>();
 		List<TopicInfo> topics = null;
@@ -386,12 +372,20 @@ public class KafkaManagerService {
 					if(topicMap.containsKey(key)) {		
 						TopicInfo topicEntry = topicMap.get(key);
 						obj.put(TopicConfig.TTL, topicEntry.getTtl());
+						obj.put(TopicConfig.FILE_SIZE, topicEntry.getFileSize());
+						if(topicEntry.getOwner()!=null){
+							obj.put(TopicConfig.OWNER, topicEntry.getOwner().getName());
+						}
+
+						if(topicEntry.getTeam()!=null){
+							obj.put(TopicConfig.TEAM, topicEntry.getTeam().getName());
+						}
 					}
 					obj.put(TopicConfig.PARTITION, v.partitions().size());
 					obj.put(TopicConfig.REPLICATION, v.partitions().get(0).replicas().size());
 					obj.put(Constants.KeyStr.CLUSTER, cluster.getName());
 					obj.put(BrokerConfig.TOPIC_NAME, k);
-					obj.put(Constants.KeyStr.clusterId, cluster.getId());
+					obj.put(Constants.KeyStr.LOWER_CLUSTER_ID, cluster.getId());
 					obj.put(TopicConfig.UNDER_REPLICATION, (1-(isrCount/partitionCount))*100);
 					array.add(obj);
 				});
@@ -414,15 +408,15 @@ public class KafkaManagerService {
 	}
 	
 	public boolean updateConfigByClient(JSONObject obj,String topic,String clusterId) throws InterruptedException, ExecutionException {
-		List<ConfigEntry> entrys = new ArrayList<>();
+		List<ConfigEntry> entryList = new ArrayList<>();
 		Set<String> keys = obj.keySet();
 		keys.forEach(key->{
 			if(!"".equalsIgnoreCase(obj.getString(key).trim())) {
 				ConfigEntry entry = new ConfigEntry(key.replaceAll("\\_", "\\."), obj.getString(key).trim());
-				entrys.add(entry);
+				entryList.add(entry);
 			}			
 		});
-		return kafkaAdminService.getKafkaAdmins(clusterId).updateTopicConfigs(topic, entrys);
+		return kafkaAdminService.getKafkaAdmins(clusterId).updateTopicConfigs(topic, entryList);
 		
 	}
 
@@ -435,8 +429,8 @@ public class KafkaManagerService {
 			List<BrokerInfo> brokers = zkService.getZK(clusterId).getBrokers();
 			List<Integer> brokerList = new ArrayList<>();
 			brokers.forEach(broker-> brokerList.add(broker.getBid()));
-			int partiSize = topicDesc.partitions().size();
-			int replicSize = topicDesc.partitions().get(0).replicas().size();
+			int partitionSize = topicDesc.partitions().size();
+			int replicaSize = topicDesc.partitions().get(0).replicas().size();
 			topicDesc.partitions().forEach(partition->{
 				partition.replicas().forEach(replicas->{
 					if(brokerList.contains(replicas.id())) {
@@ -468,7 +462,7 @@ public class KafkaManagerService {
 				obj.put(TopicConfig.PARTITIONS, map.get(key).split(Constants.Symbol.COMMA).length);
 				obj.put(TopicConfig.LEADER_COUNT, leaderMap.get(key));
 				obj.put(TopicConfig.PARTITION, map.get(key));
-				double skewed = Math.ceil((double)partiSize*replicSize/(double)brokerList.size());
+				double skewed = Math.ceil((double)partitionSize*replicaSize/(double)brokerList.size());
 				boolean flagSkew = false;
 				boolean skew = false;
 				if(skewed < map.get(key).split(Constants.Symbol.COMMA).length) {
@@ -483,7 +477,7 @@ public class KafkaManagerService {
 				obj.put(TopicConfig.LEADERSKEWED, String.valueOf(skew));
 				array.add(obj);
 			}
-			result.put(TopicConfig.REPLICATION, replicSize);
+			result.put(TopicConfig.REPLICATION, replicaSize);
 			
 			result.put(TopicConfig.SUM_OF_PARTITION_OFFSETS, 0);
 			result.put(TopicConfig.TOTAL_NUMBER_OF_BROKERS, brokers.size());
@@ -521,21 +515,21 @@ public class KafkaManagerService {
 	}
 
 	public void deleteGroup(String clusterId, String consumerGroup, String consumerApi) {
-		if (Constants.KeyStr.BROKER.equals(consumerApi)) {
+		if (Constants.ConsumerType.BROKER.equalsIgnoreCase(consumerApi)) {
 			KafkaAdmins kafkaAdmins = kafkaAdminService.getKafkaAdmins(clusterId);
 			if (null != kafkaAdmins) {
 				kafkaAdmins.deleteGroup(consumerGroup);
 			} else {
 				throw new IllegalArgumentException("no this cluster, please check cluster!");
 			}
-		} else if (Constants.KeyStr.ZK.equals(consumerApi)) {
+		} else if (Constants.ConsumerType.ZK.equalsIgnoreCase(consumerApi)) {
 			zkService.deleteGroup(clusterId, consumerGroup);
 		} else {
 			throw new IllegalArgumentException("consumerAPI is neither BROKER nor ZK!");
 		}
 	}
 
-	public  List<KafkaManagerBroker> getAllClusterBrokes(String clusterId){
+	public  List<KafkaManagerBroker> getAllClusterBrokers(String clusterId){
 		List<KafkaManagerBroker> kafkaManagerBrokers = new ArrayList<>();
 		List<ClusterInfo> clusterInfoList = null;
 		if(!clusterId.equalsIgnoreCase("-1")){
@@ -549,35 +543,21 @@ public class KafkaManagerService {
 				String clusterID = cluster.getId().toString();
 				List<BrokerInfo> brokers = zkService.getZK(clusterID).getBrokers();
 				brokers.sort(Comparator.comparingInt(BrokerInfo::getBid));
-				Map<String,Set<MeterMetric>> metricBroker = JmxCollector.getInstance().metricEveryBroker(brokers);
 				Map<Integer,KafkaManagerBroker> brokerMap = new HashMap<>(brokers.size());
 				brokers.forEach(broker->{
 					KafkaManagerBroker kafkaManagerBroker = new KafkaManagerBroker();
 					kafkaManagerBroker.setBrokerInfo(broker);
 					kafkaManagerBroker.setClusterName(cluster.getName());
-					Set<MeterMetric>  metricSet = metricBroker.isEmpty()?new HashSet<>():metricBroker.get(broker.getHost());
-					try{
-						metricSet.forEach(meterMetric -> {
-							switch (meterMetric.getMetricName()){
-								case BrokerConfig.BYTES_IN_PER_SEC:{
-									kafkaManagerBroker.setBytesIn(meterMetric.getOneMinuteRate());
-								}break;
-								case BrokerConfig.BYTES_OUT_PER_SEC:{
-									kafkaManagerBroker.setBytesOut(meterMetric.getOneMinuteRate());
-								}break;
-								case BrokerConfig.MESSAGES_IN_PER_SEC:{
-									kafkaManagerBroker.setMessages(meterMetric.getOneMinuteRate()+"");
-								}break;
-								default:break;
-							}
-						});
-					}catch (Exception e){
-						LOGGER.error("kafkaManagerBroker set metric error.",e);
-					}
 					brokerMap.put(broker.getBid(),kafkaManagerBroker);
 				});
 
 				KafkaAdmins kafkaAdmins = kafkaAdminService.getKafkaAdmins(clusterID);
+				long controllerId = kafkaAdmins.descCluster().controller().get().id();
+				if(brokerMap.containsKey((int)controllerId)){
+					KafkaManagerBroker kafkaManagerBroker = brokerMap.get((int)controllerId);
+					kafkaManagerBroker.setController(true);
+					brokerMap.put((int)controllerId,kafkaManagerBroker);
+				}
 				ListTopicsOptions options = new ListTopicsOptions();
 				options.listInternal(true);
 				Set<String> topicNames= kafkaAdmins.listTopics(options).keySet();

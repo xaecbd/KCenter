@@ -63,6 +63,22 @@ public interface AlertMapper extends BaseMapper<AlertGoup> {
     })
     List<AlertGoup> getAllGroups();
 
+	@Select("select * from alert_group t where t.enable=1")
+	@Results({
+			@Result(id = true, column = "id", property = "id"),
+			@Result(column = "topic_name", property = "topicName"),
+			@Result(column = "consummer_group", property = "consummerGroup"),
+			@Result(column = "consummer_api", property = "consummerApi"),
+			@Result(column = "threshold", property = "threshold"),
+			@Result(column = "dispause", property = "dispause"),
+			@Result(column = "mail_to", property = "mailTo"),
+			@Result(column = "create_date", property = "createDate"), @Result(column = "enable", property = "enable"),
+			@Result(column = "owner_id", property = "owner",one=@One(select="org.nesc.ec.bigdata.mapper.UserInfoMapper.queryById")),
+			@Result(column = "webhook", property = "webhook"),@Result(column = "disable_alerta", property = "disableAlerta"),
+			@Result(column = "cluster_id",property="cluster", one=@One(select="org.nesc.ec.bigdata.mapper.ClusterInfoMapper.queryById"))
+	})
+	List<AlertGoup> getEnableAlertGroups();
+
     @Insert("insert into alert_group (cluster_id,topic_name,consummer_group,consummer_api,threshold,dispause,mail_to,webhook,disable_alerta,enable) VALUES "
     		+ "(#{alertMap.cluster_id},#{alertMap.topicName},#{alertMap.consummerGroup},#{alertMap.consummerApi},#{alertMap.threshold},#{alertMap.dispause},#{alertMap.mailTo},#{alertMap.webhook},#{alertMap.disableAlerta},#{alertMap.enable}) ")
 	void insertAlert(@Param("alertMap") Map<String, String> alertMap);
@@ -96,4 +112,24 @@ public interface AlertMapper extends BaseMapper<AlertGoup> {
 
     @Update("update alert_group set enable=#{alertMap.enable},disable_alerta=#{alertMap.disableAlerta} where id=#{alertMap.id}")
     int updateEnable(@Param("alertMap") Map<String, Object> alertMap);
+
+	@Select("select * from alert_group where owner_id=#{id}")
+	@Results({
+			@Result(id = true, column = "id", property = "id"),
+			@Result(column = "topic_name", property = "topicName"),
+			@Result(column = "consummer_group", property = "consummerGroup"),
+			@Result(column = "consummer_api", property = "consummerApi"),
+			@Result(column = "threshold", property = "threshold"),
+			@Result(column = "dispause", property = "dispause"),
+			@Result(column = "mail_to", property = "mailTo"),
+			@Result(column = "create_date", property = "createDate"), @Result(column = "enable", property = "enable"),
+			@Result(column = "owner_id", property = "owner",one=@One(select="org.nesc.ec.bigdata.mapper.UserInfoMapper.queryById")),
+			@Result(column = "webhook", property = "webhook"),@Result(column = "disable_alerta", property = "disableAlerta"),
+			@Result(column = "cluster_id",property="cluster", one=@One(select="org.nesc.ec.bigdata.mapper.ClusterInfoMapper.queryById"))
+	})
+	List<AlertGoup> selectAlertGroupByOwnId(@Param("id") long id);
+
+
+	@Select("select a.id,t.alarm_group from alert_group a,user_team u,team_info t where a.owner_id=u.user_id and t.id=u.team_id")
+	List<Map<String,Object>> getAlertAlarmGroupMap();
 }

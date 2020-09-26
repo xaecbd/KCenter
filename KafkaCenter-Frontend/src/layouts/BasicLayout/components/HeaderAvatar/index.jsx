@@ -46,15 +46,17 @@ const HeaderAvatar = () => {
         history.push('/users');
       }
     } else {
+      setUrl('url', '/users');
       window.location.href = loginUrl;
     }
   }
   useEffect(()=>{
     if (!checkUser()) {
-      setUrl('url', window.location.href);
+      const url=window.location.href;
+      setUrl('url', url);
       window.location.href = loginUrl;
     }
-  },[]);
+  },[]); 
 
 
   return (

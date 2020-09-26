@@ -33,7 +33,7 @@ public class GenericOauthService{
         builder.queryParam(OAuth2ParameterName.CLIENT_ID,genericConfig.getClientId());
         builder.queryParam(OAuth2ParameterName.CLIENT_SECRET,genericConfig.getClientSecret());
         builder.queryParam(OAuth2ParameterName.RESPONSE_TYPE, OAuth2ParameterName.CODE);
-        builder.queryParam(OAuth2ParameterName.REDIRECT_URI,genericConfig.getRedirctUrl());
+        builder.queryParam(OAuth2ParameterName.REDIRECT_URI,genericConfig.getRedirectUrl());
         return builder.toUriString();
     }
 
@@ -70,7 +70,7 @@ public class GenericOauthService{
         map.add(OAuth2ParameterName.CODE,code);
         map.add(OAuth2ParameterName.CLIENT_ID,genericConfig.getClientId());
         map.add(OAuth2ParameterName.CLIENT_SECRET,genericConfig.getClientSecret());
-        map.add(OAuth2ParameterName.REDIRECT_URI,genericConfig.getRedirctUrl());
+        map.add(OAuth2ParameterName.REDIRECT_URI,genericConfig.getRedirectUrl());
         uriComponentsBuilder.queryParam(OAuth2ParameterName.GRANT_TYPE, OAuth2ParameterName.AUTHORIZATION_CODE);
         uriComponentsBuilder.queryParam(OAuth2ParameterName.CODE,code);
         HttpHeaders headers = new HttpHeaders();

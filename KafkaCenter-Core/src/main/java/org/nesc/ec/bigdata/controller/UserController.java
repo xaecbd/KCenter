@@ -47,14 +47,14 @@ public class UserController extends BaseController{
 				if(userInfoService.insertToUser(user)) {
 					return SUCCESS("add success!");
 				}else {
-					return ERROR("add faild!");
+					return ERROR("add failed!");
 				}
 			}else{
 				return ERROR("The user already exits!");
 			}
 
 		} catch (Exception e) {
-			return ERROR("add faild!");
+			return ERROR("add failed!");
 		}
 			
 	}
@@ -71,10 +71,10 @@ public class UserController extends BaseController{
 				return SUCCESS("update success!");
 			}else {
 
-				return ERROR("update faild!");
+				return ERROR("update failed!");
 			}	
 		} catch (Exception e) {
-			return ERROR("update faild!");
+			return ERROR("update failed!");
 		}
 	}
 	  
@@ -85,10 +85,10 @@ public class UserController extends BaseController{
 			if(userInfoService.updateRole(user)) {
 				return SUCCESS("update success!");
 			}else {
-				return ERROR("update faild!");
+				return ERROR("update failed!");
 			}	
 		} catch (Exception e) {			
-			return ERROR("update faild!");
+			return ERROR("update failed!");
 		}
 	}
 	
@@ -120,7 +120,7 @@ public class UserController extends BaseController{
 			UserInfo user = userInfoService.selectById(id);
 			return SUCCESS_DATA(user);
 		} catch (Exception e) {	
-			return ERROR("select User faild");
+			return ERROR("select User failed");
 		}		
 	}
 

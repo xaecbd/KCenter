@@ -15,7 +15,7 @@ export default class Cluster extends Component {
 
 const styles = {
   container: {
-    padding: '10px 20px 20px',
+    // padding: '10px 20px 20px',
     minHeight: '600px',
   },
 };

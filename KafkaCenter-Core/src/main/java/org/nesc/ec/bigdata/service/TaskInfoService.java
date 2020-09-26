@@ -100,12 +100,12 @@ public class TaskInfoService {
             if (clusterIds.length == 1) {
                 ids.add(task.getId());
             } else {
-                List<String> arrys = Arrays.asList(clusterIds);
-                List<String> xxx = new ArrayList<>(arrys);
-                xxx.remove(id.toString());
-                Object[] arr = xxx.toArray();
-                task.setClusterIds(Arrays.toString(arr).replaceAll(Constants.Symbol.DOUBLE_THE_SLASH + Constants.Symbol.Left_parentheses, Constants.Symbol.EMPTY_STR).
-                        replaceAll(Constants.Symbol.DOUBLE_THE_SLASH + Constants.Symbol.Right_parentheses, Constants.Symbol.EMPTY_STR));
+                List<String> clusterIdList = Arrays.asList(clusterIds);
+                List<String> clusterIdArrayList = new ArrayList<>(clusterIdList);
+                clusterIdArrayList.remove(id.toString());
+                Object[] arr = clusterIdArrayList.toArray();
+                task.setClusterIds(Arrays.toString(arr).replaceAll(Constants.Symbol.DOUBLE_THE_SLASH + Constants.Symbol.LEFT_PARENTHESES, Constants.Symbol.EMPTY_STR).
+                        replaceAll(Constants.Symbol.DOUBLE_THE_SLASH + Constants.Symbol.RIGHT_PARENTHESES, Constants.Symbol.EMPTY_STR));
                 updates.add(task);
             }
         });
@@ -179,7 +179,7 @@ public class TaskInfoService {
             }
 
             Map<String, Object> mailContentMap = new HashMap<>();
-            taskInfoVo.setApproveURL(initConfig.getApproveURL());
+            taskInfoVo.setApproveURL(initConfig.getKafkaCenterUrl());
             taskInfoVo.setOwner(owner);
             BeanUtils.copyProperties(task, taskInfoVo);
             mailContentMap.put("taskInfo", taskInfoVo);

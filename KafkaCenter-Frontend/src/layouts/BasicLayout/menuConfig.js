@@ -63,16 +63,16 @@ const asideMenuConfig = [
     authority: 'admin',
   },
   {
-    name: 'Kafka Manager',
-    path: '/kafka-manager',
+    name: 'Cluster',
+    path: '/cluster',
     icon: <CustomIcon type="iconall1"/>,
-    authority: 'admin',
-    children: [
-      { name: 'Cluster', path: '/kafka-manager/cluster' },
-      { name: 'Topic', path: '/kafka-manager/topic' },
-      { name: 'Broker', path: '/kafka-manager/broker' },
-      { name: 'Group', path: '/kafka-manager/group' },
-    ],
+
+    // children: [
+    //   { name: 'Cluster', path: '/kafka-manager/cluster' },
+    //   // { name: 'Topic', path: '/kafka-manager/topic' },
+    //   // { name: 'Broker', path: '/kafka-manager/broker' },
+    //   // { name: 'Group', path: '/kafka-manager/group' },
+    // ],
   },
   {
     name: 'Settings',

@@ -4,11 +4,24 @@ import CustomBreadcrumb from '@components/CustomBreadcrumb';
 import TeamTable from './components/TeamList';
 import TeamUserInfo from './components/UserInfo';
 
+const styles = {
+  container: {
+    margin: '20px',
+    padding: '10px 20px 20px',
+    minHeight: '600px',
+  },
+};
+
+
 export default class Team extends Component {
-  state = {
-    teamUserShow: false,
-    teamInfoData: {},
-  };
+  
+  constructor(){
+    super();
+    this.state = {
+      teamUserShow: false,
+      teamInfoData: {},
+    };
+  }
 
   showTeamUserInfo = (teamInfo) => {
     this.setState({
@@ -18,10 +31,11 @@ export default class Team extends Component {
   };
 
   transform = () => {
-    this.setState({
-      teamUserShow: !this.state.teamUserShow,
-    });
+    this.setState(prevState =>({
+      teamUserShow: !prevState .teamUserShow,
+    }));
   }
+
   render() {
     const breadcrumb = [
       {
@@ -52,10 +66,4 @@ export default class Team extends Component {
   }
 }
 
-const styles = {
-  container: {
-    margin: '20px',
-    padding: '10px 20px 20px',
-    minHeight: '600px',
-  },
-};
+

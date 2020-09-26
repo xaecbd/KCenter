@@ -14,7 +14,8 @@ import version from '@images/Version.jpg';
 import control from '@images/controller.jpg';
 import box from '@images/box.jpg';
 import chart from '@images/chart.jpg';
-import '../../../Cluster.scss';
+import TopAnalyze from '../../../TopAnalyze';
+
 
 const { Row, Col } = Grid;
 
@@ -155,16 +156,6 @@ export default class ClusterInfo extends Component {
                   <p style={styles.itemValue}>{mockDate.alertSize}</p>
                 </div>
               </Col>
-              {/* {mockDate.map((item, index) => {
-              return (
-                <Col l="4" key={index}>
-                  <div style={styles.item}>
-                    <p style={styles.itemTitle}>{item.title}</p>
-                    <p style={styles.itemValue}>{item.value}</p>
-                  </div>
-                </Col>
-              );
-            })} */}
               <Col l="3">
                 <div style={styles.item}>
                   <p style={styles.itemTitles} >Summary</p>
@@ -177,85 +168,8 @@ export default class ClusterInfo extends Component {
 
 
         <div style={styles.container}>
-          <Loading visible={this.state.isLoading} style={styles.loading}>
-            <Row wrap gutter="20">
-              {data.map((item, index) => {
-               let title;
-                const border = { displayName: 'flex', background: '#fff', borderRadius: '6px', marginTop: '10px' };
-               if (item.status === 'ok') {
-                 title = <p title={item.status} className="greencircle" />;
-               } else if (item.status === 'warn') {
-                 title = <p title={item.status} className="yellowcircle" />;
-                border.boxShadow = '0px 2px 10px #ffd876';
-               } else {
-                 title = <p title={item.status} className="redcircle" />;
-                 border.boxShadow = '0px 2px 10px #ff3b1f';
-               }
-              return (
-                <Col l="8" xs="48" xxs="48" key={index}>
-
-                  <div
-                    style={border}
-                  >
-                    <div style={styles.head}>
-                      <h4 style={styles.title}>{item.name}</h4>
-                    </div>
-                    <div style={styles.body} onClick={e => this.onDetail(item)}>
-                      <Row wrap gutter="20" style={styles.formItems}>
-                        <Col l="6" xs="12" xxs="24" className="test">
-                          <p>
-                            <img src={cluster} alt="" />
-                            &nbsp;&nbsp;Cluster Status:
-                          </p>
-                        </Col>
-                        <Col l="18" xs="12" xxs="24" className="test">
-                          {title}
-                        </Col>
-                      </Row>
-
-                      <Row wrap gutter="20" style={styles.formItems}>
-                        <Col l="6" xs="12" xxs="24" className="test">
-                          <p>
-                            <img src={control} alt="" />
-                            &nbsp;&nbsp;Controller:
-                          </p>
-                        </Col>
-                        <Col l="18" xs="12" xxs="24" className="test">
-                          <p title={item.controller}> {item.controller}</p>
-                        </Col>
-                      </Row>
-
-                      <Row wrap gutter="20" style={styles.formItemes} >
-                        <Col l="6" xs="12" xxs="24" className="test">
-                          <p>
-                            <img src={broker} alt="" />
-                            &nbsp;&nbsp;Broker:
-                          </p>
-                        </Col>
-                        <Col l="18" xs="12" xxs="24" className="test">
-                          <p title={item.broker}> {item.broker}</p>
-                        </Col>
-                      </Row>
-
-                      <Row wrap gutter="20" style={styles.formItemes} >
-                        <Col l="6" xs="12" xxs="24" className="test">
-                          <p>
-                            <img src={version} alt="" />
-                            &nbsp;&nbsp;Kafka Version:
-                          </p>
-                        </Col>
-                        <Col l="18" xs="12" xxs="24" className="test">
-                          <p title={item.version}> {item.version}</p>
-
-                        </Col>
-                      </Row>
-                    </div>
-                  </div>
-                </Col>
-              );
-            })}
-            </Row>
-          </Loading>
+          <TopAnalyze/>
+       
         </div>
 
       </div>
@@ -265,14 +179,16 @@ export default class ClusterInfo extends Component {
 
 const styles = {
   container: {
-    margin: '20px',
+    // margin: '20px',
+    marginTop:'5px',
+    padding:'0 !important',
   },
   loading: {
     width: '100%',
   },
   head: {
     position: 'relative',
-    padding: '16px 16px 8px',
+    // padding: '16px 16px 8px',
     borderBottom: '1px solid #e9e9e9',
   },
   title: {
@@ -287,7 +203,7 @@ const styles = {
   },
   body: {
     position: 'relative',
-    padding: '16px',
+    // padding: '16px',
   },
   formItems: {
     alignItems: 'center',

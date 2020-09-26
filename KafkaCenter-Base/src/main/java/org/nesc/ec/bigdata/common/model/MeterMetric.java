@@ -50,9 +50,16 @@ public class MeterMetric {
 	private String location;
     private String clusterName;
 	private String metricName;
-	
-	
-	
+	private String topic;
+
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+
 	public String getClusterName() {
 		return clusterName;
 	}

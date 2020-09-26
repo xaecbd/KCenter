@@ -7,7 +7,7 @@ import { getPersonalityCluster } from '@utils/cookies';
 import axios from '@utils/axios';
 import FoundationSymbol from '@icedesign/foundation-symbol';
 import EditDialog from '../EditDialog';
-import '../../Alert.scss';
+import style from  '../../index.module.scss';
 
 const { Col } = Grid;
 export default class Alter extends Component {
@@ -157,6 +157,7 @@ export default class Alter extends Component {
     obj.disabled = true;
     obj.enable = record.enable;
     obj.id = record.id;
+    
     this.setState({
       visible: !this.state.visible,
       endValue: obj,
@@ -222,7 +223,8 @@ export default class Alter extends Component {
           <FoundationSymbol size="small"
             type="edit2"
             onClick={() => {
-                this.handleEdit(record);
+                const recordValue = this.state.pageData[index];
+                this.handleEdit(recordValue);
           }}
           />
         </span>
@@ -252,7 +254,7 @@ export default class Alter extends Component {
   renderApi = (value, index, record) => {
     return (
       <div style={styles.oper}>
-        <span title={value}> <Tag className="tags" size="small">{value}</Tag></span>
+        <span title={value}> <Tag className={style.tags} size="small">{value}</Tag></span>
       </div>
     );
   }

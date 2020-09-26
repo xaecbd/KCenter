@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect } from 'react';
+import React, {  useState, useEffect } from 'react';
 import { Button, Loading, Message } from '@alifd/next';
 import { withRouter } from 'react-router-dom';
 import FoundationSymbol from '@icedesign/foundation-symbol';
@@ -6,7 +6,7 @@ import axios from '@utils/axios';
 import ConsumberGroup from './ConsumerGroup';
 
 
-import './GroupDetail.scss';
+
 
 function Detail(props) {
   const[brokerMsg,setBrokerMsg] = useState([]);
@@ -25,84 +25,61 @@ function Detail(props) {
       clusterName: props.match.params.clusterName,
     };
     if (data) {
+      let broker = 0;
+      let zk = 0;
       data.map((obj) => {
-        if (obj.consumerMethod === 'broker') {
-          let logEndOffset = 0;
-          let lag = 0;
-          let offset = 0;
-          let isConsumber = false;
-          const isSimpleConsumerGroup = obj.simpleConsumerGroup;
-          const consumerGroupState = obj.consumerGroupState;
+        let logEndOffset = 0;
+        let lag = 0;
+        let offset = 0;
+        const isSimpleConsumerGroup = obj.simpleConsumerGroup;
+        const consumerGroupState = obj.consumerGroupState;
+        const kafkaCenterGroupState = obj.kafkaCenterGroupState;
 
-          if (obj.partitionAssignmentStates) {
-            obj.partitionAssignmentStates.map((objs) => {
-              logEndOffset = parseInt(objs.logEndOffset, 10) + logEndOffset;
-              if (objs.clientId) {
-                isConsumber = true;
-              }
-              if (parseInt(objs.offset, 10) >= 0) {
-                lag = parseInt(objs.lag, 10) + lag;
-                offset = parseInt(objs.offset, 10) + offset;
-              }
-            });
-            obj.partitionAssignmentStates.splice(0, 0, {
-              group: obj.groupId,
-              topic: obj.topic,
-              logEndOffset,
-              offset,
-              lag,
-              status: '',
-            });
+        if (obj.partitionAssignmentStates) {
+          obj.partitionAssignmentStates.map((objs) => {
+            logEndOffset = parseInt(objs.logEndOffset, 10) + logEndOffset;
+            if (parseInt(objs.offset, 10) >= 0) {
+              lag = parseInt(objs.lag, 10) + lag;
+              offset = parseInt(objs.offset, 10) + offset;
+            }
+          });
+          obj.partitionAssignmentStates.splice(0, 0, {
+            group: obj.groupId,
+            topic: obj.topic,
+            logEndOffset,
+            offset,
+            lag,
+            status: '',
+          });
+          if (obj.consumerMethod === 'broker') {
+            
             const entry = {
               isSimpleConsumerGroup,
               consumerGroupState,
+              kafkaCenterGroupState,
               isZk: false,
-              isConsumber,
+              hasHeard:broker==0
             };
             brokerResult.push({
               topic: obj.topic,
               content: <ConsumberGroup datasource={obj.partitionAssignmentStates} config={entry} record={record} groupName={groupName} consumerMethod={obj.consumerMethod} />,
             });
-          }
-        } else {
-          let isConsumber = false;
-          let logEndOffset = 0;
-          let lag = 0;
-          let offset = 0;
-          const isSimpleConsumerGroup = obj.simpleConsumerGroup;
-          const consumerGroupState = obj.consumerGroupState;
-
-          if (obj.partitionAssignmentStates) {
-            obj.partitionAssignmentStates.map((objs) => {
-              logEndOffset = parseInt(objs.logEndOffset, 10) + logEndOffset;
-
-              if (objs.clientId) {
-                isConsumber = true;
-              }
-              if (parseInt(objs.offset, 10) >= 0) {
-                lag = parseInt(objs.lag, 10) + lag;
-                offset = parseInt(objs.offset, 10) + offset;
-              }
-            });
-            obj.partitionAssignmentStates.splice(0, 0, {
-              group: obj.group,
-              topic: obj.topic,
-              logEndOffset,
-              offset,
-              lag,
-              status: '',
-            });
+            broker +=1;
+          }else{
             const entry = {
               isSimpleConsumerGroup,
               consumerGroupState,
+              kafkaCenterGroupState,
               isZk: true,
-              isConsumber,
+              hasHeard:zk==0
             };
             zkResult.push({
               topic: obj.topic,
               content: <ConsumberGroup datasource={obj.partitionAssignmentStates} config={entry} record={record} groupName={groupName} consumerMethod={obj.consumerMethod} />,
             });
+            zk +=1;
           }
+            
         }
       });
     }

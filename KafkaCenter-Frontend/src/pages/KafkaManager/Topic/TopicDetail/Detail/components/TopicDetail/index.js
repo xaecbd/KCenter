@@ -5,6 +5,7 @@ import FoundationSymbol from '@icedesign/foundation-symbol';
 import { Table, Card, Button, Message, Dialog, Loading } from '@alifd/next';
 import axios from '@utils/axios';
 import { formatSizeUnits } from '@utils/dataFormat';
+import Auth from '@components/Auth'
 import AddPartition from '../Partition';
 
 
@@ -140,7 +141,7 @@ export default class Detail extends Component {
   }
 
   updateConfig = () => {
-    this.props.history.push(`/kafka-manager/topic/config/${this.props.match.params.clusterId}/${this.props.match.params.topic}`);
+    this.props.history.push(`/cluster/topic/config/${this.props.match.params.clusterId}/${this.props.match.params.clusterName}/${this.props.match.params.topic}`);
   }
 
   fetchMetric = () => {
@@ -180,7 +181,8 @@ export default class Detail extends Component {
   };
 
   handleCancel = () => {
-    this.props.history.push('/kafka-manager/topic');
+    this.props.history.push(`/cluster/${this.props.match.params.clusterId}/${this.props.match.params.clusterName}/topic`);
+    // this.props.history.go(-1);
   }
 
 
@@ -225,28 +227,25 @@ export default class Detail extends Component {
               />
               cluster:&nbsp;<span style={styles.listTitles}>{this.state.clusterName} </span>&nbsp;&nbsp;topic:&nbsp;<span style={styles.listTitles}>{this.props.match.params.topic}</span>
             </div>
-            <IceContainer style={{ marginBottom: '0px' }}>
-              <Card style={styles.card} contentHeight="auto">
+            <Card style={styles.card} contentHeight="auto">
                 <div style={styles.title}>Topic Summary</div>
                 <Table dataSource={this.state.topicsummary.summary} hasHeader={false}>
                   <Table.Column dataIndex="name" width={150} />
                   <Table.Column dataIndex="value" width={150} />
                 </Table>
                 <p />
-                <div style={styles.title}>Topic Config</div>
-                <Table dataSource={configData} hasHeader={false}>
-                  <Table.Column dataIndex="config" width={150} />
-                  <Table.Column dataIndex="value" width={150} />
-                </Table>
+               
               </Card>
+            <Auth rolename="admin"> 
               <Card title="Operations" style={styles.cards} contentHeight="auto">
-                <Button type="secondary" onClick={this.deleteTopic} style={styles.button}>Delete Topic</Button>&nbsp;&nbsp;&nbsp;
-                <Button type="secondary" style={styles.button} disabled> Reassign Partitions </Button>&nbsp;&nbsp;&nbsp;
+              
+              <Button type="secondary" onClick={this.deleteTopic} style={styles.button}>Delete Topic</Button>&nbsp;&nbsp;&nbsp;
+             <Button type="secondary" style={styles.button} disabled> Reassign Partitions </Button>&nbsp;&nbsp;&nbsp;
                 <Button type="secondary" style={styles.button} disabled>Generate Partition Assignments</Button><br />
                 <Button type="secondary" onClick={this.addPartitions} style={styles.button}>Add Partitions</Button>&nbsp;&nbsp;&nbsp;
                 <Button type="secondary" onClick={this.updateConfig} style={styles.button}>Update Config</Button>&nbsp;&nbsp;&nbsp;
                 <Button type="secondary" style={styles.button} disabled>Manual Partition Assignments</Button>
-              </Card>
+              </Card></Auth>
               <Card title="Partitions by Broker" style={styles.cards} contentHeight="auto">
                 <Table dataSource={this.state.topicsummary.broker} >
                   <Table.Column
@@ -282,12 +281,14 @@ export default class Detail extends Component {
                     cell={brokerstaw}
                   />
                 </Table>
+                <div style={styles.title}>Topic Config</div>
+                <Table dataSource={configData} hasHeader={false}>
+                  <Table.Column dataIndex="config" width={150} />
+                  <Table.Column dataIndex="value" width={150} />
+                </Table>
               </Card>
 
-            </IceContainer>
 
-
-            <IceContainer style={{ marginBottom: '0px' }}>
               <Card title="Metric" style={styles.metriCard} contentHeight="auto">
                 <Loading visible={this.state.isMetricLoading} style={styles.loading}>
                   <Table dataSource={this.state.metric}>
@@ -325,9 +326,6 @@ export default class Detail extends Component {
                   <Table.Column title="Under Replicated?" dataIndex="Under_Replicated" width={150} />
                 </Table>
               </Card>
-
-            </IceContainer>
-
           </div>
         </IceContainer>
       </div>
@@ -343,11 +341,13 @@ const styles = {
     width: '50%',
     height: '100%',
     float: 'left',
+    marginTop:'0px !important'
   },
   cards: {
     width: '50%',
     height: '100%',
     float: 'right',
+    marginTop:'0px !important'
   },
   cardPartition: {
     width: '100%',

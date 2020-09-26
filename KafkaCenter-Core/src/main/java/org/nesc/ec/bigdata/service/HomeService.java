@@ -5,20 +5,27 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.kafka.clients.admin.DescribeClusterResult;
 import org.apache.kafka.common.Node;
 import org.nesc.ec.bigdata.cache.HomeCache;
+import org.nesc.ec.bigdata.common.RoleEnum;
 import org.nesc.ec.bigdata.common.model.BrokerInfo;
+import org.nesc.ec.bigdata.common.model.KafkaCenterGroupState;
 import org.nesc.ec.bigdata.common.model.MeterMetric;
 import org.nesc.ec.bigdata.common.util.ElasticSearchQuery;
 import org.nesc.ec.bigdata.common.util.JmxCollector;
 import org.nesc.ec.bigdata.constant.BrokerConfig;
 import org.nesc.ec.bigdata.constant.Constants;
+import org.nesc.ec.bigdata.model.AlertGoup;
 import org.nesc.ec.bigdata.model.ClusterInfo;
+import org.nesc.ec.bigdata.model.TopicInfo;
+import org.nesc.ec.bigdata.model.UserInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class HomeService {
@@ -39,6 +46,12 @@ public class HomeService {
 
     @Autowired
     ElasticsearchService elasticsearchService;
+
+    @Autowired
+    TopicInfoService topicInfoService;
+
+
+
 
     @Autowired
     ZKService zkService;
@@ -89,7 +102,7 @@ public class HomeService {
             pageCache.setGroupSize(pageCache.getGroupSize()==0?calcGroup(clusterInfoList):pageCache.getGroupSize());
             pageCache.setBrokerSize(pageCache.getBrokerSize()==0?this.getBrokerSize(clusterInfoList):pageCache.getBrokerSize());
         } catch (Exception e2) {
-            LOG.error("Get Cluster Date Faild!,{}",e2.getMessage());
+            LOG.error("Get Cluster Date Failed!,{}",e2.getMessage());
         }
         return pageCache;
     }
@@ -103,7 +116,7 @@ public class HomeService {
                 zk += zkService.getZK(cluser.getId().toString()).listConsumerGroups().size();
             }
         }catch (Exception e){
-            LOG.error("calc all cluster group faild!,",e);
+            LOG.error("calc all cluster group failed!,",e);
         }
         return (zk+group);
     }
@@ -116,7 +129,7 @@ public class HomeService {
                 count += topicMap.size();
             }
         } catch (Exception e) {
-            LOG.error("Get Topics Date Faild!,",e);
+            LOG.error("Get Topics Date Failed!,",e);
         }
         return count;
 
@@ -156,7 +169,7 @@ public class HomeService {
         try {
             map = elasticsearchService.clusterTrendData(start, end, clientId);
         } catch (Exception e) {
-            LOG.error("Get trend Cluster data Faild!,",e);
+            LOG.error("Get trend Cluster data Failed!,",e);
         }
         return map;
     }
@@ -174,6 +187,86 @@ public class HomeService {
             array.add(obj);
         });
         return array;
+    }
+
+    /**
+     *Returns the file size of the current user's team topic,
+     * as well as the total file size of all team topics
+     * @param userInfo current login user info
+     * */
+    public  Map<String,Long> topicFileSizeGroupByTeams(UserInfo userInfo){
+        List<TopicInfo> fileSizeSet = topicInfoService.topicFileSizeByTeams();
+        if(Objects.equals(userInfo.getRole().name(), RoleEnum.ADMIN.name())){
+           Map<String,Long> allTeamsMap =  fileSizeSet.stream().filter(topicInfo -> !Objects.isNull(topicInfo.getTeam())).
+                                                collect(Collectors.toMap(topic->topic.getTeam().getName(), TopicInfo::getFileSize));
+           return allTeamsMap;
+        }
+        List<Long> teamIds =  userInfo.getTeamIDs();
+        long otherTeamSizeSum = fileSizeSet.stream().filter(topicInfo-> !Objects.isNull(topicInfo.getTeam()) && !teamIds.contains(topicInfo.getTeam().getId())).mapToLong(TopicInfo::getFileSize).sum();
+        Map<String,List<TopicInfo>> userTeamMap =  fileSizeSet.stream().filter(topicInfo -> !Objects.isNull(topicInfo.getTeam()) && teamIds.contains(topicInfo.getTeam().getId())).
+                                                    collect(Collectors.groupingBy(topicInfo -> topicInfo.getTeam().getName()));
+         Map<String,Long> newUserTeamMap =  userTeamMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,e->e.getValue().stream().mapToLong(TopicInfo::getFileSize).sum()));
+         newUserTeamMap.put("other team",otherTeamSizeSum);
+         return newUserTeamMap;
+
+    }
+
+    /**
+     * return the top 10 topic log size
+     * time rang : now-7d ~ now
+     * */
+    public List<JSONObject> top10TopicLogSizeRang7Days(UserInfo userInfo, long start, long end){
+        return elasticsearchService.top10TopicLogSizeRang7Days(userInfo,start,end);
+    }
+
+
+    /**
+     * return the top 10 consumer group alert
+     * by different user role
+     * */
+    public List<HomeCache.ConsumerLagCache> topic10ConsumerGroupAlert(UserInfo userInfo, Map<String, HomeCache.ConsumerLagCache> consumerLagCacheMap){
+        List<HomeCache.ConsumerLagCache> consumerLagCacheList;
+        if(Objects.equals(userInfo.getRole().name(),RoleEnum.ADMIN.name())){
+            consumerLagCacheList = new ArrayList<>(consumerLagCacheMap.values());
+        }else{
+            List<AlertGoup> alertGroups  = alertService.selectAlertGroupByOwerId(userInfo.getId());
+            Map<String,AlertGoup> alertGroupMap = alertService.generateAlertGroup(alertGroups);
+            consumerLagCacheList =
+                    consumerLagCacheMap.keySet().stream().filter(key -> !CollectionUtils.isEmpty(alertGroupMap) && alertGroupMap.containsKey(key)).
+                            map(consumerLagCacheMap::get).collect(Collectors.toList());
+        }
+
+
+        return sortedConsumerLag(consumerLagCacheList);
+
+    }
+
+    public List<HomeCache.ConsumerLagCache> sortedConsumerLag(List<HomeCache.ConsumerLagCache> consumerLagCacheList){
+        List<HomeCache.ConsumerLagCache>  deadList = consumerLagCacheList.stream().
+                filter(consumerLagCache -> KafkaCenterGroupState.DEAD.name().equalsIgnoreCase(consumerLagCache.getStatus())).collect(Collectors.toList());
+        int size = 10 - deadList.size();
+        if(size > 0){
+            List<HomeCache.ConsumerLagCache> otherList =  consumerLagCacheList.stream().
+                    filter(consumerLagCache -> !Constants.Status.DEAD.equalsIgnoreCase(consumerLagCache.getStatus())).
+                    sorted((o1, o2) -> (int) (o2.getLag() - o1.getLag()))
+                    .collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(otherList) && otherList.size()>size){
+                otherList = otherList.subList(0,size);
+            }
+            deadList.addAll(otherList);
+        }else{
+            deadList.sort((o1, o2) -> (int) (o2.getLag() - o1.getLag()));
+            deadList = deadList.subList(0,10);
+        }
+        return deadList;
+    }
+
+    /**
+     *  return the top 10 topic log size from es
+     *  time rang : now-7d ~ now
+     * */
+    public List<JSONObject> top10TopicFileSizeRang7Days(UserInfo userInfo, long start, long end){
+        return  elasticsearchService.top10TopicFileSizeRang7Days(userInfo,start,end);
     }
 
     static class MetricVo {

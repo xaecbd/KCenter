@@ -2,19 +2,23 @@ package org.nesc.ec.bigdata.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
+import org.nesc.ec.bigdata.common.RoleEnum;
 import org.nesc.ec.bigdata.common.model.OffsetStat;
 import org.nesc.ec.bigdata.common.util.ElasticSearchQuery;
 import org.nesc.ec.bigdata.common.util.ElasticsearchUtil;
+import org.nesc.ec.bigdata.config.InitConfig;
 import org.nesc.ec.bigdata.constant.BrokerConfig;
 import org.nesc.ec.bigdata.constant.Constants;
 import org.nesc.ec.bigdata.constant.TopicConfig;
 import org.nesc.ec.bigdata.model.ClusterInfo;
-import org.apache.commons.lang3.StringUtils;
+import org.nesc.ec.bigdata.model.TopicInfo;
+import org.nesc.ec.bigdata.model.UserInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -31,25 +35,22 @@ public class ElasticsearchService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchService.class);
 
-    @Value("${monitor.elasticsearch.hosts:}")
-    private String monitorElasticsearchHost;
-    @Value("${monitor.elasticsearch.index:}")
-    private String monitorElasticsearchIndexName;
-    @Value("${monitor.elasticsearch.auth.user:}")
-    private String monitorElasticsearchAuthUser;
-    @Value("${monitor.elasticsearch.auth.password:}")
-    private String monitorElasticsearchAuthPassword;
-
+    @Autowired
+    InitConfig initConfig;
 
     @Autowired
     private ClusterService clusterService;
 
+    @Autowired
+    private TopicInfoService topicInfoService;
 
     private ElasticsearchUtil elasticsearchUtil;
 
+
+
     @PostConstruct
     public void init() {
-        elasticsearchUtil = new ElasticsearchUtil(monitorElasticsearchHost, monitorElasticsearchAuthUser, monitorElasticsearchAuthPassword);
+        elasticsearchUtil = new ElasticsearchUtil(initConfig.getMonitorElasticsearchHost(), initConfig.getMonitorElasticsearchAuthUser(),initConfig.getMonitorElasticsearchAuthPassword());
     }
 
     public ElasticsearchUtil getESDB() {
@@ -66,7 +67,7 @@ public class ElasticsearchService {
     }
 
     public String getMonitorElasticsearchIndexName() {
-        return monitorElasticsearchIndexName;
+        return initConfig.getMonitorElasticsearchIndexName();
     }
 
 
@@ -93,7 +94,7 @@ public class ElasticsearchService {
                 start = String.valueOf(Long.parseLong(start) - (24 * 60 * 60 * 1000));
             }
             String requestBody = ElasticSearchQuery.getDateIntervalQueryBody(clusterId, topic, group, type, start, end, interval);
-            JSONObject responseObj = elasticsearchUtil.searchES(requestBody, monitorElasticsearchIndexName + "*");
+            JSONObject responseObj = elasticsearchUtil.searchES(requestBody, getMonitorElasticsearchIndexName() + "*");
             if (responseObj != null) {
                 list = parseDateIntervalResponse(responseObj);
                 for (int i = list.size() - 1; i > 0; i--) {
@@ -147,12 +148,12 @@ public class ElasticsearchService {
             }
 
             String requestBody = ElasticSearchQuery.getRequestBody(clusterId, topic, group, type, start, end);
-            JSONObject responseObj = elasticsearchUtil.searchES(requestBody, monitorElasticsearchIndexName + "*");
+            JSONObject responseObj = elasticsearchUtil.searchES(requestBody, getMonitorElasticsearchIndexName() + "*");
             if (responseObj != null) {
                 list = parseResponse(responseObj);
             }
         } catch (IOException e) {
-            LOG.error("queryOffset faild!", e);
+            LOG.error("queryOffset failed!", e);
         }
         return list;
     }
@@ -162,7 +163,7 @@ public class ElasticsearchService {
         JSONArray array = responseObj.getJSONObject(Constants.EleaticSearch.HITS).getJSONArray(Constants.EleaticSearch.HITS);
         array.forEach(obj -> {
             JSONObject objs = (JSONObject) obj;
-            OffsetStat offsetStat = objs.getObject(Constants.EleaticSearch._SOURCE, OffsetStat.class);
+            OffsetStat offsetStat = objs.getObject(Constants.EleaticSearch.SOURCE_, OffsetStat.class);
             list.add(offsetStat);
         });
         return list;
@@ -177,7 +178,7 @@ public class ElasticsearchService {
         String searchQuery = ElasticSearchQuery.getLagQueryString(clientId);
         JSONObject responseObj;
         try {
-            responseObj = elasticsearchUtil.searchES(searchQuery, monitorElasticsearchIndexName + "*");
+            responseObj = elasticsearchUtil.searchES(searchQuery, getMonitorElasticsearchIndexName() + "*");
             if (responseObj != null) {
                 JSONObject aggs = responseObj.getJSONObject(Constants.EleaticSearch.AGGREGATIONS);
                 if(aggs==null){
@@ -195,7 +196,7 @@ public class ElasticsearchService {
                 });
             }
         } catch (IOException e) {
-            LOG.error("getRequestBody faild!", e);
+            LOG.error("getRequestBody failed!", e);
         }
         return list;
     }
@@ -208,7 +209,7 @@ public class ElasticsearchService {
         String searchQuery = ElasticSearchQuery.getClusterQueryString(size, clusterId, timeStamp);
         JSONObject responseObj;
         try {
-            responseObj = elasticsearchUtil.searchES(searchQuery, monitorElasticsearchIndexName + "*");
+            responseObj = elasticsearchUtil.searchES(searchQuery, getMonitorElasticsearchIndexName() + "*");
             if (responseObj != null) {
                 offsetStats = parseResponse(responseObj);
                 if (!offsetStats.isEmpty()) {
@@ -216,7 +217,7 @@ public class ElasticsearchService {
                 }
             }
         } catch (IOException e) {
-            LOG.error("getCluster faild!", e);
+            LOG.error("getCluster failed!", e);
         }
         return offsetStats;
     }
@@ -229,7 +230,7 @@ public class ElasticsearchService {
         }
         String searchQuery = ElasticSearchQuery.clusterTrendAggres(start, end, clientId, interval);
         try {
-            JSONObject temp = elasticsearchUtil.searchES(searchQuery, monitorElasticsearchIndexName + "*");
+            JSONObject temp = elasticsearchUtil.searchES(searchQuery, getMonitorElasticsearchIndexName() + "*");
             if (!temp.containsKey(Constants.EleaticSearch.AGGREGATIONS)) {
                 return map;
             }
@@ -280,7 +281,7 @@ public class ElasticsearchService {
         }
         String searchQuery = ElasticSearchQuery.clusterQuery(start, end, clientId);
         try {
-            JSONObject temp = elasticsearchUtil.scrollSearch(searchQuery, monitorElasticsearchIndexName + Constants.Symbol.STARSTR);
+            JSONObject temp = elasticsearchUtil.scrollSearch(searchQuery, getMonitorElasticsearchIndexName() + Constants.Symbol.STARSTR);
             if (!temp.containsKey(Constants.EleaticSearch.HITS)) {
                 return map;
             }
@@ -292,16 +293,19 @@ public class ElasticsearchService {
                 JSONArray array = (JSONArray) obj;
                 array.forEach(arr -> {
                     JSONObject hit = (JSONObject) arr;
-                    JSONObject source = hit.getJSONObject(Constants.EleaticSearch._SOURCE);
-                    String metrcName = source.getString(BrokerConfig.METRICNAME);
-                    JSONArray arrRes;
-                    if (map.containsKey(metrcName)) {
-                        arrRes = map.get(metrcName);
-                    } else {
-                        arrRes = new JSONArray();
+                    JSONObject source = hit.getJSONObject(Constants.EleaticSearch.SOURCE_);
+                    if(source.containsKey(Constants.ConsumerType.BROKER)){
+                        String metrcName = source.getString(BrokerConfig.METRICNAME);
+                        JSONArray arrRes;
+                        if (map.containsKey(metrcName)) {
+                            arrRes = map.get(metrcName);
+                        } else {
+                            arrRes = new JSONArray();
+                        }
+                        arrRes.add(source);
+                        map.put(metrcName, arrRes);
                     }
-                    arrRes.add(source);
-                    map.put(metrcName, arrRes);
+
                 });
 
             });
@@ -336,7 +340,7 @@ public class ElasticsearchService {
         clusters.forEach(cluster -> clusterMap.put(cluster.getId().toString(), cluster));
         String[] metricNames = BrokerConfig.METRIC_NAME_ARRAY;
         try {
-            JSONObject temp = elasticsearchUtil.searchES(searchQuery, monitorElasticsearchIndexName + Constants.Symbol.STARSTR);
+            JSONObject temp = elasticsearchUtil.searchES(searchQuery, getMonitorElasticsearchIndexName() + Constants.Symbol.STARSTR);
             if (!temp.containsKey(Constants.EleaticSearch.AGGREGATIONS)) {
                 return res;
             }
@@ -398,7 +402,7 @@ public class ElasticsearchService {
         }
         String searchQuery = ElasticSearchQuery.summaryMetricQuery(start, end);
         try {
-            JSONObject temp = elasticsearchUtil.searchES(searchQuery, monitorElasticsearchIndexName + "*");
+            JSONObject temp = elasticsearchUtil.searchES(searchQuery, getMonitorElasticsearchIndexName() + "*");
             if (!temp.containsKey(Constants.EleaticSearch.AGGREGATIONS)) {
                 return map;
             }
@@ -425,6 +429,165 @@ public class ElasticsearchService {
         return map;
     }
 
+    public  List<JSONObject> getTopicMetric(long start,long end,String clusterId,String topic,String metric){
+        List<JSONObject> resultList = new ArrayList<>();
+        String searchQuery = ElasticSearchQuery.searchTopicMetricQuery(start,end,clusterId,topic,metric);
+        try{
+           JSONObject result =   elasticsearchUtil.searchES(searchQuery,getMonitorElasticsearchIndexName()+"*");
+            if (!result.containsKey(Constants.EleaticSearch.AGGREGATIONS)) {
+                return resultList;
+            }
+           JSONArray bucketArray = result.getJSONObject(Constants.EleaticSearch.AGGREGATIONS).getJSONObject(Constants.KeyStr.DATE).getJSONArray(Constants.EleaticSearch.BUCKETS);
+           for (int i = 0;i<bucketArray.size()-1;i++){
+               JSONObject obj = bucketArray.getJSONObject(i);
+               JSONObject nextObj = bucketArray.getJSONObject(i+1);
+               String key = obj.getString(Constants.EleaticSearch.KEY_AS_STRING);
+               String nextKey = nextObj.getString(Constants.EleaticSearch.KEY_AS_STRING);
+               JSONObject metricObj = obj.getJSONObject(Constants.KeyStr.METRIC);
+               JSONObject nextMetricObj = nextObj.getJSONObject(Constants.KeyStr.METRIC);
+               long metricValue = metricObj.getLongValue(Constants.JsonObject.VALUE);
+               long nextMetricValue = nextMetricObj.getLongValue(Constants.JsonObject.VALUE);
+               JSONObject resultObj = new JSONObject();
+               resultObj.put(Constants.JsonObject.TIME,nextKey);
+               resultObj.put(Constants.JsonObject.VALUE,(nextMetricValue-metricValue));
+               resultList.add(resultObj);
+           }
+        }catch (Exception e){
+            LOG.error("get topic metric data error", e);
+        }
+        return resultList;
+    }
+
+
+    /***
+     *
+     * search the topic max log size group by topic,
+     * Admin user queries all topics,
+     * while ordinary user queries all topics belonging to the team
+     * @param  userInfo the current login user information
+     *
+     */
+    public List<JSONObject> top10TopicLogSizeRang7Days(UserInfo userInfo, long start, long end){
+        List<JSONObject> objectList = new ArrayList<>();
+        String searchQuery = ElasticSearchQuery.top10TopicLogSizeRang7Days(searchQuery(userInfo),start,end);
+        try{
+            JSONObject result = elasticsearchUtil.searchES(searchQuery,getMonitorElasticsearchIndexName()+"*");
+            if(!result.containsKey(Constants.EleaticSearch.AGGREGATIONS)){
+                return  objectList;
+            }
+            JSONArray bucketArray = result.getJSONObject(Constants.EleaticSearch.AGGREGATIONS).getJSONObject(Constants.KeyStr.DATE).getJSONArray(Constants.EleaticSearch.BUCKETS);
+            for (int i =0;i<bucketArray.size();i++){
+                JSONObject bucketObj = bucketArray.getJSONObject(i);
+                long key = bucketObj.getLongValue(Constants.EleaticSearch.KEY);
+                JSONArray clusterBuckets = bucketObj.getJSONObject("cluster").getJSONArray(Constants.EleaticSearch.BUCKETS);
+                Map<String,Long> valueMap = new HashMap<>();
+                for(int k=0;k<clusterBuckets.size();k++){
+                    JSONObject clusterObj = clusterBuckets.getJSONObject(k);
+                    String clusterName = clusterObj.getString(Constants.EleaticSearch.KEY);
+                    JSONArray topicBucket=clusterObj.getJSONObject("topic").getJSONArray(Constants.EleaticSearch.BUCKETS);
+                    for (int j =0;j<topicBucket.size();j++){
+                        JSONObject topicObj = topicBucket.getJSONObject(j);
+                        String topic = topicObj.getString(Constants.EleaticSearch.KEY);
+                        long value = topicObj.getJSONObject("logSize").getLongValue(Constants.EleaticSearch.VALUE);
+                        String mapKey = clusterName+Constants.Symbol.SPACE_STR+topic;
+                        valueMap.put(mapKey,value);
+                    }
+                }
+                List<JSONObject> mergeList = generateMapToArray(valueMap,key);
+                if(!CollectionUtils.isEmpty(mergeList)){
+                    objectList.addAll(mergeList);
+                }
+
+            }
+        }catch (Exception e){
+            LOG.error("search top 10 topic Log Size Rang 7 Days has Error",e);
+        }
+        return objectList;
+    }
+
+    /**
+     * search the topic max file size group by topic,
+     * Admin user queries all topics,
+     * while ordinary user queries all topics belonging to the team
+     *  @param  userInfo the current login user information
+     * */
+    public List<JSONObject> top10TopicFileSizeRang7Days(UserInfo userInfo, long start, long end){
+        List<JSONObject> objectList = new ArrayList<>();
+        String query = searchQuery(userInfo);
+        if(Objects.equals("",query)){
+            return objectList;
+        }
+        String searchQuery =  ElasticSearchQuery.top10TopicFileSizeRang7Days(searchQuery(userInfo),start,end);
+        try{
+            JSONObject result = elasticsearchUtil.searchES(searchQuery,getMonitorElasticsearchIndexName()+"*");
+            if(!result.containsKey(Constants.EleaticSearch.AGGREGATIONS)){
+                return  objectList;
+            }
+            JSONArray bucketArray = result.getJSONObject(Constants.EleaticSearch.AGGREGATIONS).getJSONObject(Constants.KeyStr.DATE).getJSONArray(Constants.EleaticSearch.BUCKETS);
+            for (int i =0;i<bucketArray.size();i++){
+                JSONObject bucketObj = bucketArray.getJSONObject(i);
+                long time = bucketObj.getLongValue(Constants.EleaticSearch.KEY);
+                JSONArray clusterBuckets = bucketObj.getJSONObject(Constants.KeyStr.CLUSTER).getJSONArray(Constants.EleaticSearch.BUCKETS);
+                Map<String,Long> valueMap = new HashMap<>();
+                for (int k = 0;k<clusterBuckets.size();k++){
+                    JSONObject clusterObj = clusterBuckets.getJSONObject(k);
+                    String clusterName = clusterObj.getString(Constants.EleaticSearch.KEY);
+                    JSONArray topicBucket = clusterObj.getJSONObject(Constants.KeyStr.TOPIC).getJSONArray(Constants.EleaticSearch.BUCKETS);
+                    for(int j = 0;j<topicBucket.size();j++){
+                        JSONObject topicObj = topicBucket.getJSONObject(j);
+                        String topic = topicObj.getString(Constants.EleaticSearch.KEY);
+                        long value = topicObj.getJSONObject(Constants.KeyStr.MAX_FILE).getLongValue(Constants.EleaticSearch.VALUE);
+                        String key = clusterName+Constants.Symbol.SPACE_STR+topic;
+                        valueMap.put(key,value);
+                    }
+                }
+                List<JSONObject> mergeList = generateMapToArray(valueMap,time);
+                if(!CollectionUtils.isEmpty(mergeList)){
+                    objectList.addAll(mergeList);
+                }
+            }
+        }catch (Exception e){
+            LOG.error("search top 10 topic file Size Rang 7 Days has Error",e);
+        }
+        return objectList;
+
+    }
+
+    /**
+     * Return topic by role
+     * if user is admin,return null
+     * f the user is a regular user,returns the topic owned by the user's team
+     * */
+    private String searchQuery(UserInfo userInfo){
+        if(Objects.equals(userInfo.getRole().name(), RoleEnum.ADMIN.name())){
+            return null;
+        }else{
+            List<TopicInfo> topicInfoList = topicInfoService.getTopicByTeamIDs(userInfo.getTeamIDs());
+            StringBuilder sb = new StringBuilder();
+            if(!CollectionUtils.isEmpty(topicInfoList)){
+                topicInfoList.forEach(topicInfo -> {
+                    sb.append("\"").append(topicInfo.getTopicName()).append("\"").append(",");
+                });
+                String str  = sb.toString();
+                return str.substring(0,str.length()-1);
+            }
+            return sb.toString();
+
+        }
+    }
+
+    private List<JSONObject> generateMapToArray(Map<String,Long> valueMap, long time){
+        List<JSONObject> list = new ArrayList<>();
+        valueMap.keySet().stream().sorted((o1, o2) -> (int) (valueMap.get(o1) - valueMap.get(o2))).limit(10).forEach((key)->{
+            JSONObject object = new JSONObject();
+            object.put(Constants.KeyStr.DATE,time);
+            object.put("topic",key);
+            object.put(Constants.EleaticSearch.VALUE,valueMap.get(key));
+            list.add(object);
+        });
+        list.sort((o1, o2) -> (int) (o2.getLongValue(Constants.EleaticSearch.VALUE) - o1.getLongValue(Constants.EleaticSearch.VALUE)));
+        return list;
+    }
 
     private String getInterval(int diff) {
         if (diff / Constants.Time.FIVE < Constants.Time.HUNDRED) {

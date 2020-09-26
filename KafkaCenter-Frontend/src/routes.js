@@ -30,11 +30,9 @@ const SummaryChart = lazy(() => import('@/pages/Home/Summary'));
 const Team = lazy(() => import('@/pages/Setting/Team'));
 const User = lazy(() => import('@/pages/Setting/User'));
 // kafka-manager
-const managerTopic = lazy(() => import('@/pages/KafkaManager/Topic/TopicList'));
-const managerGroup = lazy(() => import('@/pages/KafkaManager/Group'));
 const managerTopiDetail = lazy(() => import('@/pages/KafkaManager/Topic/TopicDetail/Detail'));
 const Cluster = lazy(() => import('@/pages/KafkaManager/Cluster'));
-const managerBroker = lazy(() => import('@/pages/KafkaManager/Broker'));
+const clusterTab = lazy(()=> import('@/pages/KafkaManager/ClusterTab'));
 
 
 // monitor page
@@ -54,8 +52,13 @@ const Ksql = lazy(() => import('@/pages/Ksql'));
 
 const KsqlHome = lazy(() => import('@/pages/Ksql/KsqlList/KsqlHome'));
 const KsqlConsole = lazy(() => import('@/pages/Ksql/KsqlList/Console/index.js'));
+const Loading = lazy(() => import('@/pages/Loading'));
 
 const routerConfig = [
+  {
+    path: '/loading',
+    component: Loading,
+  },
   {
     path: '/user',
     component: UserLayout,
@@ -173,6 +176,7 @@ const routerConfig = [
         path: '/monitor/consumer/group/detail/:clusterID/:clusterName/:consummerGroup',
         component: consumerGroupDetail,
       },
+     
       {
         path: '/users',
         component: MyProfile,
@@ -186,35 +190,26 @@ const routerConfig = [
         path: '/monitor/lag',
         component: ConsumerLag,
       },
-    
+     
       {
-        path: '/kafka-manager/topic',
-        component: managerTopic,
-        exact: true,
-      },
-      {
-        path: '/kafka-manager/broker',
-        component: managerBroker,
-        exact: true,
-      },
-      {
-        path: '/kafka-manager/topic/:clusterId/:topic',
+        path: '/cluster/topic/:clusterId/:clusterName/:topic',
         component: managerTopiDetail,
         exact: true,
       },
       {
-        path: '/kafka-manager/topic/config/:clusterId/:topic',
+        path: '/cluster/:clusterID/:clusterName/:tab',
+        component: clusterTab,
+        exact: true,
+      },
+      {
+        path: '/cluster/topic/config/:clusterId/:clusterName/:topic',
         component: managerUpdateConfig,
         exact: true,
       },
       {
-        path: '/kafka-manager/group',
-        component: managerGroup,
-        exact: true,
-      },
-      {
-        path: '/kafka-manager/cluster',
+        path: '/cluster',
         component: Cluster,
+        exact: true,
       },
       {
         path: '/ksql/list',

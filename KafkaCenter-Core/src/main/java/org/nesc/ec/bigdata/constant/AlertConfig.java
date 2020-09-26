@@ -2,6 +2,7 @@ package org.nesc.ec.bigdata.constant;
 
 /**
  * @author lg99
+ * send to alerta constants
  */
 public class AlertConfig {
     public static final String RESOURCE = "resource";
@@ -23,7 +24,10 @@ public class AlertConfig {
     public static final String RAWDATA = "rawData";
     public static final String CUSTOMER = "customer";
     public static final String CONSUMER_SEVERITY = "warning";
-    public static final String CONSUMER_GROUP = "XABigdata";
+    public static final String CONSUMER_GROUP = "XAECBigdata";
     public static final String CONSUMER_ORIGIN = "Group Consumer Lag";
     public static final String CONSUMER_TYPE = "lagAlert";
+
+    public static final String DEPARTMENT = "Department";
+    public static final String NAME = "Name";
 }

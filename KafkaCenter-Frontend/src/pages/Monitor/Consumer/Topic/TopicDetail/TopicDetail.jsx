@@ -2,19 +2,51 @@ import React, { useState, useEffect } from 'react';
 import { Loading, Message, Button } from '@alifd/next';
 import { withRouter } from 'react-router-dom';
 import axios from '@utils/axios';
-import { formatSizeUnits } from '@utils/dataFormat';
 import FoundationSymbol from '@icedesign/foundation-symbol';
 import ConsumberGroup from './ConsumberGroup';
 
-import './TopicDetail.scss';
+
 
 
 function TopicDetail(props) {
 
+  const styles = {
+    listTitle: {
+      marginBottom: '10px',
+      fontSize: '30px',
+    },
+    listTitles: {
+      marginBottom: '10px',
+      fontSize: '30px',
+      fontWeight: 'bold',
+    },
+    metricTitle: {
+      marginBottom: '10px',
+      fontSize: '18px',
+      fontWeight: 'bold',
+      marginTop: '10px',
+    },
+    loading: {
+      width: '100%',
+    },
+    backward: {
+      display: 'inline-block',
+      minWidth: '40px',
+      marginBottom: '15px',
+      cursor: 'pointer',
+      color: '#0066FF',
+    },
+    container: {
+      //  margin: '20px',
+      padding: '10px 20px 20px',
+      minHeight: '600px',
+    },
+  };
+
   const[brokerMsg,setBrokerMsg] = useState([]);
   const[zkMsg,setZkMsg] = useState([]);
   const[isConsumberLoading,setIsConsumberLoading] = useState(false);
-  const[clusterName,setClusterName] = useState(props.match.params.clusterName);
+  const[clusterName] = useState(props.match.params.clusterName);
 
 
   const restructurConsumberData = (data) => {
@@ -25,39 +57,42 @@ function TopicDetail(props) {
       clusterID: props.match.params.id,
       clusterName: props.match.params.clusterName,
     };
-    if (data) {
-      data.map((obj) => {
-        if (obj.consumerMethod === 'broker') {
-          let logEndOffset = 0;
-          let lag = 0;
-          let offset = 0;
-          let isConsumber = false;
-          const isSimpleConsumerGroup = obj.simpleConsumerGroup;
-          const consumerGroupState = obj.consumerGroupState;
 
-          if (obj.partitionAssignmentStates) {
-            obj.partitionAssignmentStates.map((objs) => {
-              logEndOffset = parseInt(objs.logEndOffset, 10) + logEndOffset;
-              if (objs.clientId) {
-                isConsumber = true;
-              }
-              if (parseInt(objs.offset, 10) >= 0) {
-                lag = parseInt(objs.lag, 10) + lag;
-                offset = parseInt(objs.offset, 10) + offset;
-              }
-            });
-            obj.partitionAssignmentStates.splice(0, 0, {
-              group: obj.groupId,
-              logEndOffset,
-              offset,
-              lag,
-              status: '',
-            });
+    if (data) {
+      let broker = 0;
+      let zk = 0;
+      data.map((obj) => {
+        let logEndOffset = 0;
+        let lag = 0;
+        let offset = 0;
+        const isSimpleConsumerGroup = obj.simpleConsumerGroup;
+        const consumerGroupState = obj.consumerGroupState;
+        const kafkaCenterGroupState = obj.kafkaCenterGroupState;
+
+        if (obj.partitionAssignmentStates) {
+          obj.partitionAssignmentStates.map((objs) => {
+            logEndOffset = parseInt(objs.logEndOffset, 10) + logEndOffset;
+            if (parseInt(objs.offset, 10) >= 0) {
+              lag = parseInt(objs.lag, 10) + lag;
+              offset = parseInt(objs.offset, 10) + offset;
+            }
+          });
+          obj.partitionAssignmentStates.splice(0, 0, {
+            group: obj.groupId,
+            logEndOffset,
+            offset,
+            lag,
+            status: '',
+          });
+          
+          if(obj.consumerMethod === 'broker'){
+           
             const entry = {
               isSimpleConsumerGroup,
               consumerGroupState,
+              kafkaCenterGroupState,
               isZk: false,
-              isConsumber,
+              hasHeard:broker==0
             };
             brokerResult.push({
               title: obj.groupId,
@@ -70,44 +105,17 @@ function TopicDetail(props) {
                 />
               ),
             });
-          }
-        } else {
-          let isConsumber = false;
-          let logEndOffset = 0;
-          let lag = 0;
-          let offset = 0;
-          const isSimpleConsumerGroup = obj.simpleConsumerGroup;
-          const consumerGroupState = obj.consumerGroupState;
-
-          if (obj.partitionAssignmentStates) {
-            obj.partitionAssignmentStates.map((objs) => {
-              logEndOffset = parseInt(objs.logEndOffset, 10) + logEndOffset;
-
-              if (objs.clientId) {
-                isConsumber = true;
-              }
-              if (parseInt(objs.offset, 10) >= 0) {
-                lag = parseInt(objs.lag, 10) + lag;
-                offset = parseInt(objs.offset, 10) + offset;
-              }
-            });
-            obj.partitionAssignmentStates.splice(0, 0, {
-              group: obj.groupId,
-              logEndOffset,
-              offset,
-              lag,
-              status: '',
-
-            });
+            broker +=1;
+          }else{
             const entry = {
               isSimpleConsumerGroup,
               consumerGroupState,
+              kafkaCenterGroupState,
               isZk: true,
-              isConsumber,
+              hasHeard:zk==0
             };
             zkResult.push({
               title: obj.groupId,
-
               content: (
                 <ConsumberGroup
                   datasource={obj.partitionAssignmentStates}
@@ -117,12 +125,13 @@ function TopicDetail(props) {
                 />
               ),
             });
-          }
-        }
+            zk +=1;
+          } 
+        }  
       });
     }
     setZkMsg(zkResult);
-    setBrokerMsg(brokerMsg);
+    setBrokerMsg(brokerResult);
   };
 
   const fetchDetail = (data) => {
@@ -157,22 +166,6 @@ function TopicDetail(props) {
     fetchDetail(data);
   },[]);
  
-
- 
-  const fetchCluster = (data) => {
-    axios
-      .get(`/cluster/get?id=${data.clusterID}`)
-      .then((response) => {
-        if (response.data.code === 200) {
-          if (response.data.data) {
-            setClusterName(response.data.data.name);
-          }
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
   
   const backward = () => {
     window.location.href = '#/monitor/consumer';
@@ -188,6 +181,7 @@ function TopicDetail(props) {
   const handleProduct=() => {
     props.history.push(`/monitor/producer/metric/${props.match.params.id}/${clusterName}/${props.match.params.topicName}`);
   }
+
 
   return (
     <div style={styles.container}>
@@ -273,37 +267,6 @@ function TopicDetail(props) {
   );
 }
 
-const styles = {
-  listTitle: {
-    marginBottom: '10px',
-    fontSize: '30px',
-  },
-  listTitles: {
-    marginBottom: '10px',
-    fontSize: '30px',
-    fontWeight: 'bold',
-  },
-  metricTitle: {
-    marginBottom: '10px',
-    fontSize: '18px',
-    fontWeight: 'bold',
-    marginTop: '10px',
-  },
-  loading: {
-    width: '100%',
-  },
-  backward: {
-    display: 'inline-block',
-    minWidth: '40px',
-    marginBottom: '15px',
-    cursor: 'pointer',
-    color: '#0066FF',
-  },
-  container: {
-    //  margin: '20px',
-    padding: '10px 20px 20px',
-    minHeight: '600px',
-  },
-};
+
 
 export default withRouter(TopicDetail);

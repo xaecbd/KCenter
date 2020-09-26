@@ -19,11 +19,6 @@ export default class GroupTable extends Component {
     allData: [],
   };
 
-  //   componentDidMount() {
-  //    // console.log('id:'+getPersonalityCluster('monitorGroup').id);
-  //    // this.fetchData(getPersonalityCluster('monitorGroup').id);
-
-  //   }
   componentWillMount() {
     this.mounted = true;
   }
