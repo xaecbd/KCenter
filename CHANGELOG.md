@@ -1,5 +1,5 @@
 # 2.3.0 (2020-9-26)
-###Features / Enhancements
+### Features / Enhancements
 * add new home page
 * add topic file size
 * enhance producer monitor
@@ -7,7 +7,7 @@
 ### Bug Fixes
 * fix some bug
 # 2.2.0 (2020-7-31)
-###Features / Enhancements
+### Features / Enhancements
 * add monitor consumer lag api
 * update login background
 * Missing English Translations / Improvable English Translations
