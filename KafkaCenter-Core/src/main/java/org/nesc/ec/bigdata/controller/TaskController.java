@@ -53,6 +53,7 @@ public class TaskController extends BaseController {
     @Value("${mail.enable:true}")
     private Boolean mailEnable;
 
+    /**return the task list according to taskId*/
     @GetMapping("/get")
     @ResponseBody
     public RestResponse getTasksById(@RequestParam Long id) {
@@ -105,6 +106,7 @@ public class TaskController extends BaseController {
         }
     }
 
+    /**return the task list by user role*/
     @GetMapping("/list")
     @ResponseBody
     public RestResponse getTasks() {
@@ -127,6 +129,9 @@ public class TaskController extends BaseController {
         }
     }
 
+    /**add task information to task table
+     * if add task success,send the email to admin
+     * */
     @PostMapping("/add")
     @ResponseBody
     public RestResponse add(@RequestBody TaskInfo task) {
@@ -138,7 +143,7 @@ public class TaskController extends BaseController {
             if (taskInfoService.insert(task)) {
                 if (mailEnable) {
                     Map<String, Object> emailMap = taskInfoService.getEmailAllMessage(task, 1);
-                    emailService.randerTemplate(emailMap.get("emailEntity"), emailMap.get("emailContent"), 1);
+                    emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), 1);
                 }
 
                 return SUCCESS("Add task data success.");
@@ -151,6 +156,7 @@ public class TaskController extends BaseController {
         }
     }
 
+    /**update task information ,if update task success,send the email to admin*/
     @PutMapping("update")
     @ResponseBody
     public RestResponse update(@RequestBody TaskInfo task) {
@@ -168,7 +174,7 @@ public class TaskController extends BaseController {
                 if (taskInfoService.updateTask(task)) {
                     if (mailEnable) {
                         Map<String, Object> emailMap = taskInfoService.getEmailAllMessage(task, 1);
-                        emailService.randerTemplate(emailMap.get("emailEntity"), emailMap.get("emailContent"), 1);
+                        emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), 1);
                     }
                     return SUCCESS("Update task data success.");
                 } else {
@@ -181,6 +187,10 @@ public class TaskController extends BaseController {
         }
     }
 
+    /**delete the task,
+     * if task is approved,return error,
+     * else delete task from task table
+     * */
     @DeleteMapping("/{id}")
     @ResponseBody
     public RestResponse delete(@PathVariable Long id) {
@@ -197,7 +207,7 @@ public class TaskController extends BaseController {
             }
         } catch (Exception e) {
             LOG.error("Delete task error.", e);
-            return ERROR("DELETE TASK DATA FAILD!");
+            return ERROR("DELETE TASK DATA FAILED!");
         }
 
     }
@@ -212,7 +222,7 @@ public class TaskController extends BaseController {
     public RestResponse approve(@RequestBody Map<String, String> queryMap) {
         Integer partition = Integer.valueOf(queryMap.get(TopicConfig.PARTITION));
         Short replication = Short.valueOf(queryMap.get(TopicConfig.REPLICATION));
-        String clusterIds = queryMap.get(Constants.KeyStr.clusterId);
+        String clusterIds = queryMap.get(Constants.KeyStr.LOWER_CLUSTER_ID);
         Long id = Long.valueOf(queryMap.get(Constants.JsonObject.ID));
         try {
             TaskInfo task = taskInfoService.queryById(id);
@@ -239,7 +249,7 @@ public class TaskController extends BaseController {
                     if (taskInfoService.update(task)) {
                         if (mailEnable) {
                             Map<String, Object> emailMap = taskInfoService.getEmailAllMessage(task, 3);
-                            emailService.randerTemplate(emailMap.get("emailEntity"), emailMap.get("emailContent"), 3);
+                            emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), 3);
                         }
                         return SUCCESS("Approve task success, the topic will be create.");
                     } else {
@@ -262,6 +272,7 @@ public class TaskController extends BaseController {
         }
     }
 
+    /**reject task and send the email to task owner */
     @PostMapping("/reject/{id}")
     @ResponseBody
     public RestResponse reject(@PathVariable Long id, @RequestBody Map<String, String> queryMap) {
@@ -278,7 +289,7 @@ public class TaskController extends BaseController {
             if (taskInfoService.update(task)) {
                 if (mailEnable) {
                     Map<String, Object> emailMap = taskInfoService.getEmailAllMessage(task, 2);
-                    emailService.randerTemplate(emailMap.get("emailEntity"), emailMap.get("emailContent"), 2);
+                    emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), 2);
                 }
                 return SUCCESS("Reject task request success.");
             } else {

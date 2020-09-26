@@ -1,8 +1,11 @@
 package org.nesc.ec.bigdata.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import org.apache.kafka.common.Node;
 import org.nesc.ec.bigdata.common.model.BrokerInfo;
 import org.nesc.ec.bigdata.config.InitConfig;
+import org.nesc.ec.bigdata.constant.BrokerConfig;
 import org.nesc.ec.bigdata.constant.Constants;
 import org.nesc.ec.bigdata.mapper.ClusterInfoMapper;
 import org.nesc.ec.bigdata.model.ClusterInfo;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ClusterService {
@@ -64,6 +68,29 @@ public class ClusterService {
 	public List<ClusterInfo> getTotalData(){
 		return clusterInfoMapper.selectList(null);
 	}
+
+	/**return cluster info by db,and cluster status by kafka cluster*/
+	public JSONObject getClusterAndStatus(ClusterInfo cluster){
+		JSONObject result = new JSONObject();
+		try {
+			DescribeClusterResult describeClusterResult = kafkaAdminService
+					.getKafkaAdmins(String.valueOf(cluster.getId())).descCluster();
+			int brokers = describeClusterResult.nodes().get().size();
+			if(brokers==0) {result.put(Constants.Status.STATUS, Constants.Status.BAD);}
+			if(cluster.isEnable()) {
+				if(cluster.getBrokerSize()>brokers) {
+					result.put(Constants.Status.STATUS, Constants.Status.WARN);
+				}else if(cluster.getBrokerSize()==brokers) {
+					result.put(Constants.Status.STATUS, Constants.Status.OK);
+				}
+			}else {
+				result.put(Constants.Status.STATUS, Constants.Status.OK);
+			}
+		} catch (Exception e) {
+			return result;
+		}
+		return result;
+	}
 	public boolean update(ClusterInfo cluster) {
 		int result;
 		try {
@@ -85,11 +112,11 @@ public class ClusterService {
 		return checkResult(result);		
 	}
 
-	public boolean clusterExits(ClusterInfo cluster, boolean isUpdata) {
+	public boolean clusterExits(ClusterInfo cluster, boolean isUpdate) {
 	try{
 		List<ClusterInfo> clusterInfos = clusterInfoMapper.selectBrokers();
 		// 如果是修改，先把自身移除
-		if(isUpdata) {
+		if(isUpdate) {
 			clusterInfos.removeIf(clusterInfo -> clusterInfo.getId().equals(cluster.getId()));
 		}
 		// 先校验name
@@ -141,7 +168,7 @@ public class ClusterService {
 	}
 
 	
-	public boolean deleteAssociatTable(Long id) {
+	public boolean deleteAssociateTable(Long id) {
 		boolean topic = topicInfoService.deleteByClusterId(id);
 		boolean alter = alterService.deleteByClusterId(id);
 		boolean task = taskInfoService.deleteByClusterId(id);

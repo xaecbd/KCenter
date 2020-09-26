@@ -51,6 +51,7 @@ public class TeamController  extends BaseController {
     @Autowired
     ClusterService clusterService;
 
+    /**return team list according to role*/
     @RequestMapping(  value = "/", method = RequestMethod.GET )
     public RestResponse list() {
         try {
@@ -72,11 +73,16 @@ public class TeamController  extends BaseController {
 
     }
 
+    /**return team list*/
     @RequestMapping(  value = "/get", method = RequestMethod.GET )
     public TeamInfo get(Long id) {
         return teamInfoService.selectById(id);
     }
 
+    /**save team,
+     * if team exits,return error
+     * else add team to team table success,return success
+     * */
     @RequestMapping(  value = "/save", method = RequestMethod.POST )
     public RestResponse save(@RequestBody TeamInfo team) {
         try {
@@ -94,19 +100,27 @@ public class TeamController  extends BaseController {
         }
     }
 
+    /**save or update team,if team exits,return error,
+     * else update team to team table,return success
+     * */
     @RequestMapping(  value = "/upsert", method = RequestMethod.POST )
     public RestResponse update(@RequestBody TeamInfo team) {
         try {
-            if(teamInfoService.teamNameExist(team.getName())) {
-                return ERROR("team " + team.getName() + " already exist, please modify!");
-            }
+
             if (null != team.getId()) {
+                if(!teamInfoService.isAllowUpdate(team)) {
+                    return ERROR("team " + team.getName() + " already exist, please modify!");
+                }
                 if (teamInfoService.update(team)) {
                     return SUCCESS("update team success.");
                 } else {
                     return ERROR("update team fail.");
                 }
             } else {
+                if(teamInfoService.teamNameExist(team.getName())) {
+                    return ERROR("team " + team.getName() + " already exist, please modify!");
+                }
+
                 if (teamInfoService.insert(team)){
                     return SUCCESS("Save team success.");
                 } else {
@@ -119,6 +133,10 @@ public class TeamController  extends BaseController {
         }
     }
 
+    /**delete team,
+     * if team  is associated with Topic,return error,
+     * else delete team from team table
+     * */
     @RequestMapping(  value = "/del/{teamId}", method = RequestMethod.DELETE )
     public RestResponse del(@PathVariable Long teamId) {
         try {
@@ -137,6 +155,7 @@ public class TeamController  extends BaseController {
         return ERROR("Delete team fail.");
     }
 
+    /**add user to team*/
     @RequestMapping(  value = "/adduser", method = RequestMethod.POST )
     public RestResponse addUser(@RequestBody TeamUser teamUser) {
 
@@ -153,6 +172,7 @@ public class TeamController  extends BaseController {
         return ERROR("Add user to team fail.");
     }
 
+    /**return the user of the specified team */
     @GetMapping("/userinfos/{teamId}")
     public RestResponse userInfos(@PathVariable Long teamId) {
         try {
@@ -169,6 +189,7 @@ public class TeamController  extends BaseController {
         }
     }
 
+    /**delete user of team */
     @DeleteMapping("/del/user")
     public RestResponse removeUser(@RequestParam Long userId, @RequestParam Long teamId) {
         try{
@@ -182,6 +203,7 @@ public class TeamController  extends BaseController {
         return ERROR("Remove user failed!");
     }
 
+    /**return the user`s team*/
 	@GetMapping("/userteam")
 	public RestResponse getUserTeamBySession() {
 		try {

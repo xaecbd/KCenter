@@ -155,15 +155,17 @@ export default class EditDialog extends Component {
             if (response.data.code === 200) {
               this.handelDialog();
               this.props.fetchData(postData.clusterId);
+              this.props.refreshData();
               Message.success(response.data.message);
             } else {
               this.onCreateLoading();
               Message.error(response.data.message);
             }
           })
-          .catch(() => {
+          .catch((e) => {
             this.onCreateLoading();
-            Message.error('Create Topic has error.');
+            console.error(e);
+            Message.error('Create Topic has error.',e);
           });
       });
     });

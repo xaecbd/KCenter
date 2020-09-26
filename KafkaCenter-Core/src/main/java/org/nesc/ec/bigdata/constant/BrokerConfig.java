@@ -2,6 +2,7 @@ package org.nesc.ec.bigdata.constant;
 
 /**
  * @author lg99
+ *
  */
 public class BrokerConfig {
 
@@ -21,4 +22,7 @@ public class BrokerConfig {
     public static final String ONE_MINUTE_RATE ="oneMinuteRate";
     public static final String OWNER ="owner";
     public static final String GROUP_NAME ="kafka_center_consumer";
+
+    public static final String FILESIZE="fileSize";
+    public static final String LOGSIZE = "logSize";
 }

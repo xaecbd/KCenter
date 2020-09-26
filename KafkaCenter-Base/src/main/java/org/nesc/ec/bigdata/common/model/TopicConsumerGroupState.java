@@ -1,8 +1,8 @@
 package org.nesc.ec.bigdata.common.model;
 
-import java.util.List;
-
 import org.apache.kafka.common.ConsumerGroupState;
+
+import java.util.List;
 
 /**
  * @author Truman.P.Du
@@ -16,6 +16,7 @@ public class TopicConsumerGroupState {
 	 */
 	private String consumerMethod;
 	private List<PartitionAssignmentState> partitionAssignmentStates;
+	private KafkaCenterGroupState kafkaCenterGroupState;
 	/**
 	 * Dead：组内已经没有任何成员的最终状态，组的元数据也已经被coordinator移除了。这种状态响应各种请求都是一个response：UNKNOWN_MEMBER_ID 
 	 * Empty：组内无成员，但是位移信息还没有过期。这种状态只能响应JoinGroup请求
@@ -24,10 +25,20 @@ public class TopicConsumerGroupState {
 	 * Stable：rebalance完成！可以开始消费了~
 	 */
 	private ConsumerGroupState consumerGroupState;
-	private boolean isSimpleConsumerGroup = false ;//false：api 根据member信息判断状态,true 状态直接置黄，给提示（"SimpleConsumerGroup无法判断其状态"）低级
+	/**
+	 * isSimpleConsumerGroup false：api 根据member信息判断状态,true 状态直接置黄，给提示（"SimpleConsumerGroup无法判断其状态"）低级
+	 */
+	private boolean isSimpleConsumerGroup = false ;
 
-	//组内是否有members
+	/**
+	 * 组内是否有members
+	 */
 	private boolean hasMembers = true;
+
+	public TopicConsumerGroupState(String groupId,String consumerMethod){
+		this.groupId = groupId;
+		this.consumerMethod = consumerMethod;
+	}
 
 
 	public boolean isHasMembers() {
@@ -76,5 +87,13 @@ public class TopicConsumerGroupState {
 
 	public void setSimpleConsumerGroup(boolean isSimpleConsumerGroup) {
 		this.isSimpleConsumerGroup = isSimpleConsumerGroup;
+	}
+
+	public KafkaCenterGroupState getKafkaCenterGroupState() {
+		return kafkaCenterGroupState;
+	}
+
+	public void setKafkaCenterGroupState(KafkaCenterGroupState kafkaCenterGroupState) {
+		this.kafkaCenterGroupState = kafkaCenterGroupState;
 	}
 }

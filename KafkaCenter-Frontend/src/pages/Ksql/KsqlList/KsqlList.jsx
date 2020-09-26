@@ -19,7 +19,6 @@ import axios from '@utils/axios';
 import CustomPagination from '@components/CustomPagination';
 
 import EditDialog from './EditDialog';
-import './Ksql.scss';
 
 const { Row, Col } = Grid;
 @withRouter

@@ -5,6 +5,11 @@ import BrokerList from './components/Broker';
 
 
 export default class Broker extends Component {
+  constructor(props){
+    super(props);
+  }
+
+  
   render() {
     const breadcrumb = [
       {

@@ -18,6 +18,16 @@ public class KafkaManagerBroker {
     private Double bytesOut;
     private String clusterName;
 
+    private boolean isController;
+
+    public boolean isController() {
+        return isController;
+    }
+
+    public void setController(boolean controller) {
+        isController = controller;
+    }
+
     public BrokerInfo getBrokerInfo() {
         return brokerInfo;
     }

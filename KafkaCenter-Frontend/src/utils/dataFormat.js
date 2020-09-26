@@ -1,31 +1,36 @@
 import numeral from 'numeral';
+
 export function transToHours(miss){
-   if(miss>0){
+  if(miss>0){
     const mss = parseFloat(miss);
     const hours = mss/(60*60*1000);
+    if(!Number.isInteger(hours)){
+      return hours.toFixed(2);
+    }
     return hours;
-   }else{
-       return 0;
-   }
+    
+  }else{
+    return 0;
+  }
  
 }
 
 export function resturctData (data,containsAll) {
-    const result = [];
-    data.toString().split(',').map((key) => {
-      result.push({
-        value: key,
-        label: key,
-      });
+  const result = [];
+  data.toString().split(',').map((key) => {
+    result.push({
+      value: key,
+      label: key,
     });
-    if(containsAll){
-        result.push({
-            value: "ALL",
-            label: 'ALL',
-          });
-    }
-    return result;
+  });
+  if(containsAll){
+    result.push({
+      value: 'ALL',
+      label: 'ALL',
+    });
   }
+  return result;
+}
 
 
 export function transToNumer(num) {
@@ -36,7 +41,7 @@ export function transToNumer(num) {
     }
     return numeral(val).format('0.00a');
   }else{
-      return '-';
+    return '-';
   }
   
 }
@@ -74,17 +79,7 @@ export function sortData(data, type) {
   return dataSource;
 }
 
-export function sortNum(data, type) {
-  let dataSource = [];
-  dataSource = data.sort((a, b) => {
-    a = parseInt(a[type], 10);
-    b = parseInt(b[type], 10);
-    if (order === 'asc') {
-      return a - b;
-    }
-  });
-  return dataSource;
-}
+
 
 export function sortDataByOrder(data, type, order) {
   const dataSource = data.sort((a, b) => {
@@ -94,6 +89,33 @@ export function sortDataByOrder(data, type, order) {
       return a.localeCompare(b);
     }
     return b.localeCompare(a);
+  });
+  return dataSource;
+}
+/**
+ * 根据不同数据类型排序,调用请保证数据不存在undefined
+ * @param {*} data 
+ * @param {*} type 
+ * @param {*} order 
+ */
+export function sort(data, value, order) {
+  
+  const dataSource = data.sort((a, b) => {
+    const x = a[value];
+    const y = b[value];
+   
+    if(typeof x==='number'){
+      if (order&&order === 'asc') {
+        return x - y;
+      }else{
+        return y - x;
+      }
+    }else{
+      if (order&&order === 'asc') {
+        return x.localeCompare(y);
+      }
+      return y.localeCompare(x);
+    }  
   });
   return dataSource;
 }

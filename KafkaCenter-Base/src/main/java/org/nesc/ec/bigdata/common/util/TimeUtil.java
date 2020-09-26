@@ -1,6 +1,7 @@
 package org.nesc.ec.bigdata.common.util;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 
 public class TimeUtil {
 
@@ -31,8 +32,18 @@ public class TimeUtil {
 			break;
 		case "d":			
 			result = value * 24 *60 *60;
-			break;		
+			break;
+			default:;
 		}
 		return result;
+	}
+
+	public static Calendar nowCalendar(){
+		long now = System.currentTimeMillis();
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(now);
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.set(Calendar.SECOND, 0);
+		return cal;
 	}
 }

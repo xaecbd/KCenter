@@ -1,9 +1,10 @@
-.custom-table {
+.customTable {
   width: 100%;
   tr {
     border: 1px solid #eee;
     td {
       border-right: 1px solid #eeeeee;
+      min-height: 12rem;
       border: 0;
       &:nth-child(2n-1) {
         font-weight: 500;
@@ -20,34 +21,34 @@
   }
 }
 
-.contain{
-    min-height: 600px !important;
-    padding: 10px 20px 20px;
+.customTable:first-of-type .thead{
+  display: table-header-group;
 }
-.table{
-  padding: 15px;
-  background: #fff;
+
+.customTable:not(:first-of-type) .thead{
+  display: none;
 }
+
 
 .refresh{
     float: right;
-    background-color: rgb(242, 242, 242) !important;
-    border-color:rgb(242, 242, 242) !important;
+    // background-color: rgb(242, 242, 242) !important;
+    // border-color:rgb(242, 242, 242) !important;
   }
-.refresh:hover{  
-    background:#C4C6CF !important;
-    background-color:#FFFFFF !important;
-}  
+.refresh:hover{
+    // background:#C4C6CF !important;
+    // background-color:#FFFFFF !important;
+}
 .circle {
-//   border-radius: 50%;
-//   width: 20px;
-//   height: 20px;
-//   animation: thecolorsduke 2s infinite;
-//   -webkit-animation: thecolorsduke 2s infinite;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: thecolorsduke 2s infinite;
+  -webkit-animation: thecolorsduke 2s infinite;
 }
-.custom-table thead {
-  display: none;
-}
+// .custom-table thead {
+//   display: none;
+// }
 .circle div {
   display: none; /*默认隐藏*/
 }
@@ -56,11 +57,11 @@
   display: initial; /*当鼠标hover时展示*/
 }
 .circleStop {
- // border-radius: 50%;
-  width: 15px;
+  border-radius: 50%;
+  width: 20px;
   height: 20px;
-//   animation: stopconsumber 2s infinite;
-//   -webkit-animation: stopconsumber 2s infinite;
+  animation: stopconsumber 2s infinite;
+  -webkit-animation: stopconsumber 2s infinite;
 }
 .circleStop div {
   display: none; /*默认隐藏*/
@@ -70,9 +71,11 @@
   display: initial; /*当鼠标hover时展示*/
 }
 .yellowcricle {
-//   border-radius: 50%;
-//   animation: yellowconsumber 2s infinite;
-//   -webkit-animation: yellowconsumber 2s infinite;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: yellowconsumber 2s infinite;
+  -webkit-animation: yellowconsumber 2s infinite;
 }
 
 .onMeous span {
@@ -92,22 +95,22 @@
 
 @keyframes yellowconsumber {
   0% {
-    background: #ffc107;
+    background: #ffd876;
   }
   20% {
-    background: #FFC71F;
+    background: #f5cc6b;
   }
   40% {
-    background: #FFCD38;
+    background: #e8c05f;
   }
   60% {
-    background: #FFD351;
+    background: #dbb454;
   }
   80% {
-    background: #FFD96A;
+    background: #cea849;
   }
   100% {
-    background: #FFE083;
+    background: #c19d3d;
   }
 }
 

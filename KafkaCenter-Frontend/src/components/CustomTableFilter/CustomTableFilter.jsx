@@ -26,7 +26,8 @@ export default class CustomTableFilter extends Component {
       searchField: this.props.searchField,
 
       switchField: this.props.switchField,
-      switchValue: switchValue === null ? false : switchValue,
+    
+      switchValue: switchValue === null || switchValue === ''? false : switchValue,
 
     };
   }
@@ -37,8 +38,11 @@ export default class CustomTableFilter extends Component {
   }
 
 
+
   componentDidMount() {
+   
     this.getCluster();
+    
   }
 
 
@@ -120,7 +124,7 @@ export default class CustomTableFilter extends Component {
       },
     ];
     axios
-      .get('/monitor/cluster')
+      .get('/cluster')
       .then((response) => {
         if (response.data.code === 200) {
           let minClusterValue = response.data.data[0].id;
@@ -295,9 +299,13 @@ export default class CustomTableFilter extends Component {
         result = result.filter(v => !v[switchField].startsWith('_'));
       }
     }
-    if (!this.isNullOrEmptyStr(clusterValue) && clusterValue !== 'ALL') {
-      result = this.searchdata(result, clusterField, clusterValue);
+    
+    if(!this.isNullOrEmptyStr(clusterField)){
+      if (!this.isNullOrEmptyStr(clusterValue) && clusterValue !== 'ALL' ) {
+        result = this.searchdata(result, clusterField, clusterValue);
+      }
     }
+    
     if (!this.isNullOrEmptyStr(searchValue)) {
       result = this.searchdata(result, searchField, searchValue);
     }

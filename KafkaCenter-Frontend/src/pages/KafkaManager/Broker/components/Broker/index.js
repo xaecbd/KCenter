@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import IceContainer from '@icedesign/container';
-import { Table, Message, Loading } from '@alifd/next';
+import { Table, Message, Loading ,Icon} from '@alifd/next';
 import { transToNumer, formatSizeUnits } from '@utils/dataFormat';
 import CustomPagination from '@components/CustomPagination';
 import CustomTableFilter from '@components/CustomTableFilter';
@@ -9,21 +9,27 @@ import axios from '@utils/axios';
 
 
 export default class Broker extends Component {
-  state = {
-    isLoading: false,
-    dataSource: [],
-    filterDataSource: [],
-    pageData: [],
-  };
+  constructor(props){
+    super(props);
+    this.state = {
+      isLoading: false,
+      dataSource: [],
+      filterDataSource: [],
+      pageData: [],
+    };
+  }
+ 
 
   componentWillMount() {
     this.mounted = true;
-    // this.fetchData(getPersonalityCluster('kafkaManagerBroker').id);
+    this.fetchData(this.props.id);
   }
 
   componentWillUnmount = () => {
     this.mounted = false;
   }
+
+
 
   fetchData = (clusterId) => {
     this.setState(
@@ -84,18 +90,15 @@ export default class Broker extends Component {
           visible={isLoading}
           style={styles.loading}
         >
-          <CustomTableFilter
-            dataSource={this.state.dataSource}
-            refreshTableData={this.refreshTableData}
-            refreshDataSource={this.fetchData}
-            selectTitle="Cluster"
-            selectField="clusterName"
-            id="kafkaManagerBroker"
-          />
           <Table
             dataSource={pageData}
             hasBorder={false}
           >
+            <Table.Column width="2%" cell={(value,index,record) => {
+              if(record.controller===true){
+                return (<div title="controller"><Icon type="favorites-filling" size="xs"/></div>);
+              }
+            }}/>
             <Table.Column title="Cluster" dataIndex="clusterName" />
             <Table.Column title="Id" dataIndex="id" cell={(value, index, record) => record.brokerInfo.bid} />
             <Table.Column title="Host" dataIndex="host" cell={(value, index, record) => record.brokerInfo.host} />
@@ -103,9 +106,7 @@ export default class Broker extends Component {
             <Table.Column title="Topics" dataIndex="topics" />
             <Table.Column title="Partitions" dataIndex="partitions" />
             <Table.Column title="Partitions as Leader" dataIndex="partitionsAsLeader" />
-            <Table.Column title="Messages" dataIndex="messages" cell={transToNumer} />
-            <Table.Column title="Bytes In" dataIndex="bytesIn" cell={formatSizeUnits} />
-            <Table.Column title="Bytes Out" dataIndex="bytesOut" cell={formatSizeUnits} />
+            
           </Table>
           <CustomPagination dataSource={filterDataSource} redrawPageData={this.redrawPageData} />
         </Loading>

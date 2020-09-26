@@ -73,7 +73,7 @@ export default class Queries extends Component {
   // 获取集群信息
   fecthClusters = () => {
     axios
-      .get('/monitor/cluster')
+      .get('/cluster')
       .then((response) => {
         if (response.data.code === 200) {
           const data = this.resouceData(response.data.data);

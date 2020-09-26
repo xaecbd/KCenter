@@ -1,8 +1,8 @@
 package org.nesc.ec.bigdata.model;
 
-import java.util.List;
-
 import org.nesc.ec.bigdata.common.model.OffsetInfo;
+
+import java.util.List;
 
 /**
  * @author Truman.P.Du
@@ -11,6 +11,7 @@ import org.nesc.ec.bigdata.common.model.OffsetInfo;
  */
 public class MonitorNoticeInfo {
 	private AlertGoup alertGoup;
+	private String alertaOwnerGroups;
 	private String sendType;
 	List<OffsetInfo> offsetInfos;
 
@@ -48,4 +49,11 @@ public class MonitorNoticeInfo {
 		this.offsetInfos = offsetInfos;
 	}
 
+	public String getAlertaOwnerGroups() {
+		return alertaOwnerGroups;
+	}
+
+	public void setAlertaOwnerGroups(String alertaOwnerGroups) {
+		this.alertaOwnerGroups = alertaOwnerGroups;
+	}
 }

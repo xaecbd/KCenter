@@ -48,6 +48,7 @@ public class TopicController extends BaseController {
     @Autowired
     KafkaManagerService kafkaManagerService;
 
+
     @GetMapping("/query/partition")
     public RestResponse getPartition(@RequestParam String clusterId, @RequestParam String topicName) {
         try {
@@ -101,8 +102,8 @@ public class TopicController extends BaseController {
             TopicInfo topic = topicInfoService.selectById(id);
             ClusterInfo clusterInfo = clusterService.selectById(Long.parseLong(topic.getClusterId()));
             Long clusterID = clusterInfo.getId();
-            boolean sucess = kafkaAdminService.getKafkaAdmins(clusterID.toString()).delete(topic.getTopicName());
-            if (sucess && topicInfoService.delete(id)) {
+            boolean success = kafkaAdminService.getKafkaAdmins(clusterID.toString()).delete(topic.getTopicName());
+            if (success && topicInfoService.delete(id)) {
                 return SUCCESS("DELETE TOPIC SUCCESS");
             } else {
                 return ERROR("DELETE TOPIC FAILED!");

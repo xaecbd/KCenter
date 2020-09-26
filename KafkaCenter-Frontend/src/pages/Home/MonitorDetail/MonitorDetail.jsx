@@ -5,9 +5,13 @@ import axios from '@utils/axios';
 import MonitorMetric from './components/MonitorMetric';
 
 export default class MonitorDetail extends Component {
-  state = {
-    id: this.props.match.params.item,
-    cluster: {},
+  constructor(props){
+    super(props);
+    this.state = {
+      id: this.props.match.params.item,
+      cluster: {},
+  }
+  
   }
 
   componentWillMount() {
@@ -20,7 +24,7 @@ export default class MonitorDetail extends Component {
   }
 
   fetchDate = () => {
-    axios.get(`/cluster/get?id=${this.state.id}`).then((response) => {
+    axios.get(`/cluster/get?id=${this.props.id}`).then((response) => {
       if (response.data.code === 200) {
         if (this.mounted) {
           this.setState({
@@ -48,9 +52,9 @@ export default class MonitorDetail extends Component {
     ];
     return (
       <div>
-        <CustomBreadcrumb items={breadcrumb} title="" />
+        {/* <CustomBreadcrumb items={breadcrumb} title="" /> */}
         <div style={styles.container} >
-          <MonitorMetric id={this.state.id} />
+          <MonitorMetric id={this.props.id} />
         </div>
       </div>
     );

@@ -52,7 +52,7 @@ const LoginBlock = (
     setAuth({ role:user.role === 'ADMIN'?'admin':'member' });
 
     let urls = getUrlCookie('url');
-    urls = '/#/home/page';
+
     if (isUndefined(urls) || isNull(urls) || urls === '') {
       urls = '/#/home/page';
     }
@@ -136,12 +136,13 @@ const LoginBlock = (
   const genericLogin = () => {
     window.location.href = '/login/oauth2';
   }
+
+
   // 第一次加载调用，类似于componentDidMount 
   useEffect(() => {
     fetchOauth();
   },[]);
   
-
   return (
     <div className={styles.LoginBlock}>
       <div className={styles.innerBlock}>

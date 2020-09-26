@@ -23,6 +23,7 @@ public class JmxCollector {
     private static Logger LOG = LoggerFactory.getLogger(JmxCollector.class);
     private static final String FORMAT_URL = "service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi";
     private static Map<String, JMXConnector> jmxMap = new ConcurrentHashMap<>();
+    public static final String REGEX = "[a-zA-Z]+";
 
     private static class SingletonHolder {
         private static final JmxCollector INSTANCE = new JmxCollector();
@@ -48,7 +49,7 @@ public class JmxCollector {
 
 
     private JMXConnector connect(JMXServiceURL jmxUrl) throws IOException {
-        Map<String, Object> env = new HashMap<>();
+        Map<String, Object> env = new HashMap<>(2<<2);
         return JMXConnectorFactory.connect(jmxUrl, env);
     }
     public Map<String, Set<MeterMetric>> metricEveryBroker(List<BrokerInfo> brokers) throws Exception {
@@ -68,7 +69,7 @@ public class JmxCollector {
         if ("".equalsIgnoreCase(topic)) {
             metricName = new String[]{"MessagesInPerSec", "BytesInPerSec", "BytesOutPerSec"};
         }
-        Map<String, Set<MeterMetric>> result = new HashMap<>();
+        Map<String, Set<MeterMetric>> result = new HashMap<>(2 << 2);
         for (BrokerInfo brokerInfo : brokers) {
             Set<MeterMetric> metricSet = new HashSet<>();
             try {
@@ -93,15 +94,15 @@ public class JmxCollector {
     }
 
     public Map<String, MeterMetric> mergeBrokersMetric(Map<String, Set<MeterMetric>> result) throws Exception {
-        Map<String, MeterMetric> map = new HashMap<>();
+        Map<String, MeterMetric> map = new HashMap<>(2 << 2);
         result.forEach((host, metricSet) -> metricSet.forEach((metricObj) -> {
-            String metricName = metricObj.getMetricName();
-            if (map.containsKey(metricName)) {
-                MeterMetric oldVal = map.getOrDefault(metricName, new MeterMetric());
-                map.put(metricName, mergeMetric(oldVal, metricObj));
-            } else {
-                map.put(metricName, metricObj);
-            }
+                String metricName = metricObj.getMetricName();
+                if (map.containsKey(metricName)) {
+                    MeterMetric oldVal = map.getOrDefault(metricName, new MeterMetric());
+                    map.put(metricName, mergeMetric(oldVal, metricObj));
+                } else {
+                    map.put(metricName, metricObj);
+                }
         }));
         return map;
     }
@@ -122,7 +123,6 @@ public class JmxCollector {
             }
             return jsonObject.toJavaObject(MeterMetric.class);
         } catch (InstanceNotFoundException e) {
-            LOG.warn("collect this metric info fail:", e);
             return new MeterMetric();
         } catch (Exception e) {
             LOG.error("collect this metric info fail:", e);
@@ -145,8 +145,9 @@ public class JmxCollector {
 
     }
 
+
     private static boolean isString(String str) {
-        Pattern pattern = Pattern.compile("[a-zA-Z]+");
+        Pattern pattern = Pattern.compile(REGEX);
         return pattern.matcher(str).matches();
     }
 
@@ -163,4 +164,100 @@ public class JmxCollector {
         }
         return objectName;
     }
+
+    /**
+     * return the topic size according to cluster`s brokers
+     * @param brokerInfoList cluster`s broker information
+     * @param  topicInfoMap key:topic name value:topic partition`s list
+     * */
+    public Map<String, Long> topicLogSizeByBroker(List<BrokerInfo> brokerInfoList,Map<String,Set<Integer>> topicInfoMap){
+        Map<Integer, Map<String,Long>> brokerMap = new HashMap<>(2 << 2);
+        for (BrokerInfo brokerInfo : brokerInfoList){
+            try{
+                JMXConnector jmxConnector = this.getJmxConnector(brokerInfo.getHost(), brokerInfo.getJmxPort());
+                MBeanServerConnection mBeanServerConnection = jmxConnector.getMBeanServerConnection();
+                Map<String,Long> topicSizeMap = getTopicLogSize(topicInfoMap,mBeanServerConnection);
+                brokerMap.put(brokerInfo.getBid(),topicSizeMap);
+            }catch (IOException e) {
+                removeJmxConnector(brokerInfo.getHost());
+                LOG.error("connect closed:", e);
+            } catch (Exception e) {
+                throw e;
+            }
+        }
+        return mergeBrokerLogSize(brokerMap);
+    }
+
+
+    /**
+     * merge every broker according to topicName
+     * @param  topicLogSizeMap key: brokerId value:  key:topicName value:file size
+     * */
+    private  Map<String, Long> mergeBrokerLogSize(Map<Integer, Map<String, Long>> topicLogSizeMap){
+        Map<String, Long> sizeMap = new HashMap<>(2 << 2);
+        topicLogSizeMap.keySet().forEach(key->{
+            Map<String,Long> map = topicLogSizeMap.getOrDefault(key,new HashMap<>(1));
+            map.keySet().forEach(topic->{
+                long oldSize = sizeMap.getOrDefault(topic,0L);
+                sizeMap.put(topic,oldSize+map.getOrDefault(topic,0L));
+            });
+        });
+        return sizeMap;
+    }
+
+    /**
+     * return the topic file size by topic information and merge every partitions value
+     * @param topicInfoMap key:topic name value:topic partition`s list
+     * @param  mBeanServerConnection broker jmx connection
+     * */
+    private Map<String,Long>  getTopicLogSize(Map<String,Set<Integer>> topicInfoMap,MBeanServerConnection mBeanServerConnection){
+        Map<String,Long> topicLogSize = new HashMap<>(2 << 2);
+        topicInfoMap.keySet().forEach(key->{
+            try{
+                Set<Integer> partitions = topicInfoMap.get(key);
+                long size = getLogSizeMetricValue(key,partitions,mBeanServerConnection);
+                topicLogSize.put(key,size);
+            }catch (Exception e){
+                LOG.error("get topic log size has error",e);
+            }
+
+        });
+        return topicLogSize;
+    }
+
+    /**
+     * return the topic file size by partitions
+     * @param  topicName topic name
+     * @param  partitions topic`s partition list
+     * @param mBeanServerConnection   broker jmx connection
+     * */
+    private long getLogSizeMetricValue(String topicName,Set<Integer> partitions,MBeanServerConnection mBeanServerConnection){
+        return partitions.stream().mapToLong(partition->{
+            String value = null;
+            try {
+                value = mBeanServerConnection.getAttribute(getLogSizeObjectName(topicName,partition),"Value").toString();
+            } catch (InstanceNotFoundException ignored) {
+
+            }catch (Exception e){
+                LOG.warn("get topic log size has error",e);
+            }
+            return value!=null?Long.parseLong(value):0L;
+        }).sum();
+
+
+    }
+
+    /**
+     * return the kafka log size Object Name
+     * */
+    private ObjectName getLogSizeObjectName(String topicName,int partition){
+        ObjectName objectName = null;
+        try{
+            objectName = new ObjectName("kafka.log:type=Log,name=Size,topic="+topicName +",partition="+partition);
+        } catch (MalformedObjectNameException e) {
+            LOG.debug("Get topic Log Size ObjectName error! " + e.getMessage());
+        }
+        return objectName;
+    }
+
 }

@@ -6,6 +6,7 @@ import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.TopicConfig;
+import org.apache.kafka.common.requests.DescribeLogDirsResponse;
 import org.nesc.ec.bigdata.common.model.GroupTopicConsumerState;
 import org.nesc.ec.bigdata.common.model.PartitionAssignmentState;
 import org.nesc.ec.bigdata.common.model.TopicConsumerGroupState;
@@ -143,7 +144,7 @@ public class KafkaAdmins implements Closeable {
 			try {
 				result.put(topicName, describeFutures.get(topicName).get());
 			} catch (Exception e) {
-				LOGGER.error("", e);
+				LOGGER.error("desc topic:{} error.",topicName, e);
 			}
 		}
 		return result;
@@ -506,9 +507,8 @@ public class KafkaAdmins implements Closeable {
 			String groupId = entry.getKey();
 			ConsumerGroupDescription description = entry.getValue();
 
-			TopicConsumerGroupState topicConsumerGroupState = new TopicConsumerGroupState();
-			topicConsumerGroupState.setGroupId(groupId);
-			topicConsumerGroupState.setConsumerMethod("broker");
+			TopicConsumerGroupState topicConsumerGroupState = new TopicConsumerGroupState(groupId,"broker");
+
 			topicConsumerGroupState.setConsumerGroupState(description.state());
 			topicConsumerGroupState.setSimpleConsumerGroup(description.isSimpleConsumerGroup());
 			//判断group下是否有members
@@ -540,20 +540,20 @@ public class KafkaAdmins implements Closeable {
 	/**
 	 * 根据group获取broker消费方式下 GroupTopicConsumerState信息，不包含lag/logEndOffset
 	 * 
-	 * @param consummerGroup
+	 * @param consumerGroup
 	 * @return
 	 * @throws InterruptedException
 	 * @throws ExecutionException
 	 * @throws TimeoutException
 	 */
-	public List<GroupTopicConsumerState> describeConsumerGroupsByGroup(String consummerGroup)
+	public List<GroupTopicConsumerState> describeConsumerGroupsByGroup(String consumerGroup)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		final List<GroupTopicConsumerState> groupConsumerStates = new ArrayList<>();
 		Map<TopicPartition, OffsetAndMetadata> partitionsToOffsetAndMetadataMap = adminClient
-				.listConsumerGroupOffsets(consummerGroup).partitionsToOffsetAndMetadata().get();
+				.listConsumerGroupOffsets(consumerGroup).partitionsToOffsetAndMetadata().get();
 
 		Map<String, ConsumerGroupDescription> groupDetails = this.adminClient
-				.describeConsumerGroups(Arrays.asList(consummerGroup)).all().get(DEFAULT_TIME_OUT_SECOND, TimeUnit.SECONDS);
+				.describeConsumerGroups(Arrays.asList(consumerGroup)).all().get(DEFAULT_TIME_OUT_SECOND, TimeUnit.SECONDS);
 
 		Map<String, Map<TopicPartition, OffsetAndMetadata>> resMap = new HashMap<>();
 		for (Entry<TopicPartition, OffsetAndMetadata> entry : partitionsToOffsetAndMetadataMap.entrySet()) {
@@ -567,12 +567,11 @@ public class KafkaAdmins implements Closeable {
 		}
 
 		ConsumerGroupDescription description = null;
-		if (groupDetails.containsKey(consummerGroup)) {
-			description = groupDetails.get(consummerGroup);
+		if (groupDetails.containsKey(consumerGroup)) {
+			description = groupDetails.get(consumerGroup);
 			for (Entry<String, Map<TopicPartition, OffsetAndMetadata>> oneTopic : resMap.entrySet()) {
-				GroupTopicConsumerState groupConsumerState = new GroupTopicConsumerState();
-				groupConsumerState.setConsumerMethod("broker");
-//				groupConsumerState.setHasMembers(description.members().size()>0);
+				GroupTopicConsumerState groupConsumerState = new GroupTopicConsumerState(consumerGroup,oneTopic.getKey(),"broker");
+
 				groupConsumerState.setConsumerGroupState(description.state());
 				groupConsumerState.setSimpleConsumerGroup(description.isSimpleConsumerGroup());
 				Set<Entry<TopicPartition, OffsetAndMetadata>> consumerPatitionOffsets = oneTopic.getValue().entrySet();
@@ -580,28 +579,25 @@ public class KafkaAdmins implements Closeable {
 
 				if (!description.members().isEmpty()) {
 					// 获取存在consumer(memeber存在的情况)
-					partitionAssignmentStates = this.withMembers(consumerPatitionOffsets, consummerGroup, description);
+					partitionAssignmentStates = this.withMembers(consumerPatitionOffsets, consumerGroup, description);
 				} else {
 					// 获取不存在consumer
-					partitionAssignmentStates = this.withNoMembers(consumerPatitionOffsets, consummerGroup);
+					partitionAssignmentStates = this.withNoMembers(consumerPatitionOffsets, consumerGroup);
 				}
 				// 这块增加这个的逻辑是因为可能存在member，但是这个memeber不属于这个topic，因此会存在partitionAssignmentStates为空的状况
 				if (partitionAssignmentStates.isEmpty()) {
-					partitionAssignmentStates = this.withNoMembers(consumerPatitionOffsets, consummerGroup);
+					partitionAssignmentStates = this.withNoMembers(consumerPatitionOffsets, consumerGroup);
 				}
 				groupConsumerState.setPartitionAssignmentStates(partitionAssignmentStates);
-				groupConsumerState.setTopic(oneTopic.getKey());
 				groupConsumerStates.add(groupConsumerState);
 			}
 		} else {
 			for (Entry<String, Map<TopicPartition, OffsetAndMetadata>> oneTopic : resMap.entrySet()) {
-				GroupTopicConsumerState groupConsumerState = new GroupTopicConsumerState();
-				groupConsumerState.setConsumerMethod("broker");
-				Set<Entry<TopicPartition, OffsetAndMetadata>> consumerPatitionOffsets = oneTopic.getValue().entrySet();
-				List<PartitionAssignmentState> partitionAssignmentStates = this.withNoMembers(consumerPatitionOffsets,
-						consummerGroup);
+				GroupTopicConsumerState groupConsumerState = new GroupTopicConsumerState(consumerGroup,oneTopic.getKey(),"broker");
+				Set<Entry<TopicPartition, OffsetAndMetadata>> consumerPartitionOffsets = oneTopic.getValue().entrySet();
+				List<PartitionAssignmentState> partitionAssignmentStates = this.withNoMembers(consumerPartitionOffsets,
+						consumerGroup);
 				groupConsumerState.setPartitionAssignmentStates(partitionAssignmentStates);
-				groupConsumerState.setTopic(oneTopic.getKey());
 				groupConsumerStates.add(groupConsumerState);
 			}
 		}
@@ -697,4 +693,27 @@ public class KafkaAdmins implements Closeable {
 			throw new IllegalStateException(e);
 		}
 	}
+
+	public Map<String,Long> getTopicDiskSizeForBroker(List<Integer> brokerIds) throws ExecutionException, InterruptedException {
+		Map<String,Long>  sizeMap = new HashMap<>();
+		DescribeLogDirsResult describeLogDirsResult = this.adminClient.describeLogDirs(brokerIds);
+		Map<Integer,Map<String, DescribeLogDirsResponse.LogDirInfo>> tmp = describeLogDirsResult.all().get();
+		tmp.forEach((k,map)->{
+			map.forEach((k2,v)->{
+				DescribeLogDirsResponse.LogDirInfo info = v;
+				Map<TopicPartition, DescribeLogDirsResponse.ReplicaInfo> replicaInfoMap = info.replicaInfos;
+				replicaInfoMap.forEach((topic,replicaInfo)->{
+					long size = sizeMap.getOrDefault(topic.topic(),0L);
+					size += replicaInfo.size;
+					sizeMap.put(topic.topic(),size);
+				});
+			});
+		});
+		return sizeMap;
+	}
+
+	public Map<String,Long> getTopicDiskSizeForBroker(int brokerId) throws ExecutionException, InterruptedException {
+		return getTopicDiskSizeForBroker(Collections.singletonList(brokerId));
+	}
+
 }

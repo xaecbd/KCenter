@@ -36,10 +36,28 @@ public class InitConfig {
     @Value("${spring.mail.username:kafkacenter@kafka.com}")
     private String emailFrom;
     @Value("${public.url:localhost:8080}")
-    private String approveURL;
+    private String kafkaCenterUrl;
 
 	@Value("${spring.security.user.name}")
 	private String adminname;
+
+
+	@Value("${mail.enable:true}")
+	private Boolean mailEnable;
+
+
+	@Value("${monitor.elasticsearch.hosts:}")
+	private String monitorElasticsearchHost;
+	@Value("${monitor.elasticsearch.index:}")
+	private String monitorElasticsearchIndexName;
+	@Value("${monitor.elasticsearch.auth.user:}")
+	private String monitorElasticsearchAuthUser;
+	@Value("${monitor.elasticsearch.auth.password:}")
+	private String monitorElasticsearchAuthPassword;
+
+	@Value("${ark.login.verify.url:}")
+	private String loginVerifyUrl;
+
 
 	public String getAdminname() {
 		return adminname;
@@ -112,9 +130,36 @@ public class InitConfig {
 		return emailFrom;
 	}
 
-	public String getApproveURL() {
-		return approveURL;
+
+	public String getKafkaCenterUrl() {
+		return kafkaCenterUrl;
 	}
 
+	public Boolean getMailEnable() {
+		return mailEnable;
+	}
 
+	public String getMonitorElasticsearchHost() {
+		return monitorElasticsearchHost;
+	}
+
+	public String getMonitorElasticsearchIndexName() {
+		return monitorElasticsearchIndexName;
+	}
+
+	public String getMonitorElasticsearchAuthUser() {
+		return monitorElasticsearchAuthUser;
+	}
+
+	public String getMonitorElasticsearchAuthPassword() {
+		return monitorElasticsearchAuthPassword;
+	}
+
+	public String getLoginVerifyUrl() {
+		return loginVerifyUrl;
+	}
+
+	public void setLoginVerifyUrl(String loginVerifyUrl) {
+		this.loginVerifyUrl = loginVerifyUrl;
+	}
 }

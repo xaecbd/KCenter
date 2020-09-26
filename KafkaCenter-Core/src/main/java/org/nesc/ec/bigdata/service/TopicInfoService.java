@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -76,7 +77,7 @@ public class TopicInfoService {
 			throw new Exception(" Topic already exists in the " + clusterService.selectById(Long.parseLong(topicInfo.getClusterId())).getName() + " .");
 		}
 		try {
-			if(KafkaAdminCreateTopic(topicInfo)){
+			if(kafkaAdminCreateTopic(topicInfo)){
 				TopicInfo topicInfo1 = topicInfo;
 				topicInfo1.setTtl(TimeUtil.hoursTransToMiss(topicInfo.getTtl().intValue()));
 				if (!"admin".equalsIgnoreCase(userInfo.getName())){
@@ -93,9 +94,9 @@ public class TopicInfoService {
 		}catch (Exception e){
 			flag = false;
 			Map<String,Object> paramMap = new HashMap<>();
-			KafkaAdmins kafkaAdmis = kafkaAdminService.getKafkaAdmins(topicInfo.getClusterId());
-			if(kafkaAdmis.checkExists(topicInfo.getTopicName())) {
-				kafkaAdmis.delete(topicInfo.getTopicName());
+			KafkaAdmins kafkaAdmins = kafkaAdminService.getKafkaAdmins(topicInfo.getClusterId());
+			if(kafkaAdmins.checkExists(topicInfo.getTopicName())) {
+				kafkaAdmins.delete(topicInfo.getTopicName());
 			}
 			paramMap.put(Constants.KeyStr.TOPIC_NAME, topicInfo.getTopicName());
 			paramMap.put(Constants.KeyStr.CLUSTER_ID, topicInfo.getClusterId());
@@ -173,18 +174,33 @@ public class TopicInfoService {
 		return Boolean.TRUE;
 
 	}
-	public Boolean KafkaAdminCreateTopic(TopicInfo topicInfo) throws Exception {
+	public Boolean kafkaAdminCreateTopic(TopicInfo topicInfo) throws Exception {
 		if(!kafkaAdminService.getKafkaAdmins(topicInfo.getClusterId()).createTopicIfNotExists(topicInfo.getTopicName(), topicInfo.getPartition(),topicInfo.getReplication(), (topicInfo.getTtl().intValue() * 3600 * 1000))) {
 			return Boolean.FALSE;
 		}
 		return Boolean.TRUE;
 	}
 
+	
 	public TopicInfo getTopicsByName(String topic,Long clientId) {
 		return topicInfoMapper.getTopicsByTopicName(topic, clientId);
 	}
+
+	public Long selectFileSizeByTopic(String topic,Long clientId){
+		String fileSize = topicInfoMapper.selectFileSizeByTopic(topic, clientId);
+		return Objects.isNull(fileSize)?null:Long.parseLong(fileSize);
+	}
+
+	public List<TopicInfo>  topicFileSizeByTeams(){
+		List<TopicInfo> topicFileSizeMap = topicInfoMapper.topicFileSizeByTeam();
+		return CollectionUtils.isEmpty(topicFileSizeMap)?new ArrayList<>(): topicFileSizeMap;
+	}
+
 	public List<TopicInfo> getTopicByTeamIDs(List<Long> teamIDs) {
-		return topicInfoMapper.getTopicsByTeamIDs(teamIDs);
+		if(!CollectionUtils.isEmpty(teamIDs)){
+			return topicInfoMapper.getTopicsByTeamIDs(teamIDs);
+		}
+		return new ArrayList<>();
 	}
 
 	public boolean exitsTopic(String topic,Long clusterId) {

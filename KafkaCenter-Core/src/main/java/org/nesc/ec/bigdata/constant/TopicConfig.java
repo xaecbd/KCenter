@@ -19,6 +19,10 @@ public class TopicConfig {
     public static final String REPLICATION = "replication";
     public static final String UNDER_REPLICATION = "under_replication";
 
+    public static final String OWNER = "owner";
+    public static final String TEAM = "team";
+    public static final String FILE_SIZE = "fileSize";
+
     public static final String OFFSET = "offset";
     public static final String LAG ="lag";
     public static final String NUMBER_OF_PARTITIONS = "Number of Partitions";

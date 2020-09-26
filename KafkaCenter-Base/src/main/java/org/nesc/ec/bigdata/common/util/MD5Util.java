@@ -17,7 +17,7 @@ public class MD5Util {
     public static String string2MD5(String inStr){
         MessageDigest md5 = null;
         try{
-            md5 = MessageDigest.getInstance(Constant.ENCRYPTION.MD5);
+            md5 = MessageDigest.getInstance(Constant.Encryption.MD5);
         }catch (Exception e){
             LOGGER.warn("", e);
             return "";
@@ -33,7 +33,7 @@ public class MD5Util {
         for (byte md5Byte : md5Bytes) {
             int val = ((int) md5Byte) & 0xff;
             if (val < 16) {
-                hexValue.append(Constant.NUM.ZERO);
+                hexValue.append(Constant.Num.ZERO);
             }
             hexValue.append(Integer.toHexString(val));
         }

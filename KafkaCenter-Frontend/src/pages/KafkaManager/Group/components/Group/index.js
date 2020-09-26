@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { isNullOrUndefined } from 'util';
 import { withRouter } from 'react-router-dom';
-import { Table, Message, Loading, Icon, Dialog, Grid, Select, Input } from '@alifd/next';
+import { Table, Message, Loading, Icon, Dialog, Grid, Select, Input, Tab } from '@alifd/next';
 import axios from '@utils/axios';
 import CustomPagination from '@components/CustomPagination';
 import CustomTableFilter from '@components/CustomTableFilter';
@@ -11,22 +11,31 @@ import {
   FormBinder as IceFormBinder,
   FormError as IceFormError,
 } from '@icedesign/form-binder';
+import dayjs from 'dayjs';
 import { sortDataByOrder } from '@utils/dataFormat';
 import { getPersonalityCluster } from '@utils/cookies';
-
+import GroupStatus from './GroupStatus';
+import style  from './index.module.scss';
+import Auth from '@components/Auth'
 const { Row, Col } = Grid;
 @withRouter
 export default class GroupTable extends Component {
-  state = {
-    isLoading: false,
-    pageData: [],
-    filterDataSource: [],
-    dataSource: [],
-    isMobile: false,
-    visable: false,
-    value: {},
-    topicInfo: [],
-  };
+
+  constructor(props){
+     super(props);
+     this.state = {
+      isLoading: false,
+      pageData: [],
+      filterDataSource: [],
+      dataSource: [],
+      isMobile: false,
+      visable: false,
+      value: {},
+      topicInfo: [],
+      tableData:[],
+      topicLoading:false,
+    };
+  }
 
 
   componentWillMount() {
@@ -36,13 +45,13 @@ export default class GroupTable extends Component {
     this.mounted = false;
   }
 
-  fetchData = (clusterId) => {
+  fetchData = () => {
     this.setState(
       {
         isLoading: true,
       },
       () => {
-        axios.get(`/manager/group?cluster=${clusterId}`).then((response) => {
+        axios.get(`/manager/group?cluster=${this.props.id}`).then((response) => {
           if (response.data.code === 200) {
             const data = sortDataByOrder(response.data.data, 'consummerGroup', 'asc');
             if (this.mounted) {
@@ -75,6 +84,8 @@ export default class GroupTable extends Component {
       }
     );
   };
+
+
 
   onSort(value, order) {
     const dataSource = sortDataByOrder(this.state.filterDataSource, value, order);
@@ -116,13 +127,14 @@ export default class GroupTable extends Component {
   // group detail
   renderGroup = (value, index, record) => {
     return (
-      <div>
+
         <a style={styles.groupLink} onClick={() => this.handelDetail(record)}>
           {record.consummerGroup}
         </a>
-      </div>
+
     );
   };
+
     redrawPageData=(value) => {
       this.setState({
         pageData: value,
@@ -312,14 +324,16 @@ export default class GroupTable extends Component {
   renderDeleteGroup = (value, index, record) => {
     return (
       <div>
+          <Auth rolename="admin">
         <span title="reset offset" style={styles.operBtn} onClick={() => { this.handleRestOffset(record); }}>
-          <FoundationSymbol size="xxs" type="exchange" />
+          <FoundationSymbol size="xxs" type="exchange" style={{ width:'10px',height:'10px'}}/>
         </span>
 
         <span style={styles.separator} />
         <span title="Delete this Group" style={styles.operBtn}>
-          <Icon size="xxs" type="close" onClick={() => { this.handleDeleteGroup(record); }} />
-        </span>
+          <Icon size="xxs" type="close" style={{ width:'10px',height:'10px'}} onClick={() => { this.handleDeleteGroup(record); }} />
+        </span></Auth>
+        <Auth rolename="member"> <span className={style.span}>-</span> </Auth>
       </div>
     );
   };
@@ -355,11 +369,19 @@ export default class GroupTable extends Component {
     this.filterComponent = componentMethod;
   }
 
+   renderTime = (value, index, record) =>{
+    return dayjs(value).format('MM-DD HH:mm')
+  }
+
   render() {
     const { isLoading } = this.state;
     const view = this.renderRestDialog();
     return (
-      <div>
+      <div style={{ marginTop:'5px'}}>
+        <GroupStatus id={this.props.id}/>
+        <hr style={{ marginTop:'25px'}}/>
+        <div >
+
         <Loading
           visible={isLoading}
           style={styles.loading}
@@ -368,27 +390,32 @@ export default class GroupTable extends Component {
             dataSource={this.state.dataSource}
             refreshTableData={this.refreshTableData}
             refreshDataSource={this.fetchData}
-            selectTitle="Cluster"
-            selectField="clusterName"
+            // selectTitle="Cluster"
+            // selectField="clusterName"
             searchTitle="Filter"
             searchField="consummerGroup"
             searchPlaceholder="Input Group Name"
             id="kafkaManagerGroup"
             onRef={this.onRef}
           />
+
           <Table
+           className={style.activeTable}
             dataSource={this.state.pageData}
             hasBorder={false}
             onSort={(value, order) => this.onSort(value, order)}
             onFilter={this.consumerApiFilter}
+
           >
             <Table.Column title="Group Name" dataIndex="consummerGroup" cell={this.renderGroup} sortable />
-            <Table.Column title="Consumer Api" dataIndex="consumereApi" filters={[{ label: 'ZK', value: 'ZK' }, { label: 'BROKER', value: 'BROKER' }]} filterMode="single" />
+            <Table.Column title="Consumer Api" dataIndex="consumereApi" filters={[{ label: 'zk', value: 'zk' }, { label: 'broker', value: 'broker' }]} filterMode="single"/>
             <Table.Column title="Cluster" dataIndex="clusterName" />
-            <Table.Column title="Operation" cell={this.renderDeleteGroup} />
+          
+            <Table.Column title="Operation" cell={this.renderDeleteGroup}/>
           </Table>
-          <CustomPagination dataSource={this.state.filterDataSource} redrawPageData={this.redrawPageData} />
+          <CustomPagination dataSource={this.state.filterDataSource} redrawPageData={this.redrawPageData}  pageList={[5,10,50,100]} pageSize={5}/>
         </Loading>
+        </div>
         {view}
       </div>
     );
@@ -401,6 +428,7 @@ const styles = {
     color: '#1111EE',
     cursor: 'pointer',
     textDecoration: 'none',
+    width:'60%'
   },
   loading: {
     width: '100%',
@@ -415,17 +443,20 @@ const styles = {
   },
   operBtn: {
     display: 'inline-block',
-    width: '24px',
-    height: '24px',
+    width: '12px',
+     height: '12px',
     borderRadius: '999px',
     color: '#929292',
     background: '#f2f2f2',
     textAlign: 'center',
     cursor: 'pointer',
-    lineHeight: '24px',
+    lineHeight: '3px',
     marginRight: '6px',
   },
   formRow: { marginTop: 20 },
   simpleFormDialog: { width: '640px' },
   formLabel: { lineHeight: '26px' },
+  table:{
+
+  }
 };

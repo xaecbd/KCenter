@@ -25,7 +25,7 @@ public class GenericConfig {
     @Value("${generic.scopes:}")
     private String scopes;
     @Value("${generic.redirect_utl:}")
-    private String redirctUrl;
+    private String redirectUrl;
 
     public String getScopes() {
         return scopes;
@@ -42,8 +42,8 @@ public class GenericConfig {
         return apiUrl;
     }
 
-    public String getRedirctUrl() {
-        return redirctUrl;
+    public String getRedirectUrl() {
+        return redirectUrl;
     }
 
     public String getName() {

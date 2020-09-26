@@ -4,7 +4,6 @@
     border: 1px solid #eee;
     td {
       border-right: 1px solid #eeeeee;
-      min-height: 12rem;
       border: 0;
       &:nth-child(2n-1) {
         font-weight: 500;
@@ -21,15 +20,90 @@
   }
 }
 
+.card-body{
+  height: 80px;
+}
+.mt-0{
+  line-height: 0.8;
+  margin-bottom: 0.1em;
+}
+.contain{
+    min-height: 600px;
+    // padding: 10px 20px 20px;
+}
+.tables{
+  padding: 15px;
+  background: #fff;
+ // width: 50%;
+  height: 20%;
+  float: left;
+  border-collapse: collapse;
+  line-height: 1.05;
+  width: 50%;
+  float: left;
+  padding-top: 50px;
+}
+
+.table td{
+  padding: 5px;
+
+}
+
+.card{
+  // background-color: #f3f1f1;
+  background-color: white;
+  border: 0px solid rgba(0, 0, 0, 0.125) ;
+}
+
+// .card :hover{
+//   background-color: #dedbdb;
+// }
+
+.mb-0{
+  color: #314659;
+    font-size: 28px;
+    margin-top: 10px;
+  overflow:hidden;
+   white-space:nowrap;
+   text-overflow:ellipsis;
+  //  width: 200px;
+   text-align: center;
+}
+
+
+
+.chart{
+  padding: 10px;
+  background: #fff;
+  bottom: 5px;
+  width: 100%;
+  float: left;
+}
+
+.metrichart{
+  padding-top: 100px;
+  height: 400px;
+//  float: left;
+  width: 100%;
+}
+
+.leftChart{
+  width: 50%;
+  float: right;
+}
+.rightChart{
+  width: 50%;
+  float: left;
+}
 .refresh{
     float: right;
     background-color: rgb(242, 242, 242) !important;
     border-color:rgb(242, 242, 242) !important;
   }
-.refresh:hover{  
+.refresh:hover{
     background:#C4C6CF !important;
     background-color:#FFFFFF !important;
-}  
+}
 .circle {
 //   border-radius: 50%;
 //   width: 20px;

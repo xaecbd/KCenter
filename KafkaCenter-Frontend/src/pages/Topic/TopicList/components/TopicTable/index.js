@@ -9,7 +9,7 @@ import {
 } from '@icedesign/form-binder';
 import axios from '@utils/axios';
 import Auth from '@components/Auth'
-import { sortData, sortDataByOrder } from '@utils/dataFormat';
+import {  sort,bytesToSize } from '@utils/dataFormat';
 import CustomPagination from '@components/CustomPagination';
 import CustomTableFilter from '@components/CustomTableFilter';
 
@@ -21,28 +21,32 @@ import DetailDialog from '../DetailDialog';
 const { Row, Col } = Grid;
 
 export default class TopicTable extends Component {
-  state = {
-    isQueries: false,
-    queriesRecord: {},
-    isLoading: false,
-    pageData: [],
-    isMobile: false,
-    uvisable: false,
-    dialogObj: {
-      record: {},
-      visible: false,
-    },
-    value: {},
-    teamData: [],
-    ownerData: [],
-    spanCluster: '',
-    filterDataSource: [],
-    dataSource: [],
-  };
+  
+
+  constructor(){
+    super();
+    this.state = {
+      isQueries: false,
+      queriesRecord: {},
+      isLoading: false,
+      pageData: [],
+      isMobile: false,
+      uvisable: false,
+      dialogObj: {
+        record: {},
+        visible: false,
+      },
+      value: {},
+      teamData: [],
+      ownerData: [],
+      spanCluster: '',
+      filterDataSource: [],
+      dataSource: [],
+    };
+  }
 
   componentWillMount() {
     this.mounted = true;
-    // this.fetchData();
   }
 
   componentWillUnmount = () => {
@@ -114,7 +118,7 @@ export default class TopicTable extends Component {
           if (response.data.code === 200) {
             if (this.mounted) {
               const switchValue = sessionStorage.getItem('topicTopicListSwitch') == null ? false : sessionStorage.getItem('topicTopicListSwitch');
-              let data = sortData(response.data.data, 'topicName');
+              let data = sort(response.data.data, 'topicName');
               const oldData = data;
               if (!switchValue || switchValue === 'false') {
                 data = data.filter(v => !v.topicName.startsWith('_'));
@@ -144,7 +148,7 @@ export default class TopicTable extends Component {
   };
 
   onSort(value, order) {
-    const dataSource = sortDataByOrder(this.state.dataSource, value, order);
+    const dataSource = sort(this.state.dataSource, value, order);
     this.refreshTableData(dataSource);
   }
 
@@ -153,6 +157,18 @@ export default class TopicTable extends Component {
       filterDataSource: value,
     });
   }
+
+  renderBytes= (value) => {
+    if (value !== null && value) {
+      if(value===-1){
+        return '-';
+      }
+      return bytesToSize(value);
+    }else if(value===0){
+      return bytesToSize(0);
+    }
+    return '-';
+  };
 
 
   handelDetail = (record) => {
@@ -313,6 +329,7 @@ export default class TopicTable extends Component {
           />
           <Table loading={isLoading} dataSource={this.state.pageData} hasBorder={false} onSort={(value, order) => this.onSort(value, order)}>
             <Table.Column title="Topic Name" dataIndex="topicName" sortable />
+            <Table.Column title="File Size" dataIndex="fileSize" cell={this.renderBytes} sortable />
             <Table.Column title="Cluster" dataIndex="cluster.name" />
             <Table.Column title="Create Date" dataIndex="createTime" cell={this.renderTime} />
             <Table.Column title="Owner" dataIndex="owner" cell={this.renderTopic} />

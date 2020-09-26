@@ -6,7 +6,7 @@ package org.nesc.ec.bigdata.common.model;
  * @version 1.0
  */
 public class PartitionAssignmentState {
-	private String group; // groupId
+	private String group;
 	private String topic;
 	private int partition;
 	private long offset;

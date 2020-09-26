@@ -32,12 +32,14 @@ public class TopicInfo {
 	private String comments;
 	@TableField(value="create_time")
 	private Date createTime;
+	@TableField(value="file_size")
+	private Long fileSize = -1L;
 	@TableField(exist = false)
 	private TeamInfo team;
 	@TableField(exist = false)
 	private ClusterInfo cluster;
 	@TableField(exist = false)
-	private UserInfo owner;	
+	private UserInfo owner;
 	public TeamInfo getTeam() {
 		return team;
 	}
@@ -49,6 +51,15 @@ public class TopicInfo {
 	}
 	public void setOwnerId(Long ownerId) {
 		this.ownerId = ownerId;
+	}
+
+
+	public Long getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(Long fileSize) {
+		this.fileSize = fileSize;
 	}
 
 	public UserInfo getOwner() {

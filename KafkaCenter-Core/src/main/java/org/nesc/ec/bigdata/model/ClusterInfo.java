@@ -121,4 +121,11 @@ public class ClusterInfo {
         this.comments = comments;
     }
 
+    @Override
+    public String toString() {
+        return "ClusterInfo{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

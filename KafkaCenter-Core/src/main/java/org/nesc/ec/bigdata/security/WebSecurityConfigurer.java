@@ -27,7 +27,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .antMatchers("/", "/**", "/login", "/login/**", "/assets/**", "/webjars/**", "/error/**", "/js/**", "/css/**")
                 .permitAll().anyRequest()
                 .authenticated()
-                .and().logout().logoutSuccessHandler(
+                .and().headers().frameOptions().disable().and().logout().logoutSuccessHandler(
                 ((request, response, authentication) -> {
                     if(authentication != null) {
                         response.sendRedirect(authConfig.getOauthHost().substring(0,authConfig.getOauthHost().lastIndexOf("auth")) + "logout?redirect_uri=http://" +  request.getHeader("Host"));

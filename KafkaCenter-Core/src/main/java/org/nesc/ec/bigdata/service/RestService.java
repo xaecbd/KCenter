@@ -46,8 +46,6 @@ public class RestService {
 		queryMap.forEach(builder::queryParam);
 		JSONObject responseBody = restTemplate.getForEntity(builder.build().encode().toUriString(),JSONObject.class).getBody();
 		return responseBody.getJSONArray(Constants.KeyStr.DATA);
-		//return exchange(builder.build().encode().toUriString(),HttpMethod.GET,new HttpEntity<>(null,null));
-
 	}
 
 	private JSONObject tranMapToJson( Map<String, String> queryMap) {

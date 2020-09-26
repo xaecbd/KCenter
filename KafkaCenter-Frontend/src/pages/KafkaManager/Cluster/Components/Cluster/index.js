@@ -9,38 +9,51 @@ import {
   FormError as IceFormError,
 } from '@icedesign/form-binder';
 import IceContainer from '@icedesign/container';
-import MetricMonitor from '../../../../Home/MonitorDetail/components/MonitorMetric';
+import Auth from '@components/Auth'
+import MetricMonitor from '@/pages/Home/MonitorDetail/components/MonitorMetric';
 
-import './Cluster.scss';
+import { withRouter } from 'react-router-dom';
+
+import style from './index.module.scss';
+import { object } from 'prop-types';
 
 const { Row, Col } = Grid;
+
+@withRouter
 export default class Cluster extends Component {
-  state = {
-    data: [],
-    isLoading: false,
-    visable: false,
-    title: '',
-    formValue: {},
-    isMobile: false,
-    endValues: {},
-    locations: [],
-    isClusterLoading: false,
-    metricVisable: false,
-    monitorVisable: false,
-    clusterObj: {},
-  };
+  constructor(props){
+    super(props);
+    this.state = {
+      data: [],
+      isLoading: false,
+      visable: false,
+      title: '',
+      formValue: {},
+      isMobile: false,
+      endValues: {},
+      locations: [],
+      isClusterLoading: false,
+      metricVisable: false,
+      monitorVisable: false,
+      clusterObj: {},
+    };
+  }
+
 
   componentWillMount() {
     this.mounted = true;
     this.fetchData();
     this.fetchLocations();
+    
   }
+
   componentWillUnmount = () => {
     this.mounted = false;
   }
 
   componentDidMount() {
-
+    
+    
   }
 
   handleAdd = () => {
@@ -61,7 +74,7 @@ export default class Cluster extends Component {
   }
 
   handleEdit = (e, item) => {
-    const items = Object.assign({}, item);
+    const items = { ...item};
     this.setState({
       formValue: items,
       title: 'Edit',
@@ -90,6 +103,7 @@ export default class Cluster extends Component {
 
     });
   }
+
   metricMonitor = () => {
     return (
       <IceContainer>
@@ -143,6 +157,7 @@ export default class Cluster extends Component {
       console.error(e);
     });
   }
+
 
   validateAllFormField = () => {
     this.form.validateAll((errors, values) => {
@@ -203,7 +218,10 @@ export default class Cluster extends Component {
               this.setState({
                 data: response.data.data,
                 isLoading: false,
+              },()=>{
+                this.fetchStatus();
               });
+              
             }
           } else {
             Message.error(response.data.message);
@@ -211,9 +229,51 @@ export default class Cluster extends Component {
         }).catch((error) => {
           console.error(error);
         });
+        
       }
     );
+   
   };
+
+
+  fetchStatus = async() =>{
+    const data = this.state.data;
+    const values = [];
+    for(let i =0;i<data.length;i++){
+      const objs = Object.assign({}, data[i]);
+       await this.parseStatus(objs).then(response=>{
+        objs.status =  response;
+      });   
+      values.push(objs);
+      
+    }
+    if(values.length>0){
+      this.setState({
+        data:values
+      });
+    }
+   
+  }
+
+  parseStatus = (d) =>{
+    return new Promise((resolve,reject)=>{
+      axios.post(`/cluster/status`,d).then((response) => {         
+        if (response.data.code === 200) {                      
+          resolve(response.data.data.status);      
+
+        } else {
+          resolve("");
+          Message.error(response.data.message);
+        }
+      }).catch((error) => {
+        console.error(error);
+        resolve("");
+      });
+    }); 
+  }   
+  
+
+  
 
   onFormChange = (value) => {
     this.setState({
@@ -306,6 +366,10 @@ export default class Cluster extends Component {
     }
   };
 
+  toClusterDetail = (clusterId,clusterName)=>{
+    this.props.history.push(`/cluster/${clusterId}/${clusterName}/broker`);
+  }
+
   clusterView = () => {
     return (
       <Loading
@@ -322,94 +386,120 @@ export default class Cluster extends Component {
           {this.state.data.map((item, index) => {
             //    console.log('items:'+JSON.stringify(item));
             const items = item;
+            let title;
+            const border = { displayName: 'flex', background: '#fff', borderRadius: '6px'};
+           
+            if(item.status){
+              if (items.status === 'ok') {
+                title = <div title={items.status} className={style.greencircle} />;
+              } else if (items.status === 'warn') {
+                title = <div title={items.status} className={style.yellowcircle} />;
+                border.boxShadow = '0px 2px 10px #ffd876';
+              } else if(item.status === 'bad'){
+                title = <div title={items.status} className={style.redcircle} />;
+                border.boxShadow = '0px 2px 10px #ff3b1f';
+              }
+            }else{
+              title = <div title="UNKOWN" className={style.yellowcircle} />;
+             // border.boxShadow = '0px 2px 10px #ff3b1f';
+            }
+           
             return (
               <Col l="8" xs="48" xxs="48" key={index}>
-                <div style={styles.card}>
+                <div style={border}>
                   <div style={styles.head}>
                     <h4 style={styles.title}>{item.name}</h4>
                     {/* <Icon type="ashbin" size="xs" style={styles.deleteIcon} onClick={(e) => { this.handleDel(e, item); }} /> */}
                   </div>
-                  <div style={styles.body}>
+                  <div style={styles.body} >
+                    <div style={{cursor: 'pointer'}} onClick={(e)=>{this.toClusterDetail(item.id,item.name)}}>
                     <Row wrap gutter="20" style={styles.formItems}>
-                      <Col l="5" xs="5" xxs="6" className="test">
+                      <Col l="6" xs="12" xxs="24" className={style.test}>
+                        <span>Cluster Status:</span>
+                      </Col>
+                      <Col l="18" xs="12" xxs="24" className={style.test}>
+                        {title}
+                      </Col>
+                    </Row>
+                    <Row wrap gutter="20" style={styles.formItems}>
+                      <Col l="6" xs="12" xxs="24" className={style.test}>
+                        <span>Cluster Id:</span>
+                      </Col>
+                      <Col l="18" xs="12" xxs="24" className={style.test}>
+                        {item.id}
+                      </Col>
+                    </Row>
+                    <Row wrap gutter="20" style={styles.formItems}>
+                      <Col l="5" xs="5" xxs="6" className={style.test}>
                         <span>ZK:</span>
                       </Col>
-                      <Col l="18" xs="12" xxs="24" className="test1">
-                        <span title={item.zkAddress}> <Tag className="tags" size="small">{item.zkAddress}</Tag></span>
+                      <Col l="18" xs="12" xxs="24" className={style.test1}>
+                        <span title={item.zkAddress}> <Tag className={style.tags} size="small">{item.zkAddress}</Tag></span>
                       </Col>
                     </Row>
                     <Row wrap gutter="20" style={styles.formItems}>
-                      <Col l="5" xs="5" xxs="6" className="test">
+                      <Col l="5" xs="5" xxs="6" className={style.test}>
                         <span>Broker:</span>
                       </Col>
-                      <Col l="18" xs="12" xxs="24" className="test1">
-                        <span title={item.broker}> <Tag className="tags" size="small">{item.broker}</Tag></span>
+                      <Col l="18" xs="12" xxs="24" className={style.test1}>
+                        <span title={item.broker}> <Tag className={style.tags} size="small">{item.broker}</Tag></span>
                       </Col>
                     </Row>
                     <Row wrap gutter="20" style={styles.formItems}>
-                      <Col l="5" xs="5" xxs="6" className="test">
+                      <Col l="5" xs="5" xxs="6" className={style.test}>
                         <span>Kafka Version:</span>
                       </Col>
-                      <Col l="18" xs="12" xxs="24" className="test1" >
-                        <span title={item.kafkaVersion}> <Tag className="tags" size="small">{item.kafkaVersion}</Tag></span>
+                      <Col l="18" xs="12" xxs="24" className={style.test1} >
+                        <span title={item.kafkaVersion}> <Tag className={style.tags} size="small">{item.kafkaVersion}</Tag></span>
                       </Col>
                     </Row>
                     <Row wrap gutter="20" style={styles.formItems}>
-                      <Col l="5" xs="5" xxs="6" className="test">
+                      <Col l="5" xs="5" xxs="6" className={style.test}>
                         <span>Broker Size:</span>
                       </Col>
-                      <Col l="18" xs="12" xxs="24" className="test1" >
-                        <span title={item.brokerSize}> <Tag className="tags" size="small">{item.brokerSize}</Tag></span>
+                      <Col l="18" xs="12" xxs="24" className={style.test1} >
+                        <span title={item.brokerSize}> <Tag className={style.tags} size="small">{item.brokerSize}</Tag></span>
                       </Col>
                     </Row>
                     <Row wrap gutter="20" style={styles.formItems}>
-                      <Col l="5" xs="5" xxs="6" className="test">
+                      <Col l="5" xs="5" xxs="6" className={style.test}>
                         <span>Location:</span>
                       </Col>
-                      <Col l="18" xs="12" xxs="24" className="test1" >
-                        <span title={item.location}> <Tag className="tags" size="small">{item.location}</Tag></span>
+                      <Col l="18" xs="12" xxs="24" className={style.test1} >
+                        <span title={item.location}> <Tag className={style.tags} size="small">{item.location}</Tag></span>
                       </Col>
                     </Row>
-
-
-                    {/* <div>ZK:<span title={item.zkAddress}><Tag className="tags" size="small">{item.zkAddress}</Tag></span></div>
-                                        <div style={{ marginTop: '1.5%' }}>Broker:<span title={item.broker}><Tag className="tags" size="small" >{item.broker}</Tag></span></div>
-                                        <div style={{ marginTop: '1.5%' }}>Kafka Version:<span title={item.kafkaVersion}><Tag className="tags" size="small" >{item.kafkaVersion}</Tag></span></div>
-                                        <div style={{ marginTop: '1.5%' }}>Broker Size:<span title={item.brokerSize}><Tag className="tags" size="small" >{item.brokerSize}</Tag></span></div>
-                                        <div style={{ marginTop: '1.5%' }}>Location:<span title={item.location}><Tag className="tags" size="small" >{item.location}</Tag></span></div> */}
+                    </div>
+                    <div style={{ marginTop:'5px'}}>
                     <Row wrap gutter="20" style={styles.formItemes} >
-                      <button className="btn warnbtn" disabled={!!((item.grafAddr === null || item.grafAddr === ''))} onClick={(e) => { this.monitorView(e, item); }}><FoundationSymbol
+                    <Auth rolename="admin">
+                      <button type="button" className={style.warnbtn } disabled={!!((item.grafAddr === null || item.grafAddr === ''))} onClick={(e) => { this.monitorView(e, item); }}><FoundationSymbol
                         title="Grafana Monitor"
                         type="eye"
                         size="small"
-                        className="icon"
+                        className={style.icon}
                       />
-                      </button>
-                      <button className="btn warnbtn"><FoundationSymbol
-                        title=" Metric Monitor"
-                        type="chart"
-                        size="small"
-                        className="icon"
-                        onClick={(e) => { this.handleMetricMonitor(e, item); }}
-                      />
-                      </button>
-                      <button className="btn pribtn"><FoundationSymbol
+                      </button>                      
+                    
+                      <button  type="button" className={style.pribtn}><FoundationSymbol
                         title="Edit"
                         type="edit2"
                         size="small"
-                        className="icon"
+                        className={style.icon}
                         onClick={(e) => { this.handleEdit(e, this.state.data[index]); }}
                       />
                       </button>
-                      <button className="btn deletBtn"><FoundationSymbol
+                      <button type="button" className={style.deletBtn}><FoundationSymbol
                         title="Delete"
                         type="delete"
                         size="small"
-                        className="icon"
+                        className={style.icon}
                         onClick={(e) => { this.handleDel(e, item); }}
                       />
                       </button>
+                      </Auth>
                     </Row>
+                   </div>
                   </div>
                 </div>
               </Col>
@@ -449,14 +539,14 @@ export default class Cluster extends Component {
           style={simpleFormDialog}
           title={this.state.title}
           okProps={okProps}
-          cancelProps={cancelProps}          
+          cancelProps={cancelProps}
         >
 
           <IceFormBinderWrapper ref={(form) => {
             this.form = form;
           }}
-            value={this.state.formValue}
-            onChange={this.onFormChange}
+          value={this.state.formValue}
+          onChange={this.onFormChange}
           >
 
             <div style={styles.formContent}>
@@ -561,20 +651,20 @@ export default class Cluster extends Component {
                     <IceFormError name="brokerSize" />
                   </Col>
                 </Row>
-                  <Row style={styles.formItem}>
-                    <Col span={`${isMobile ? '6' : '6'}`} style={styles.label}>
+                <Row style={styles.formItem}>
+                  <Col span={`${isMobile ? '6' : '6'}`} style={styles.label}>
                       Grafana Address:
-                    </Col>
-                    <Col span={`${isMobile ? '18' : '16'}`}>
-                      <IceFormBinder name="grafAddr">
-                        <Input
-                          style={styles.inputItem}
-                          placeholder="please input grafana alert address"
-                        />
-                      </IceFormBinder>
-                      <IceFormError name="grafAddr" />
-                    </Col>
-                  </Row>
+                  </Col>
+                  <Col span={`${isMobile ? '18' : '16'}`}>
+                    <IceFormBinder name="grafAddr">
+                      <Input
+                        style={styles.inputItem}
+                        placeholder="please input grafana alert address"
+                      />
+                    </IceFormBinder>
+                    <IceFormError name="grafAddr" />
+                  </Col>
+                </Row>
                 </div> : null
               }
             </div>
@@ -626,7 +716,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '250px',
+    height: '290px',
     cursor: 'pointer',
   },
   card: {
@@ -634,7 +724,7 @@ const styles = {
     marginBottom: '20px',
     background: '#fff',
     borderRadius: '6px',
-    height: '250px',
+    height: '290px',
   },
   head: {
     position: 'relative',
@@ -654,6 +744,8 @@ const styles = {
   body: {
     position: 'relative',
     padding: '16px',
+    minHeight: '240px',
+    
   },
   addIcon: {
     marginRight: '10px',
@@ -677,7 +769,7 @@ const styles = {
   formItemes: {
     alignItems: 'center',
     float: 'right',
-    marginTop: 0,
+    // marginTop: -20,
   },
   formItem: {
     alignItems: 'center',

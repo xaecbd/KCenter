@@ -11,6 +11,7 @@ const { Row, Col } = Grid;
 
 export default class TeamInfo extends Component {
   static displayName = 'TeamInfo';
+
   constructor(props) {
     super(props);
     this.state = {
@@ -91,8 +92,8 @@ export default class TeamInfo extends Component {
           <div style={styles.formContent}>
             <h2 style={styles.formTitle}>{this.state.title}</h2>
             <Row style={styles.formRow}>
-              <Col span="4">
-                <label style={styles.formLabel}>Team Name:</label>
+              <Col span="6">
+                <label style={styles.formLabel}>Team Name: </label>
               </Col>
               <Col span="18">
                 <IceFormBinder name="name" required validator={this.checkbland}>
@@ -103,6 +104,21 @@ export default class TeamInfo extends Component {
                   />
                 </IceFormBinder>
                 <IceFormError name="name" />
+              </Col>
+            </Row>
+            <Row style={styles.formRow}>
+              <Col span="6">
+                <label style={styles.formLabel}>Alarm Group: </label>
+              </Col>
+              <Col span="18">
+                <IceFormBinder name="alarmGroup" required validator={this.checkbland}>
+                  <Input
+                    size="medium"
+                    placeholder="alarm group"
+                    style={styles.input}
+                  />
+                </IceFormBinder>
+                <IceFormError name="alarmGroup" />
               </Col>
             </Row>
           </div>

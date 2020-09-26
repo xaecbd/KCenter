@@ -1,0 +1,90 @@
+.rateIcon {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background: url(https://img.alicdn.com/tfs/TB1E.8ZvebviK0jSZFNXXaApXXa-92-90.png) 50% 50% no-repeat;
+    background-size: contain;
+  }
+  
+  .failIcon {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background: url(https://img.alicdn.com/tfs/TB1wNsuvNn1gK0jSZKPXXXvUXXa-90-90.png) 50% 50% no-repeat;
+    background-size: contain;
+  }
+  
+  .successIcon {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background: url(https://img.alicdn.com/tfs/TB1FnouvHr1gK0jSZR0XXbP8XXa-90-88.png) 50% 50% no-repeat;
+    background-size: contain;
+  }
+
+
+  .radioGroup {
+    display: flex;
+    width: 320px;
+    text-align: center;
+  }
+  
+  .flex1 {
+    flex: 1;
+  }
+  
+ /*  .title {
+    font-weight: bold;
+    font-size: 16px;
+  }*/
+
+  .Table {
+    border-collapse: collapse;
+    line-height: 0 !important;
+
+    .opt {
+      button {
+        margin-right: 5px;
+      }
+    }
+    td[data-next-table-col='0']>div{
+      word-break: unset;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space:nowrap ;
+      width: 100px ;
+    }
+    td[data-next-table-col='1']>div{
+      word-break: unset;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space:nowrap ;
+      width: 230px ;
+    }
+    td[data-next-table-col='2']>div{
+      word-break: unset;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space:nowrap ;
+      width: 230px ;
+    }
+    td[data-next-table-col='3']>div{
+      word-break: unset;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space:nowrap ;
+      width: 120px ;
+    }
+    td[data-next-table-col='4']>div{
+      word-break: unset;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space:nowrap ;
+      width: 80px ;
+    }
+  } 
+  .g2-legend{
+    top: -5px !important;
+    height: 25px;
+
+  }

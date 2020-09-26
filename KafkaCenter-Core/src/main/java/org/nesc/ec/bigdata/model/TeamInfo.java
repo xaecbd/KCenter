@@ -1,5 +1,6 @@
 package org.nesc.ec.bigdata.model;
 
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.enums.IdType;
@@ -9,6 +10,8 @@ public class TeamInfo {
 	private Long id;
 	private String name;
 	private String own;
+	@TableField(value="alarm_group")
+	private String alarmGroup;
 	
 	
 	public Long getId() {
@@ -28,5 +31,13 @@ public class TeamInfo {
 	}
 	public void setOwn(String own) {
 		this.own = own;
+	}
+
+	public String getAlarmGroup() {
+		return alarmGroup;
+	}
+
+	public void setAlarmGroup(String alarmGroup) {
+		this.alarmGroup = alarmGroup;
 	}
 }

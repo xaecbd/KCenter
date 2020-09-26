@@ -87,7 +87,7 @@ public class ElasticsearchUtil implements Closeable {
             return new JSONObject();
         }
         RestClient lowLevelClient = client.getLowLevelClient();
-        String endpoint = "/" + index + Constant.SEARCH._SEARCH;
+        String endpoint = "/" + index + Constant.Search.SEARCH_;
         Request request = new Request(HttpPost.METHOD_NAME, endpoint);
         request.setEntity(new NStringEntity(requestBody, ContentType.APPLICATION_JSON));
         Response response = lowLevelClient.performRequest(request);
@@ -111,7 +111,7 @@ public class ElasticsearchUtil implements Closeable {
         JSONObject json = new JSONObject();
         JSONArray arrays = new JSONArray();
         JSONObject aggs = null;
-        String endpoint = "/" + index + Constant.SEARCH.SEARCH_SCROLL_1M;
+        String endpoint = "/" + index + Constant.Search.SEARCH_SCROLL_1M;
         Request request = new Request(HttpPost.METHOD_NAME, endpoint);
         request.setEntity(new NStringEntity(requestBody, ContentType.APPLICATION_JSON));
         Response response = lowLevelClient.performRequest(request);
@@ -119,21 +119,21 @@ public class ElasticsearchUtil implements Closeable {
         JSONObject searchResult = null;
         while (true) {
             searchResult = JSON.parseObject(EntityUtils.toString(entity));
-            final JSONArray searchHits = searchResult.getJSONObject(Constant.ELASTICSEARCH.HITS).getJSONArray(Constant.ELASTICSEARCH.HITS);
-            if (searchResult.containsKey(Constant.ELASTICSEARCH.AGGREGATIONS)) {
-                aggs = searchResult.getJSONObject(Constant.ELASTICSEARCH.AGGREGATIONS);
+            final JSONArray searchHits = searchResult.getJSONObject(Constant.Elasticsearch.HITS).getJSONArray(Constant.Elasticsearch.HITS);
+            if (searchResult.containsKey(Constant.Elasticsearch.AGGREGATIONS)) {
+                aggs = searchResult.getJSONObject(Constant.Elasticsearch.AGGREGATIONS);
             }
             if (searchHits.size() == 0) {
                 break;
             }
-            arrays.add(searchResult.getJSONObject(Constant.ELASTICSEARCH.HITS).getJSONArray(Constant.ELASTICSEARCH.HITS));
-            request = new Request(HttpPost.METHOD_NAME, Constant.SEARCH.SEARCH_SCROLL);
-            request.setEntity(new NStringEntity(getScrollNextBody(searchResult.getString(Constant.ELASTICSEARCH.SCROLL_ID)), ContentType.APPLICATION_JSON));
+            arrays.add(searchResult.getJSONObject(Constant.Elasticsearch.HITS).getJSONArray(Constant.Elasticsearch.HITS));
+            request = new Request(HttpPost.METHOD_NAME, Constant.Search.SEARCH_SCROLL);
+            request.setEntity(new NStringEntity(getScrollNextBody(searchResult.getString(Constant.Elasticsearch.SCROLL_ID)), ContentType.APPLICATION_JSON));
             response = lowLevelClient.performRequest(request);
             entity = response.getEntity();
         }
-        json.put(Constant.ELASTICSEARCH.HITS, arrays);
-        json.put(Constant.ELASTICSEARCH.AGGREGATIONS, aggs);
+        json.put(Constant.Elasticsearch.HITS, arrays);
+        json.put(Constant.Elasticsearch.AGGREGATIONS, aggs);
         return json;
     }
 

@@ -9,19 +9,40 @@ import TeamInfoDialog from '../TeamInfo';
 
 const { Col } = Grid;
 
+const styles = {
+  separator: {
+    margin: '0 8px',
+    display: 'inline-block',
+    height: '12px',
+    width: '1px',
+    verticalAlign: 'middle',
+    background: '#e8e8e8',
+  },
+  operBtn: {
+    display: 'inline-block',
+    width: '24px',
+    height: '24px',
+    borderRadius: '999px',
+    color: '#929292',
+    background: '#f2f2f2',
+    textAlign: 'center',
+    cursor: 'pointer',
+    lineHeight: '24px',
+    marginRight: '6px',
+  },
+};
 export default class TeamList extends Component {
-  state = {
-    isLoading: false,
-    dataSource: [],
-    teamInfoDialog: false,
-    teamInfoData: {},
-    teamInfoDialogTitle: '',
-    filterDataSource: [],
-    pageData: [],
-  };
-
-  componentDidMount() {
-  //  this.fetchData();
+  constructor(){
+    super();
+    this.state = {
+      isLoading: false,
+      dataSource: [],
+      teamInfoDialog: false,
+      teamInfoData: {},
+      teamInfoDialogTitle: '',
+      filterDataSource: [],
+      pageData: [],
+    };
   }
 
   componentWillMount() {
@@ -32,6 +53,10 @@ export default class TeamList extends Component {
     this.mounted = false;
   }
 
+  onSort(value, order) {
+    const dataSource = sortDataByOrder(this.state.filterDataSource, value, order);
+    this.refreshTableData(dataSource);
+  }
 
   handleEdit = (record) => {
     this.setState({
@@ -132,10 +157,10 @@ export default class TeamList extends Component {
     });
   }
 
-  onSort(value, order) {
-    const dataSource = sortDataByOrder(this.state.filterDataSource, value, order);
-    this.refreshTableData(dataSource);
-  }
+  
+
+ 
+
 
   renderOper = (value, index, record) => {
     return (
@@ -191,6 +216,7 @@ export default class TeamList extends Component {
         />
         <Table loading={isLoading} dataSource={this.state.pageData} hasBorder={false} onSort={(value, order) => this.onSort(value, order)} primaryKey="id">
           <Table.Column title="Name" dataIndex="name" sortable />
+          <Table.Column title="Alarm Group" dataIndex="alarmGroup"/>
           <Table.Column title="Operation" cell={this.renderOper} />
         </Table>
         <CustomPagination dataSource={this.state.filterDataSource} redrawPageData={this.redrawPageData} />
@@ -199,25 +225,4 @@ export default class TeamList extends Component {
   }
 }
 
-const styles = {
-  separator: {
-    margin: '0 8px',
-    display: 'inline-block',
-    height: '12px',
-    width: '1px',
-    verticalAlign: 'middle',
-    background: '#e8e8e8',
-  },
-  operBtn: {
-    display: 'inline-block',
-    width: '24px',
-    height: '24px',
-    borderRadius: '999px',
-    color: '#929292',
-    background: '#f2f2f2',
-    textAlign: 'center',
-    cursor: 'pointer',
-    lineHeight: '24px',
-    marginRight: '6px',
-  },
-};
+
