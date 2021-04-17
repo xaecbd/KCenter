@@ -255,9 +255,8 @@ public class KafkaManagerController extends BaseController{
         ClusterInfo clusterInfo = clusterService.selectById(Long.parseLong(clusterId));
         try {
             if(config.isRemoteQueryEnable() && remoteHostsMap.containsKey(clusterInfo.getLocation().toLowerCase())){
-                String url = request.getScheme()+ Constants.Symbol.COLON+ Constants.Symbol.DOUBLE_SLASH+request.getServerName()+ Constants.Symbol.COLON
-                        +request.getServerPort()+ Constants.Symbol.SLASH+ Constants.KeyStr.REMOTE+request.getServletPath()
-                        .replaceAll(Constants.Symbol.SLASH+ Constants.KeyStr.MANAGER, Constants.Symbol.EMPTY_STR);
+               //TODO µÈ´ýÖØ¹¹
+                String url = "http://" + remoteHostsMap.get(clusterInfo.getLocation().toLowerCase())+"/manager/group/status";
                 Map<String, String> queryMap = new HashMap<>();
                 queryMap.put("cluster",clusterId);
                 JSONArray array =  restService.queryRemoteQueryByGet(url,queryMap);

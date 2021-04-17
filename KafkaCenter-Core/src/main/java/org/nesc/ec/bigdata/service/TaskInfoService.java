@@ -7,6 +7,7 @@ import org.nesc.ec.bigdata.constant.Constants;
 import org.nesc.ec.bigdata.mapper.TaskInfoMapper;
 import org.nesc.ec.bigdata.model.EmailEntity;
 import org.nesc.ec.bigdata.model.TaskInfo;
+import org.nesc.ec.bigdata.model.UserInfo;
 import org.nesc.ec.bigdata.model.vo.TaskClusterVo;
 import org.nesc.ec.bigdata.model.vo.TaskInfoVo;
 import org.slf4j.Logger;
@@ -54,6 +55,7 @@ public class TaskInfoService {
     }
 
     public boolean update(TaskInfo task) {
+        task.setCreateTime(new Date());
         Integer result = taskInfoMapper.updateById(task);
         return checkResult(result);
     }
@@ -138,58 +140,111 @@ public class TaskInfoService {
         return false;
     }
 
-    public Map<String, Object> getEmailAllMessage(TaskInfo task, Integer emailType) throws InterruptedException, ExecutionException {
+    public Map<String,Object> getSendEmailInfo(TaskInfo taskInfo,Integer emailType){
         Map<String, Object> mailMap = new HashMap<>();
-        try {
+        try{
             TaskInfoVo taskInfoVo = new TaskInfoVo();
-            EmailEntity emailEntity = new EmailEntity();
-
-            String userEmail;
-            String allAdminEamil;
-            String owner;
-            if (null != task.getOwner()) {
-                userEmail = task.getOwner().getEmail();
-                owner = task.getOwner().getName();
-            } else {
-                userEmail = userInfoService.getUserInfoById(task.getOwnerId()).getEmail();
-                owner = userInfoService.getUserInfoById(task.getOwnerId()).getName();
-            }
-            List<String> emailList = userInfoService.selectEmailByRole(RoleEnum.ADMIN);
-            StringBuilder stringBuilder = new StringBuilder();
-            for (String email : emailList) {
-                stringBuilder.append(email);
-                stringBuilder.append(Constants.Symbol.SEMICOLON);
-            }
-            if (StringUtils.isNotBlank(stringBuilder)) {
-                allAdminEamil = stringBuilder.substring(0, stringBuilder.length() - 1);
-                emailEntity.setEmailTo(allAdminEamil);
-            }
+            EmailEntity emailEntity = generateAdminEmailList();
             emailEntity.setEmailFrom(initConfig.getEmailFrom());
-            if (emailType != 1) {
-                emailEntity.setEmailTo(userEmail);
-                if (emailType == 2) {
-                    emailEntity.setEmailSubject("(info) Topic [" + task.getTopicName() + "] Create Be Rejected ");
-                } else {
-                    emailEntity.setEmailSubject("(info) Topic [" + task.getTopicName() + "] Create Success ");
-                    List<TaskClusterVo> clusterMessList = clusterService.getClusterMessById(task.getClusterIds());
+            UserInfo userInfo = taskInfo.getOwner();
+            if(Objects.isNull(userInfo)){
+                userInfo = userInfoService.getUserInfoById(taskInfo.getOwnerId());
+            }
+            String subject ="";
+            if(emailType==1){
+                subject = "(info) Topic [" + taskInfo.getTopicName() + "]  Approval Notice";
+            }else {
+                emailEntity.setEmailTo(userInfo.getEmail());
+                if(emailType==2){
+                    subject="(info) Topic [" + taskInfo.getTopicName() + "] Create Be Rejected ";
+                }else {
+                    subject="(info) Topic [" + taskInfo.getTopicName() + "] Create Success ";
+                    List<TaskClusterVo> clusterMessList = clusterService.getClusterMessById(taskInfo.getClusterIds());
                     taskInfoVo.setClusterMessList(clusterMessList);
                 }
-            } else {
-                emailEntity.setEmailSubject("(info) Topic [" + task.getTopicName() + "]  Approval Notice");
             }
+            emailEntity.setEmailSubject(subject);
+
+            taskInfoVo.setApproveURL(initConfig.getKafkaCenterUrl());
+            taskInfoVo.setOwner(userInfo.getName());
+            BeanUtils.copyProperties(taskInfo, taskInfoVo);
 
             Map<String, Object> mailContentMap = new HashMap<>();
-            taskInfoVo.setApproveURL(initConfig.getKafkaCenterUrl());
-            taskInfoVo.setOwner(owner);
-            BeanUtils.copyProperties(task, taskInfoVo);
             mailContentMap.put("taskInfo", taskInfoVo);
 
             mailMap.put("emailEntity", emailEntity);
             mailMap.put("emailContent", mailContentMap);
-
-        } catch (Exception e) {
+        }catch (Exception e){
             LOGGER.error("get emailAllMessage  error.", e);
         }
         return mailMap;
     }
+
+    private EmailEntity generateAdminEmailList(){
+        EmailEntity emailEntity = new EmailEntity();
+        List<String> emailList = userInfoService.selectEmailByRole(RoleEnum.ADMIN);
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String email : emailList) {
+            stringBuilder.append(email);
+            stringBuilder.append(Constants.Symbol.SEMICOLON);
+            String allAdminEmail = stringBuilder.substring(0, stringBuilder.length() - 1);
+            emailEntity.setEmailTo(allAdminEmail);
+        }
+        return  emailEntity;
+    }
+
+//    public Map<String, Object> getEmailAllMessage(TaskInfo task, Integer emailType) throws InterruptedException, ExecutionException {
+//        Map<String, Object> mailMap = new HashMap<>();
+//        try {
+//            TaskInfoVo taskInfoVo = new TaskInfoVo();
+//            EmailEntity emailEntity = new EmailEntity();
+//
+//            String userEmail;
+//            String allAdminEamil;
+//            String owner;
+//            if (null != task.getOwner()) {
+//                userEmail = task.getOwner().getEmail();
+//                owner = task.getOwner().getName();
+//            } else {
+//                userEmail = userInfoService.getUserInfoById(task.getOwnerId()).getEmail();
+//                owner = userInfoService.getUserInfoById(task.getOwnerId()).getName();
+//            }
+//            List<String> emailList = userInfoService.selectEmailByRole(RoleEnum.ADMIN);
+//            StringBuilder stringBuilder = new StringBuilder();
+//            for (String email : emailList) {
+//                stringBuilder.append(email);
+//                stringBuilder.append(Constants.Symbol.SEMICOLON);
+//            }
+//            if (StringUtils.isNotBlank(stringBuilder)) {
+//                allAdminEamil = stringBuilder.substring(0, stringBuilder.length() - 1);
+//                emailEntity.setEmailTo(allAdminEamil);
+//            }
+//            emailEntity.setEmailFrom(initConfig.getEmailFrom());
+//            if (emailType != 1) {
+//                emailEntity.setEmailTo(userEmail);
+//                if (emailType == 2) {
+//                    emailEntity.setEmailSubject("(info) Topic [" + task.getTopicName() + "] Create Be Rejected ");
+//                } else {
+//                    emailEntity.setEmailSubject("(info) Topic [" + task.getTopicName() + "] Create Success ");
+//                    List<TaskClusterVo> clusterMessList = clusterService.getClusterMessById(task.getClusterIds());
+//                    taskInfoVo.setClusterMessList(clusterMessList);
+//                }
+//            } else {
+//                emailEntity.setEmailSubject("(info) Topic [" + task.getTopicName() + "]  Approval Notice");
+//            }
+//
+//            Map<String, Object> mailContentMap = new HashMap<>();
+//            taskInfoVo.setApproveURL(initConfig.getKafkaCenterUrl());
+//            taskInfoVo.setOwner(owner);
+//            BeanUtils.copyProperties(task, taskInfoVo);
+//            mailContentMap.put("taskInfo", taskInfoVo);
+//
+//            mailMap.put("emailEntity", emailEntity);
+//            mailMap.put("emailContent", mailContentMap);
+//
+//        } catch (Exception e) {
+//            LOGGER.error("get emailAllMessage  error.", e);
+//        }
+//        return mailMap;
+//    }
 }

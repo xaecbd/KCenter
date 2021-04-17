@@ -142,7 +142,7 @@ public class TaskController extends BaseController {
             }
             if (taskInfoService.insert(task)) {
                 if (mailEnable) {
-                    Map<String, Object> emailMap = taskInfoService.getEmailAllMessage(task, 1);
+                    Map<String, Object> emailMap = taskInfoService.getSendEmailInfo(task, 1);
                     emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), 1);
                 }
 
@@ -173,7 +173,7 @@ public class TaskController extends BaseController {
                 task.setApprovalOpinions("");
                 if (taskInfoService.updateTask(task)) {
                     if (mailEnable) {
-                        Map<String, Object> emailMap = taskInfoService.getEmailAllMessage(task, 1);
+                        Map<String, Object> emailMap = taskInfoService.getSendEmailInfo(task, 1);
                         emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), 1);
                     }
                     return SUCCESS("Update task data success.");
@@ -248,7 +248,7 @@ public class TaskController extends BaseController {
                     task.setApprovedTime(new Date());
                     if (taskInfoService.update(task)) {
                         if (mailEnable) {
-                            Map<String, Object> emailMap = taskInfoService.getEmailAllMessage(task, 3);
+                            Map<String, Object> emailMap = taskInfoService.getSendEmailInfo(task, 3);
                             emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), 3);
                         }
                         return SUCCESS("Approve task success, the topic will be create.");
@@ -288,7 +288,7 @@ public class TaskController extends BaseController {
             task.setApprovalOpinions(approvalComments);
             if (taskInfoService.update(task)) {
                 if (mailEnable) {
-                    Map<String, Object> emailMap = taskInfoService.getEmailAllMessage(task, 2);
+                    Map<String, Object> emailMap = taskInfoService.getSendEmailInfo(task, 2);
                     emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), 2);
                 }
                 return SUCCESS("Reject task request success.");

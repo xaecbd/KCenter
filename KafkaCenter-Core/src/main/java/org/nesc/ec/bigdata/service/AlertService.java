@@ -78,7 +78,7 @@ public class AlertService {
         Map<Long, String> alertAlarmGroupMap = new HashMap<>();
         List<Map<String, Object>> list = alertMapper.getAlertAlarmGroupMap();
         list.forEach(map -> {
-            Long id = new Long((Integer) map.get("id"));
+            Long id = Long.parseLong(String.valueOf(map.get("id")));
             Object alarmGroup = map.get("alarm_group");
             if (alarmGroup == null) {
                 return;

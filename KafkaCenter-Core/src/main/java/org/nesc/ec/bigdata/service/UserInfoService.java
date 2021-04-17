@@ -71,8 +71,8 @@ public class UserInfoService {
 		return checkResult(userInfoMapper.updateUser(userInfo));
 	}
 
-	public int getRole(String RoleName){
-		if(RoleEnum.ADMIN.getDescription().equalsIgnoreCase(RoleName)){
+	public int getRole(String rolename){
+		if(RoleEnum.ADMIN.getDescription().equalsIgnoreCase(rolename)){
 			return RoleEnum.ADMIN.getValue();
 		}else{
 			return RoleEnum.MEMBER.getValue();

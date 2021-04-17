@@ -718,4 +718,177 @@ public class ElasticSearchQuery {
                 "  }\n" +
                 "}";
     }
+
+    public static  String searchTopicInOrOutQuery(String start,String end){
+        return "{\n" +
+                "  \"size\": 0,\n" +
+                "  \"aggs\": {\n" +
+                "    \"date\": {\n" +
+                "      \"date_histogram\": {\n" +
+                "        \"field\": \"date\",\n" +
+                "        \"fixed_interval\": \"1d\",\n" +
+                "        \"format\": \"yyyy-MM-dd\"\n" +
+                "      },\n" +
+                "      \"aggs\": {\n" +
+                "        \"broker\": {\n" +
+                "          \"terms\": {\n" +
+                "            \"field\": \"clusterID.keyword\",\n" +
+                "            \"size\": 20\n" +
+                "          },\n" +
+                "          \"aggs\": {\n" +
+                "            \"topic\": {\n" +
+                "              \"terms\": {\n" +
+                "                \"field\": \"topic.keyword\",\n" +
+                "                \"size\": 100\n" +
+                "              },\n" +
+                "              \"aggs\": {\n" +
+                "                \"metric\": {\n" +
+                "                  \"terms\": {\n" +
+                "                    \"field\": \"metricName.keyword\",\n" +
+                "                    \"size\": 2\n" +
+                "                  },\n" +
+                "                  \"aggs\": {\n" +
+                "                    \"maxCount\": {\n" +
+                "                      \"max\": {\n" +
+                "                        \"field\": \"count\"\n" +
+                "                      }\n" +
+                "                    },\n" +
+                "                    \"minCount\": {\n" +
+                "                      \"min\": {\n" +
+                "                        \"field\": \"count\"\n" +
+                "                      }\n" +
+                "                    },\n" +
+                "                    \"diff_data\":{\n" +
+                "                      \"bucket_script\": {\n" +
+                "                        \"buckets_path\": {\n" +
+                "                          \"max_data\":\"maxCount\",\n" +
+                "                          \"min_data\":\"minCount\"\n" +
+                "                        },\n" +
+                "                        \"script\": \"params.max_data-params.min_data\"\n" +
+                "                      }\n" +
+                "                    }\n" +
+                "                  }\n" +
+                "                }\n" +
+                "              }\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"query\": {\n" +
+                "    \"bool\": {\n" +
+                "      \"filter\": [\n" +
+                "        {\n" +
+                "          \"range\": {\n" +
+                "            \"date\": {\n" +
+                "              \"gte\": \""+start+"\",\n" +
+                "              \"lte\": \""+end+"\",\n" +
+                "              \"format\": \"yyyy-MM-dd\"\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"terms\": {\n" +
+                "            \"metricName.keyword\": [\n" +
+                "              \"BytesOutPerSec\",\n" +
+                "              \"BytesInPerSec\"\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        },{\n" +
+                "          \"term\": {\n" +
+                "            \"type\": \"topic\"\n" +
+                "          }\n" +
+                "        },{\n" +
+                "          \"exists\": {\n" +
+                "            \"field\": \"count\"\n" +
+                "          }\n" +
+                "        },{\n" +
+                "          \"query_string\":{\n" +
+                "            \"query\":\"NOT topic:(_*)\"\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+    }
+
+    public static String searchFileSizeGroupByTopic(String start,String end){
+        return "{\n" +
+                "  \"size\": 0,\n" +
+                "  \"aggs\": {\n" +
+                "    \"date\": {\n" +
+                "      \"date_histogram\": {\n" +
+                "        \"field\": \"date\",\n" +
+                "        \"fixed_interval\": \"1d\",\n" +
+                "        \"format\": \"yyyy-MM-dd\"\n" +
+                "      },\n" +
+                "      \"aggs\": {\n" +
+                "        \"clusterId\": {\n" +
+                "          \"terms\": {\n" +
+                "            \"field\": \"clusterId.keyword\",\n" +
+                "            \"size\": 20\n" +
+                "          },\n" +
+                "          \"aggs\": {\n" +
+                "            \"topic\": {\n" +
+                "              \"terms\": {\n" +
+                "                \"field\": \"topic.keyword\",\n" +
+                "                \"size\": 100\n" +
+                "              },\n" +
+                "              \"aggs\": {\n" +
+                "                \"maxCount\": {\n" +
+                "                  \"max\": {\n" +
+                "                    \"field\": \"fileSize\"\n" +
+                "                  }\n" +
+                "                },\n" +
+                "                \"minCount\": {\n" +
+                "                  \"min\": {\n" +
+                "                    \"field\": \"fileSize\"\n" +
+                "                  }\n" +
+                "                },\n" +
+                "                \"diff_data\": {\n" +
+                "                  \"bucket_script\": {\n" +
+                "                    \"buckets_path\": {\n" +
+                "                      \"max_data\": \"maxCount\",\n" +
+                "                      \"min_data\": \"minCount\"\n" +
+                "                    },\n" +
+                "                    \"script\": \"params.max_data-params.min_data\"\n" +
+                "                  }\n" +
+                "                }\n" +
+                "              }\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"query\": {\n" +
+                "    \"bool\": {\n" +
+                "      \"filter\": [\n" +
+                "        {\n" +
+                "          \"range\": {\n" +
+                "            \"date\": {\n" +
+                "              \"gte\": \""+start+"\",\n" +
+                "              \"lte\": \""+end+"\",\n" +
+                "              \"format\": \"yyyy-MM-dd\"\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"term\": {\n" +
+                "            \"type.keyword\": \"fileSize\"\n" +
+                "          }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"query_string\": {\n" +
+                "            \"query\": \"NOT topic:(_*)\"\n" +
+                "          }\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+
+    }
 }

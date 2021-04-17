@@ -16,7 +16,7 @@ export default class KsqlHome extends Component {
 
 
    onTabChanged = (key) => {
-     const url = `/ksql/${this.props.match.params.clusterName}/${this.props.match.params.ksqlServerId}/${key}`;
+     const url = `/ksql/${this.props.match.params.id}/${this.props.match.params.clusterName}/${this.props.match.params.ksqlServerId}/${key}`;
      this.props.history.push(url);
      const timestamp = new Date().getTime();
      if (key === 'streams') {

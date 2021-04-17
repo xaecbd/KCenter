@@ -3,7 +3,7 @@ package org.nesc.ec.bigdata.websocket;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.nesc.ec.bigdata.model.WebSocketMessage;
-import org.nesc.ec.bigdata.service.KsqlService;
+import org.nesc.ec.bigdata.service.KsqlClusterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +21,12 @@ import javax.websocket.server.ServerEndpoint;
 @Component
 public class KsqlWebsocket {
     private final static Logger LOGGER = LoggerFactory.getLogger(KsqlWebsocket.class);
-    private static KsqlService ksqlService;
+    private static KsqlClusterService ksqlClusterService;
     private Gson gson = new Gson();
 
     @Autowired
-    public void setKsqlService(KsqlService ksqlService) {
-        KsqlWebsocket.ksqlService = ksqlService;
+    public void setKsqlService(KsqlClusterService ksqlClusterService) {
+        KsqlWebsocket.ksqlClusterService = ksqlClusterService;
     }
 
     @OnOpen
@@ -37,7 +37,7 @@ public class KsqlWebsocket {
     @OnClose
     public void onClose(Session session) {
         String sessionId = session.getId();
-        ksqlService.stopQuery(session);
+        ksqlClusterService.stopQuery(session);
         LOGGER.info("client close: {}", sessionId);
     }
 
@@ -57,9 +57,9 @@ public class KsqlWebsocket {
 
             if (webSocketMessage != null) {
                 if ("run".equalsIgnoreCase(webSocketMessage.getOperate())) {
-                    ksqlService.executeConsole(webSocketMessage, session);
+                    ksqlClusterService.executeConsole(webSocketMessage, session);
                 } else if ("stop".equalsIgnoreCase(webSocketMessage.getOperate())) {
-                    ksqlService.stopQuery(session);
+                    ksqlClusterService.stopQuery(session);
                 } else {
                     LOGGER.info("received unused message: {}", message);
                 }

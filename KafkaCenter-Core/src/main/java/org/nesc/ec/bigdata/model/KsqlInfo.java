@@ -26,12 +26,41 @@ public class KsqlInfo {
     private String ksqlServerId;
     private String clusterName;
     private String version;
+    private String serverStatus;
 
     private boolean ksqlHealthy;
     private boolean kafkaHealthy;
     private boolean metastoreHealthy;
+    private boolean commandRunnerHealthy;
+
+    private long id;
 
     private String ksqlAddress;
+
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getServerStatus() {
+        return serverStatus;
+    }
+
+    public void setServerStatus(String serverStatus) {
+        this.serverStatus = serverStatus;
+    }
+
+    public boolean isCommandRunnerHealthy() {
+        return commandRunnerHealthy;
+    }
+
+    public void setCommandRunnerHealthy(boolean commandRunnerHealthy) {
+        this.commandRunnerHealthy = commandRunnerHealthy;
+    }
 
     public String getKsqlServerId() {
         return ksqlServerId;

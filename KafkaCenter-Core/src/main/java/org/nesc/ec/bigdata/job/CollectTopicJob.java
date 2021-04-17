@@ -56,11 +56,11 @@ public class CollectTopicJob {
         List<ClusterInfo> clusters = clusterService.getTotalData();
         clusters.forEach(clusterInfo -> {
             try{
+                LOG.info("collect topic data start,{}",clusterInfo.toString());
                 if (initConfig.isMonitorCollectorIncludeEnable() && !clusterInfo.getLocation()
                         .equalsIgnoreCase(initConfig.getMonitorCollectorIncludelocation())) {
                     return;
                 }
-                LOG.debug("collect topic data start,{}",clusterInfo.toString());
                 long start  = System.currentTimeMillis();
                 Set<String> clusterTopics = clusterTopic(clusterInfo);
                 Map<String, TopicDescription> topicDescribe = takeTopicDescribe(clusterInfo.getId().toString(),clusterTopics);
@@ -84,7 +84,7 @@ public class CollectTopicJob {
                         LOG.error("batch update topic table failed,please check");
                     }
                 }
-                LOG.debug("collect topic data end,{},cost time is {}",clusterInfo.toString(),(System.currentTimeMillis()-start));
+                LOG.info("collect topic data end,{},cost time is {}",clusterInfo.toString(),(System.currentTimeMillis()-start));
             }catch (Exception e){
                 LOG.error("cluster:"+clusterInfo.getName()+" collection topic config has error",e);
             }
@@ -99,7 +99,6 @@ public class CollectTopicJob {
        Set<String> topicList = new HashSet<>();
         String clusterId = clusterInfo.getId().toString();
         KafkaAdmins kafkaAdmins = kafkaAdminService.getKafkaAdmins(clusterId);
-
         try {
             topicList = kafkaAdmins.listTopics();
         }catch (InterruptedException | ExecutionException ignored) {
@@ -235,7 +234,7 @@ public class CollectTopicJob {
         try {
             if(!CollectionUtils.isEmpty(topicDescribe)) {
                 Config con = topicDescribe.get(topicName);con.entries().forEach(entry->{
-                    if(TopicConfig.DELETE_RETENTION_MS.equalsIgnoreCase(entry.name())) {
+                    if(TopicConfig.DELETE_RETENTION_MS.equalsIgnoreCase(entry.name()) || TopicConfig.RETENTION_MS.equalsIgnoreCase(entry.name())) {
                         long ttl = Long.parseLong(entry.value());
                         tInfo.setTtl(ttl>0?ttl:0);
                     }

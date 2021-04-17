@@ -11,6 +11,12 @@ import consumerTopicDetail from '@/pages/Monitor/Consumer/Topic/TopicDetail';
 
 import consumerGroupDetail from '@/pages/Monitor/Consumer/Group/GroupDetail';
 
+import Connect from '@/pages/Connector';
+import ConnectJob from '@/pages/Connector/ConnectorJob';
+
+
+
+
 
 const Empty = lazy(() => import('@/pages/Exception'));
 const Forbidden = lazy(() => import('@/pages/Exception'));
@@ -110,6 +116,16 @@ const routerConfig = [
       {
         path: '/connect',
         component: ConnectPage,
+      },
+      {
+        path: '/connector/list',
+        component: Connect,
+        exact: true,
+      },
+      {
+        path: '/connector/job/:clusterId/:clusterName/:name/:id',
+        component: ConnectJob,
+        exact: true,
       },
       {
         path: '/topic/list',
@@ -217,7 +233,7 @@ const routerConfig = [
         exact: true,
       },
       {
-        path: '/ksql/:clusterName/:ksqlServerId/:tab',
+        path: '/ksql/:id/:clusterName/:ksqlServerId/:tab',
         component: KsqlHome,
       },
       {

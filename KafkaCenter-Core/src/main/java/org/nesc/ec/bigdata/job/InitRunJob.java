@@ -1,6 +1,5 @@
 package org.nesc.ec.bigdata.job;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.nesc.ec.bigdata.cache.HomeCache;
 import org.nesc.ec.bigdata.config.InitConfig;
@@ -14,8 +13,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.*;
-
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * @author Truman.P.Du
@@ -46,14 +43,17 @@ public class InitRunJob {
     CollectConsumerLagJob collectConsumerLagJob;
     @Autowired
     NoticeJob noticeJob;
+    @Autowired
+    CollectKsqlInfoJob collectKsqlInfoJob;
+    @Autowired
+    CollectConnectorJob connectorJob;
 
-    private ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(7,
+    private ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(10,
             new BasicThreadFactory.Builder().build());
 
     @PostConstruct
     public void init() {
         this.runCollectClusterStatistics();
-
         if (initConfig.isMonitorCollectEnable()) {
             this.runCollectConsumerLagJob();
             this.runCollectMetricsJob();
@@ -62,8 +62,27 @@ public class InitRunJob {
         if(initConfig.isCollectTopicEnable()) {
             this.runCollectTopicData();
         }
+        if(initConfig.isCollectKsqlInfoJobEnable()){
+            runCollectKsqlInfoJob();
+        }
 
+        if(initConfig.isCollectorJobEnable()){
+            runCollectorJob();
+        }
     }
+
+
+
+
+    private void runCollectorJob(){
+        scheduledExecutorService.scheduleWithFixedDelay(()->connectorJob.runJob(),1,initConfig.getCollectorJobPeriodMinutes(),TimeUnit.MINUTES);
+    }
+
+
+    private void runCollectKsqlInfoJob(){
+        scheduledExecutorService.scheduleWithFixedDelay(()->collectKsqlInfoJob.runJob(),1,initConfig.getCollectKsqlInfoJobPeriodMinutes(),TimeUnit.MINUTES);
+    }
+
 
     private void runCollectConsumerLagJob() {
         scheduledExecutorService.scheduleWithFixedDelay(() -> collectConsumerLagJob.collectConsumerLag(), 1, initConfig.getMonitorCollectPeriod(), TimeUnit.MINUTES);

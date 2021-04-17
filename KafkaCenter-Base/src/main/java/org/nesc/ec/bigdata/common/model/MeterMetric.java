@@ -4,45 +4,45 @@ import java.util.Objects;
 
 public class MeterMetric {
 	public MeterMetric(Long count, Double meanRate, Double oneMinuteRate, Double fiveMinuteRate,
-			Double fifteenMinuteRate,String metricName,String clusterID) {
+					   Double fifteenMinuteRate, String metricName, String clusterID) {
 		super();
 		this.count = count;
-		MeanRate = meanRate;
-		OneMinuteRate = oneMinuteRate;
-		FiveMinuteRate = fiveMinuteRate;
-		FifteenMinuteRate = fifteenMinuteRate;
+		this.meanRate = meanRate;
+		this.oneMinuteRate = oneMinuteRate;
+		this.fiveMinuteRate = fiveMinuteRate;
+		this.fifteenMinuteRate = fifteenMinuteRate;
 		this.metricName = metricName;
 		this.clusterID = clusterID;
 	}
 	
-	public MeterMetric(Long count, Double meanRate, Double oneMinuteRate, Double fiveMinuteRate,
-			Double fifteenMinuteRate,String metricName) {
+	public MeterMetric(Long count,Double meanRate, Double oneMinuteRate, Double fiveMinuteRate,
+					   Double fifteenMinuteRate,String metricName) {
 		super();
 		this.count = count;
-		MeanRate = meanRate;
-		OneMinuteRate = oneMinuteRate;
-		FiveMinuteRate = fiveMinuteRate;
-		FifteenMinuteRate = fifteenMinuteRate;
+		this.meanRate = meanRate;
+		this.oneMinuteRate = oneMinuteRate;
+		this.fiveMinuteRate = fiveMinuteRate;
+		this.fifteenMinuteRate = fifteenMinuteRate;
 		this.metricName = metricName;
 	}
 	
 	
 	public MeterMetric(Long count, Double meanRate, Double oneMinuteRate, Double fiveMinuteRate,
-			Double fifteenMinuteRate) {
+					   Double fifteenMinuteRate) {
 		super();
 		this.count = count;
-		MeanRate = meanRate;
-		OneMinuteRate = oneMinuteRate;
-		FiveMinuteRate = fiveMinuteRate;
-		FifteenMinuteRate = fifteenMinuteRate;
+		this.meanRate = meanRate;
+		this.oneMinuteRate = oneMinuteRate;
+		this.fiveMinuteRate = fiveMinuteRate;
+		this.fifteenMinuteRate = fifteenMinuteRate;
 	}
 
 
 	private Long count;
-	private Double MeanRate;
-	private Double OneMinuteRate;
-	private Double FiveMinuteRate;
-	private Double FifteenMinuteRate;
+	private Double meanRate;
+	private Double oneMinuteRate;
+	private Double fiveMinuteRate;
+	private Double fifteenMinuteRate;
 	private String clusterID;
 	private String broker;
 	private String port;
@@ -124,29 +124,37 @@ public class MeterMetric {
 	public void setCount(Long count) {
 		this.count = count;
 	}
+
 	public Double getMeanRate() {
-		return MeanRate;
+		return meanRate;
 	}
+
 	public void setMeanRate(Double meanRate) {
-		MeanRate = meanRate;
+		this.meanRate = meanRate;
 	}
+
 	public Double getOneMinuteRate() {
-		return OneMinuteRate;
+		return oneMinuteRate;
 	}
+
 	public void setOneMinuteRate(Double oneMinuteRate) {
-		OneMinuteRate = oneMinuteRate;
+		this.oneMinuteRate = oneMinuteRate;
 	}
+
 	public Double getFiveMinuteRate() {
-		return FiveMinuteRate;
+		return fiveMinuteRate;
 	}
+
 	public void setFiveMinuteRate(Double fiveMinuteRate) {
-		FiveMinuteRate = fiveMinuteRate;
+		this.fiveMinuteRate = fiveMinuteRate;
 	}
+
 	public Double getFifteenMinuteRate() {
-		return FifteenMinuteRate;
+		return fifteenMinuteRate;
 	}
+
 	public void setFifteenMinuteRate(Double fifteenMinuteRate) {
-		FifteenMinuteRate = fifteenMinuteRate;
+		this.fifteenMinuteRate = fifteenMinuteRate;
 	}
 
 	@Override
@@ -170,17 +178,23 @@ public class MeterMetric {
 				(clusterID == meterMetric.getClusterID()) || (clusterID != null && clusterID.equalsIgnoreCase(meterMetric.getClusterID())) &&
 				(port == meterMetric.getPort()) || (port != null && port.equalsIgnoreCase(meterMetric.getPort()));
 	}
+
 	@Override
 	public String toString() {
-		return "MeterMetric [count=" + count + ", MeanRate=" + MeanRate + ", OneMinuteRate=" + OneMinuteRate
-				+ ", FiveMinuteRate=" + FiveMinuteRate + ", FifteenMinuteRate=" + FifteenMinuteRate + ", clusterID="
-				+ clusterID + ", broker=" + broker + ", metricName=" + metricName + "]";
+		return "MeterMetric{" +
+				"count=" + count +
+				", meanRate=" + meanRate +
+				", oneMinuteRate=" + oneMinuteRate +
+				", fiveMinuteRate=" + fiveMinuteRate +
+				", fifteenMinuteRate=" + fifteenMinuteRate +
+				", clusterID='" + clusterID + '\'' +
+				", broker='" + broker + '\'' +
+				", port='" + port + '\'' +
+				", jmxPort='" + jmxPort + '\'' +
+				", location='" + location + '\'' +
+				", clusterName='" + clusterName + '\'' +
+				", metricName='" + metricName + '\'' +
+				", topic='" + topic + '\'' +
+				'}';
 	}
-
-	
-
-
-	
-
-	
 }

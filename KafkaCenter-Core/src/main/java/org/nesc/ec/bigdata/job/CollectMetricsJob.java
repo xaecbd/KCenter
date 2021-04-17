@@ -50,6 +50,7 @@ public class CollectMetricsJob {
         }
     }
 
+
     void collectionTopicOrBrokerMetric(boolean isTopic) throws Exception {
         try{
             Calendar calendar = TimeUtil.nowCalendar();

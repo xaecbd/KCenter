@@ -17,7 +17,7 @@ const TopicList=()=>{
       text: 'Topic',
     },
     {
-      link: '',
+      link: '#/topic/list',
       text: 'Topic List',
     },
   ];

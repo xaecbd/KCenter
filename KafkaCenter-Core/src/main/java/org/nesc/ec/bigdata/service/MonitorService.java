@@ -467,9 +467,11 @@ public class MonitorService {
                 //填充lag/logEndOffset
                 Map<Integer, Long> partitionLogSizeMap = getPartitionLogSizeMap(clusterInfo, consumerGroup, topic);
                 for (PartitionAssignmentState partitionAssignmentState : partitionAssignmentStates) {
-                    long logEndOffset = partitionLogSizeMap.get(partitionAssignmentState.getPartition());
-                    partitionAssignmentState.setLogEndOffset(logEndOffset);
-                    partitionAssignmentState.setLag(getLag(partitionAssignmentState.getOffset(), logEndOffset));
+                    if(partitionLogSizeMap.containsKey(partitionAssignmentState.getPartition()) && Objects.nonNull(partitionLogSizeMap.get(partitionAssignmentState.getPartition()))){
+                        long logEndOffset = partitionLogSizeMap.get(partitionAssignmentState.getPartition());
+                        partitionAssignmentState.setLogEndOffset(logEndOffset);
+                        partitionAssignmentState.setLag(getLag(partitionAssignmentState.getOffset(), logEndOffset));
+                    }
                 }
                 KafkaCenterGroupState state = judgeStateByGroupTopicConsumerState(groupConsumerState, clusterInfo);
                 groupConsumerState.setKafkaCenterGroupState(state);

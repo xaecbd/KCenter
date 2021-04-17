@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,8 +50,7 @@ public class MonitorController extends BaseController {
 	CollectionService collectionService;
 	@Autowired
 	ElasticsearchService elasticsearchService;
-	@Autowired
-	HttpServletRequest request;
+
 
 
 	/**
@@ -150,9 +148,12 @@ public class MonitorController extends BaseController {
 		ClusterInfo info = clusterService.selectById(Long.parseLong(clusterID));
 		// 查看是否启用remote，并且配置了clusterID对应的remoteHost
 		if (config.isRemoteQueryEnable() && remoteHostsMap.containsKey(info.getLocation().toLowerCase())) {
-			String url = request.getScheme()+ Constants.Symbol.COLON+ Constants.Symbol.DOUBLE_SLASH+request.getServerName()+ Constants.Symbol.COLON
+			//TODO
+			/*String url = request.getScheme()+ Constants.Symbol.COLON+ Constants.Symbol.DOUBLE_SLASH+request.getServerName()+ Constants.Symbol.COLON
 						+request.getServerPort()+ Constants.Symbol.SLASH+ Constants.KeyStr.REMOTE+request.getServletPath()
-					.replaceAll(Constants.Symbol.SLASH+ Constants.KeyStr.MONITOR, Constants.Symbol.EMPTY_STR);
+					.replaceAll(Constants.Symbol.SLASH+ Constants.KeyStr.MONITOR, Constants.Symbol.EMPTY_STR);*/
+
+			String url = "http://" + remoteHostsMap.get(info.getLocation().toLowerCase())+ "/monitor/topic/consumer_offsets";
 			JSONArray data = restService.queryRemoteQuery(url, queryMap);
 			return SUCCESS_DATA(data);
 		} else {
@@ -175,8 +176,11 @@ public class MonitorController extends BaseController {
 		ClusterInfo info = clusterService.selectById(Long.parseLong(clusterID));
 		// 查看是否启用remote，并且配置了clusterID对应的remoteHost
 		if (config.isRemoteQueryEnable() && remoteHostsMap.containsKey(info.getLocation().toLowerCase())) {
-			String url = request.getScheme()+ Constants.Symbol.COLON+ Constants.Symbol.DOUBLE_SLASH+request.getServerName()+ Constants.Symbol.COLON+request.getServerPort()
-							+request.getServletPath().replaceAll(Constants.Symbol.SLASH+ Constants.KeyStr.MONITOR, Constants.Symbol.SLASH+ Constants.KeyStr.REMOTE);
+			//TODO
+		/*	String url = request.getScheme()+ Constants.Symbol.COLON+ Constants.Symbol.DOUBLE_SLASH+request.getServerName()+ Constants.Symbol.COLON+request.getServerPort()
+							+request.getServletPath().replaceAll(Constants.Symbol.SLASH+ Constants.KeyStr.MONITOR, Constants.Symbol.SLASH+ Constants.KeyStr.REMOTE);*/
+			String url = "http://" + remoteHostsMap.get(info.getLocation().toLowerCase())
+			+ "/monitor/topic/consumer_offsets/topic_metric";
 			JSONArray data = restService.queryRemoteQuery(url, queryMap);
 			return SUCCESS_DATA(data);
 		} else {
@@ -299,8 +303,10 @@ public class MonitorController extends BaseController {
 		ClusterInfo info = clusterService.selectById(Long.parseLong(clusterID));		
 		// 查看是否启用remote，并且配置了clusterID对应的remoteHost
 		if (config.isRemoteQueryEnable() && remoteHostsMap.containsKey(info.getLocation().toLowerCase())) {
-			String url = request.getScheme()+ Constants.Symbol.COLON+ Constants.Symbol.DOUBLE_SLASH+request.getServerName()+ Constants.Symbol.COLON+request.getServerPort()
-							+request.getServletPath().replaceAll(Constants.Symbol.SLASH+ Constants.KeyStr.MONITOR, Constants.Symbol.SLASH+ Constants.KeyStr.REMOTE);
+			//TODO
+			String url = "http://" + remoteHostsMap.get(info.getLocation().toLowerCase())+ "/monitor/group/detail";
+			/*String url = request.getScheme()+ Constants.Symbol.COLON+ Constants.Symbol.DOUBLE_SLASH+request.getServerName()+ Constants.Symbol.COLON+request.getServerPort()
+							+request.getServletPath().replaceAll(Constants.Symbol.SLASH+ Constants.KeyStr.MONITOR, Constants.Symbol.SLASH+ Constants.KeyStr.REMOTE);*/
 			JSONArray data = restService.queryRemoteQuery(url, queryMap);
 			return SUCCESS_DATA(data);
 		} else {

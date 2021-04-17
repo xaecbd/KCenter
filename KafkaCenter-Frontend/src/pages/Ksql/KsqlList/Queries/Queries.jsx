@@ -199,13 +199,13 @@ export default class Queries extends Component {
                       {this.state.detailRecord.queryString}
                     </div>
                   </li>
-                  <li style={styles.detailItem}><div style={styles.detailTitle}>Schema:</div></li>
+                  {/* <li style={styles.detailItem}><div style={styles.detailTitle}>Schema:</div></li>
                   <li>
                     <Table size="small" dataSource={this.state.detailRecord.fields}>
                       <Table.Column title="Name" dataIndex="name" />
                       <Table.Column title="Type" dataIndex="schema.type" />
                     </Table>
-                  </li>
+                  </li> */}
                 </ul>
 
               </IceContainer>
@@ -219,6 +219,7 @@ export default class Queries extends Component {
             <Table.Column title="Query ID" dataIndex="id" />
             <Table.Column title="Source" dataIndex="source" />
             <Table.Column title="Sink" dataIndex="sinks" />
+            <Table.Column title="State" dataIndex="state" />
             <Table.Column title="Operation" cell={this.renderOper} />
           </Table>
           <CustomPagination dataSource={this.state.filterDataSource} redrawPageData={this.redrawPageData} />

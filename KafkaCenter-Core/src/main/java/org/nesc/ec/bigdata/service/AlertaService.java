@@ -108,20 +108,19 @@ public class AlertaService {
                     + group;
 
 
-            String href = "<a href=" + initConfig.getKafkaCenterUrl() + "/#/monitor/topic/consumer_offsets/chart/" + alertGoup.getCluster().getId() + "/" + topic + "/" + group + "/" + method + ">" + group + "</a>";
+            String href = "<a href=" + initConfig.getKafkaCenterUrl() + "/#/monitor/consumer/topic/consumer_offsets/chart/" + alertGoup.getCluster().getId() + "/" + topic + "/" + group + "/" + method.toLowerCase() + ">" + group + "</a>";
             String threshold = " " + group + " consumer lag > " + alertGoup.getThreshold();
             String clusterName = monitorNoticeInfo.getAlertGoup().getCluster().getName();
             JSONObject attriute = new JSONObject();
             if(StringUtils.isNotBlank(monitorNoticeInfo.getAlertaOwnerGroups())){
-                JSONArray ownerGroups = new JSONArray();
                 JSONObject jsonObject = JSONObject.parseObject(monitorNoticeInfo.getAlertaOwnerGroups());
-                ownerGroups.add(jsonObject);
+                String ownerGroups = "";
+                if(jsonObject.containsKey(AlertConfig.NAME)){
+                    ownerGroups = jsonObject.getString(AlertConfig.NAME);
+                }
                 attriute.put(Constants.KeyStr.OWNER_GROUPS, ownerGroups);
-            }else{
-                attriute.put(Constants.KeyStr.OWNER_EMAIL, alertGoup.getMailTo());
             }
-
-
+            attriute.put(Constants.KeyStr.OWNER_EMAIL, alertGoup.getMailTo());
             attriute.put(Constants.KeyStr.MORE_INFO, href);
             attriute.put(Constants.KeyStr.THRESHOLDINFO, threshold);
             JSONObject object = new JSONObject();
@@ -149,8 +148,8 @@ public class AlertaService {
             HttpEntity<String> httpEntity = new HttpEntity<>(object.toString(), headers);
             ResponseEntity<String> response = restTemplate.postForEntity(alertaConfig.getAlertServiceUrl(), httpEntity, String.class);
             JSONObject respObj = JSONObject.parseObject(Objects.requireNonNull(response.getBody()));
-            if (respObj.containsKey(AlertConfig.STATUS) &&
-                    respObj.getString(AlertConfig.STATUS).equalsIgnoreCase(Constants.Status.OK)) {
+            if (respObj.containsKey(AlertConfig.CODE) &&
+                    respObj.getString(AlertConfig.CODE).equalsIgnoreCase(Constants.Number.TWO_HUNANDER)) {
                 NoticeJob.cachedLastSendTime.put(key, System.currentTimeMillis());
             } else {
                 LOG.warn("send to alerta has error. data:{} response:{} ", object.toString(), respObj.toJSONString());

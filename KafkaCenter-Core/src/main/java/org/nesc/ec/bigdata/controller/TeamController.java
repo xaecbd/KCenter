@@ -55,20 +55,40 @@ public class TeamController  extends BaseController {
     @RequestMapping(  value = "/", method = RequestMethod.GET )
     public RestResponse list() {
         try {
-			List<TeamInfo> teamInfoList = null;
-			UserInfo user = this.getCurrentUser();
-			
-			if(RoleEnum.ADMIN.getDescription().equals(user.getRole().getDescription())) {
-				teamInfoList = teamInfoService.getTotalData();
-			} else {
-				List<Long> teamIDs = user.getTeamIDs();
-				teamInfoList = teamInfoService.getTeamsByTeamIDs(teamIDs);
-			}
-
+			List<TeamInfo> teamInfoList = listTeams();
             return SUCCESS_DATA(teamInfoList);
         } catch (Exception e) {
         	LOG.error("Get Team List Errors,msg:",e);
             return ERROR("GET Team list error!");
+        }
+
+    }
+
+    @RequestMapping(  value = "", method = RequestMethod.GET )
+    public RestResponse listTeam() {
+        try {
+            List<TeamInfo> teamInfoList = listTeams();
+            return SUCCESS_DATA(teamInfoService.transformToSelectData(teamInfoList));
+        } catch (Exception e) {
+            LOG.error("Get Team List Errors,msg:",e);
+            return ERROR("GET Team list error!");
+        }
+
+    }
+
+    private List<TeamInfo> listTeams() {
+        List<TeamInfo> teamInfoList = null;
+        try{
+            UserInfo user = this.getCurrentUser();
+            if(RoleEnum.ADMIN.getDescription().equals(user.getRole().getDescription())) {
+                teamInfoList = teamInfoService.getTotalData();
+            } else {
+                List<Long> teamIDs = user.getTeamIDs();
+                teamInfoList = teamInfoService.getTeamsByTeamIDs(teamIDs);
+            }
+            return teamInfoList;
+        }catch (RuntimeException e){
+            throw e;
         }
 
     }

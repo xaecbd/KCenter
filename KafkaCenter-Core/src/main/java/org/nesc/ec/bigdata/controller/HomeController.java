@@ -195,25 +195,26 @@ public class HomeController extends BaseController{
 		}
 		try{
 			JSONArray array = new JSONArray();
-			if(initConfig.isRemoteQueryEnable()){
-				String url = request.getScheme()+ Constants.Symbol.COLON+ Constants.Symbol.DOUBLE_SLASH+request.getServerName()+ Constants.Symbol.COLON
-						+request.getServerPort()+ Constants.Symbol.SLASH+ Constants.KeyStr.REMOTE+request.getServletPath()
-						.replaceAll(Constants.Symbol.SLASH+ Constants.KeyStr.HOME, Constants.Symbol.EMPTY_STR);
-				Map<String, String> queryMap = new HashMap<>();
-				queryMap.put("id",userInfo.getId().toString());
-				queryMap.put("role",String.valueOf(userInfo.getRole().getValue()));
-				 array = restService.queryRemoteQueryByGet(url,queryMap);
+			Map<String, String> remoteHostsMap = initConfig.getRemoteHostsMap();
+			if(initConfig.isRemoteQueryEnable() ){
+			    for (String location:remoteHostsMap.keySet()){
+					String url = "http://" + remoteHostsMap.get(location)+ "/home/topic/consumer/alert";
+					Map<String, String> queryMap = new HashMap<>();
+					queryMap.put("id",userInfo.getId().toString());
+					queryMap.put("role",String.valueOf(userInfo.getRole().getValue()));
+//					array = restService.queryRemoteQueryByGet(url,queryMap);
+					array.addAll(restService.queryRemoteQueryByGet(url,queryMap));
+				}
 			}
-
 			List<HomeCache.ConsumerLagCache> consumerLagCacheList = homeService.topic10ConsumerGroupAlert(userInfo,HomeCache.consumerLagCacheMap);
 			if(!array.isEmpty()){
 				consumerLagCacheList = top10ConsumerLagStates(array,consumerLagCacheList);
 			}
 			return SUCCESS_DATA(consumerLagCacheList);
 		}catch (Exception e){
-			LOG.error("get top 10 topic file size",e.getMessage());
+			LOG.error("get top 10 topic alert",e.getMessage());
 		}
-		return ERROR("get top 10 topic file size has error!");
+		return ERROR("get top 10 topic alert has error!");
 	}
 
 	private List<HomeCache.ConsumerLagCache> top10ConsumerLagStates(JSONArray array, List<HomeCache.ConsumerLagCache> consumerLagCacheList){
@@ -226,6 +227,7 @@ public class HomeController extends BaseController{
 		return  homeService.sortedConsumerLag(consumerLagCaches);
 
 	}
+
 
 
 

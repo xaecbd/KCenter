@@ -94,7 +94,7 @@ public class EmailService {
 			messageHelper.setText(emailContent, true);
 			javaMailSender.send(mimeMessage);
 		} catch (Exception e) {
-			logger.warn("Email sending failed, please check your mailbox configuration!");
+			logger.warn("Email sending failed, please check your mailbox configuration!",e);
 		}
 	}
 }

@@ -16,6 +16,7 @@ const defaultValue = {
 
 export default class EditDialog extends Component {
   static displayName = 'EditDialog';
+
   constructor(props) {
     super(props);
     this.state = {
@@ -24,16 +25,21 @@ export default class EditDialog extends Component {
       isMobile: false,
       createLoading: false,
       clusterInfo: [],
+      teamData: [],
+      teamLoading: false,
     };
   }
 
   componentDidMount() {
+    this.fetchTeamData();
     this.enquireScreenRegister();
     this.fectgClusters();
   }
+
   componentWillMount() {
     this.mounted = true;
   }
+
   componentWillUnmount = () => {
     this.mounted = false;
   }
@@ -93,6 +99,7 @@ export default class EditDialog extends Component {
         console.error(error);
       });
   };
+
   resouceData = (data) => {
     const dataSource = [];
     data.map((obj) => {
@@ -114,10 +121,14 @@ export default class EditDialog extends Component {
         createLoading: true,
       },
       () => {
-        // const postData = JSON.parse(JSON.stringify(this.state.value));
+        
         const postData = this.state.value;
         postData.clusterId = this.state.value.clusterName;
-        axios.post(`/ksql/add_ksql?ksqlAddress=${postData.ksqlAddress}&clusterId=${postData.clusterId}`)
+        postData.teamIds = this.state.value.teams.join(',');
+     
+
+        
+        axios.post(`/ksql/add_ksql`,postData)
           .then((response) => {
             if (response.data.code === 200) {
               this.props.fetchData();
@@ -141,6 +152,25 @@ export default class EditDialog extends Component {
       value,
     });
   };
+
+  fetchTeamData = () =>{
+    axios.get('/team')
+      .then((response) => {
+        if (response.data.code === 200) {
+          this.setState({
+            teamData: response.data.data,           
+          });
+        } else {
+        
+          Message.error(response.data.message);
+        }
+      })
+      .catch((e) => {
+        Message.error('Create has error.');
+      });
+   
+  }
+
   render() {
     const { isMobile } = this.state;
     const simpleFormDialog = {
@@ -198,7 +228,7 @@ export default class EditDialog extends Component {
                 </Col>
                 <Col span={`${isMobile ? '18' : '16'}`}>
                   <IceFormBinder
-                    name="ksqlAddress"
+                    name="ksqlUrl"
                     required
                     min={2}
                     max={50}
@@ -211,6 +241,27 @@ export default class EditDialog extends Component {
                     />
                   </IceFormBinder>
                   <IceFormError name="ksqlAddress" />
+                </Col>
+              </Row>
+              <Row style={styles.formRow}>
+                <Col span={`${isMobile ? '6' : '4'}`}>
+                  <label style={styles.formLabel}>Teams:</label>
+                </Col>
+                <Col span={`${isMobile ? '18' : '16'}`}>
+                  <IceFormBinder
+                    name="teams"
+                    required
+                    triggerType="onBlur"
+                    // validator={this.checkKsqlAddress}
+                  >
+                 
+
+                    <Select mode="multiple"  showSearch   
+                      dataSource={this.state.teamData}
+                      style={styles.input} />
+
+                  </IceFormBinder>
+                  <IceFormError name="teams" />
                 </Col>
               </Row>
             </Loading>

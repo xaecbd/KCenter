@@ -16,6 +16,7 @@ import {
   Dialog,
 } from '@alifd/next';
 import axios from '@utils/axios';
+import Auth from '@components/Auth';
 import CustomPagination from '@components/CustomPagination';
 
 import EditDialog from './EditDialog';
@@ -49,11 +50,12 @@ export default class KsqlList extends Component {
         <a style={styles.link} onClick={() => this.handleDetail(record)}>
           Detail
         </a>
-
+        <Auth rolename="admin">
         <span style={styles.separator} />
         <a style={styles.link} onClick={() => this.handleDelete(record)}>
           Delete
         </a>
+        </Auth>
       </div>
     );
   };
@@ -106,7 +108,7 @@ export default class KsqlList extends Component {
       () => {
         axios
           .delete(
-            `/ksql/del_ksql?clusterName=${record.clusterName}&ksqlServiceId=${record.ksqlServerId}`
+            `/ksql/del_ksql?clusterName=${record.clusterName}&ksqlServiceId=${record.ksqlServerId}&id=${record.id}`
           )
           .then((response) => {
             if (response.data.code === 200) {
@@ -146,6 +148,9 @@ export default class KsqlList extends Component {
               }
             } else {
               Message.error(response.data.message);
+              this.setState({
+                isLoading: false,
+              });
             }
           })
           .catch((error) => {
@@ -211,7 +216,7 @@ export default class KsqlList extends Component {
 
   selectKsqlServer = (record) => {
     this.props.history.push(
-      `/ksql/${record.clusterName}/${record.ksqlServerId}/console`
+      `/ksql/${record.id}/${record.clusterName}/${record.ksqlServerId}/console`
     );
   };
 
@@ -234,7 +239,7 @@ export default class KsqlList extends Component {
         </a>
       );
     };
-    const renderHealth = (value, index, record) => {
+       const renderHealth = (value, index, record) => {
       if (value) {
         return (
           <IceImg
@@ -270,7 +275,7 @@ export default class KsqlList extends Component {
                 <span style={{ fontWeight: '600' }}>
                   Ksql Server Id:&nbsp;&nbsp;&nbsp;
                 </span>
-                <Input
+                <Input  
                   placeholder="Ksql Server Id"
                   hasClear
                   onChange={this.handleFilterChange}
