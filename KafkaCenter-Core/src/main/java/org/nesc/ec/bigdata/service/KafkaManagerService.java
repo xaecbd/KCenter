@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -331,7 +332,7 @@ public class KafkaManagerService {
 	}
 
 	/**
-	 * 从集群实时获取Topic，并且关联owner,team,FileSize
+	 * 浠庨泦缇ゅ疄鏃惰幏鍙朤opic锛屽苟涓斿叧鑱攐wner,team,FileSize
 	 * @param clusterId
 	 * @return
 	 */
@@ -339,14 +340,13 @@ public class KafkaManagerService {
 		Map<String, TopicInfo> topicMap = new HashMap<>();
 		List<TopicInfo> topics = null;
 		List<ClusterInfo> clusterInfos = null;
-		if(!clusterId.equalsIgnoreCase("-1")){
+		if(!"-1".equalsIgnoreCase(clusterId)){
 			topics = topicInfoService.selectAllByClusterId(clusterId) ;
 			clusterInfos = new ArrayList<>();
 			clusterInfos.add(clusterService.selectById(Long.parseUnsignedLong(clusterId)));
 		}else{
 			topics = topicInfoService.getTotalData() ;
 			clusterInfos = clusterService.getTotalData();
-
 		}
 		topics.forEach(topic->{
 			String key = this.generatorKey(topic.getCluster().getId().toString(), topic.getTopicName());
@@ -532,7 +532,7 @@ public class KafkaManagerService {
 	public  List<KafkaManagerBroker> getAllClusterBrokers(String clusterId){
 		List<KafkaManagerBroker> kafkaManagerBrokers = new ArrayList<>();
 		List<ClusterInfo> clusterInfoList = null;
-		if(!clusterId.equalsIgnoreCase("-1")){
+		if(!"-1".equalsIgnoreCase(clusterId)){
 			clusterInfoList = new ArrayList<>();
 			clusterInfoList.add(clusterService.selectById(Long.parseUnsignedLong(clusterId)));
 		}else{
@@ -558,36 +558,38 @@ public class KafkaManagerService {
 					kafkaManagerBroker.setController(true);
 					brokerMap.put((int)controllerId,kafkaManagerBroker);
 				}
-				ListTopicsOptions options = new ListTopicsOptions();
-				options.listInternal(true);
-				Set<String> topicNames= kafkaAdmins.listTopics(options).keySet();
-				Map<String, TopicDescription> map = kafkaAdmins.descTopics(topicNames);
-				for (Map.Entry<String, TopicDescription> entry:map.entrySet()){
-					Set<String>topicBrokers = new HashSet<>();
-					TopicDescription topicDescription = entry.getValue();
-					topicDescription.partitions().forEach(topicPartitionInfo -> {
-						int leaderId = topicPartitionInfo.leader().id();
-						KafkaManagerBroker kafkaManagerBroker= brokerMap.get(leaderId);
-						kafkaManagerBroker.setPartitionsAsLeader(kafkaManagerBroker.getPartitionsAsLeader()+1);
-						List<Node> nodes = topicPartitionInfo.replicas();
-						nodes.forEach(node -> {
-							topicBrokers.add(node.idString());
-							KafkaManagerBroker tempKafkaManagerBroker= brokerMap.get(node.id());
-							tempKafkaManagerBroker.setPartitions(tempKafkaManagerBroker.getPartitions()+1);
+				try{
+					ListTopicsOptions options = new ListTopicsOptions();
+					options.listInternal(true);
+					Set<String> topicNames= kafkaAdmins.listTopics(options).keySet();
+					Map<String, TopicDescription> map = kafkaAdmins.descTopics(topicNames);
+					for (Map.Entry<String, TopicDescription> entry:map.entrySet()){
+						Set<String>topicBrokers = new HashSet<>();
+						TopicDescription topicDescription = entry.getValue();
+						if(Objects.nonNull(topicDescription) && !CollectionUtils.isEmpty(topicDescription.partitions())){
+							for (TopicPartitionInfo topicPartitionInfo : topicDescription.partitions()){
+								int leaderId = topicPartitionInfo.leader().id();
+								KafkaManagerBroker kafkaManagerBroker= brokerMap.get(leaderId);
+								kafkaManagerBroker.setPartitionsAsLeader(kafkaManagerBroker.getPartitionsAsLeader()+1);
+								List<Node> nodes = topicPartitionInfo.replicas();
+								nodes.forEach(node -> {
+									topicBrokers.add(node.idString());
+									KafkaManagerBroker tempKafkaManagerBroker= brokerMap.get(node.id());
+									tempKafkaManagerBroker.setPartitions(tempKafkaManagerBroker.getPartitions()+1);
+								});
+							}
+						}
+						topicBrokers.forEach(broker->{
+							KafkaManagerBroker kafkaManagerBroker= brokerMap.get(Integer.parseInt(broker));
+							kafkaManagerBroker.setTopics(kafkaManagerBroker.getTopics()+1);
 						});
-					});
-					topicBrokers.forEach(broker->{
-						KafkaManagerBroker kafkaManagerBroker= brokerMap.get(Integer.parseInt(broker));
-						kafkaManagerBroker.setTopics(kafkaManagerBroker.getTopics()+1);
-					});
+					}
+				}catch (Exception exception){
+					LOGGER.error("listTopics or descTopics has error.",exception);
 				}
-
-
 				brokerMap.forEach((k,v)-> kafkaManagerBrokers.add(v));
-
-
 			} catch (Exception e) {
-				LOGGER.error("listTopics or descTopics has error.",e);
+				LOGGER.error("get all brokers has error.",e);
 			}
 
 		});

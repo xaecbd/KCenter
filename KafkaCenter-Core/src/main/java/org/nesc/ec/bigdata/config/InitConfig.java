@@ -58,6 +58,39 @@ public class InitConfig {
 	@Value("${ark.login.verify.url:}")
 	private String loginVerifyUrl;
 
+	@Value("${collect.ksql.info.job.enable:false}")
+	private boolean collectKsqlInfoJobEnable;
+	@Value("${collect.ksql.info.job.period.minutes:5}")
+	private int collectKsqlInfoJobPeriodMinutes;
+
+	@Value("${collect.connector.job.enable:false}")
+	private boolean collectorJobEnable;
+	@Value("${collect.connector.job.period.minutes:5}")
+	private int collectorJobPeriodMinutes;
+
+	public boolean isCollectorJobEnable() {
+		return collectorJobEnable;
+	}
+
+	public void setCollectorJobEnable(boolean collectorJobEnable) {
+		this.collectorJobEnable = collectorJobEnable;
+	}
+
+	public int getCollectorJobPeriodMinutes() {
+		return collectorJobPeriodMinutes;
+	}
+
+	public void setCollectorJobPeriodMinutes(int collectorJobPeriodMinutes) {
+		this.collectorJobPeriodMinutes = collectorJobPeriodMinutes;
+	}
+
+	public boolean isCollectKsqlInfoJobEnable() {
+		return collectKsqlInfoJobEnable;
+	}
+
+	public int getCollectKsqlInfoJobPeriodMinutes() {
+		return collectKsqlInfoJobPeriodMinutes;
+	}
 
 	public String getAdminname() {
 		return adminname;

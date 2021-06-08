@@ -24,6 +24,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -56,6 +57,7 @@ public class LoginController extends BaseController {
 
     @Autowired
     RestTemplate restTemplate;
+
 
     /**
      * check the user is login
@@ -139,6 +141,8 @@ public class LoginController extends BaseController {
         }
     }
 
+
+
     /**
      * return information about the logged-in user
      */
@@ -162,44 +166,7 @@ public class LoginController extends BaseController {
         return (UserInfo) session.getAttribute(SessionAttr.USER.getValue());
     }
 
-    @PostMapping("/verify")
-    public RestResponse verify(HttpSession session, @RequestBody Map<String, String> body) {
 
-        String sessionId = body.get(Constants.Verify.SESSIONID);
-        String email = body.get(Constants.Verify.EMAIL);
-        String name = body.get(Constants.Verify.NAME);
 
-        if(StringUtils.isBlank(sessionId)||StringUtils.isBlank(email)||StringUtils.isBlank(name)){
-            return ERROR("verify fail.");
-        }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(Constants.KeyStr.CONTENT_TYPE, Constants.KeyStr.APPLICATION_JSON);
-        JSONObject obj = new JSONObject();
-        body.forEach(obj::put);
-        HttpEntity<JSONObject> httpEntity = new HttpEntity<>(obj, headers);
-        JSONObject responseBody = restTemplate.postForEntity(initConfig.getLoginVerifyUrl(), httpEntity, JSONObject.class).getBody();
-        if (!responseBody.getBoolean(Constants.KeyStr.DATA)) {
-            return ERROR("verify fail.");
-        }
-
-        UserInfo userDO;
-        UserInfo user = new UserInfo();
-        user.setName(name);
-        user.setEmail(email);
-        userDO = userInfoService.getByEmail(email, name);
-        if (userDO == null) {
-            userInfoService.insert(user);
-            user.setRole(RoleEnum.MEMBER);
-            session.setAttribute(SessionAttr.USER.getValue(), user);
-        } else {
-            List<TeamUser> teamUsers = teamUserService.getTeamUsers(userDO.getId());
-            List<Long> teamIDs = new ArrayList<>();
-            teamUsers.forEach(teamUser -> teamIDs.add(teamUser.getTeamId()));
-            userDO.setTeamIDs(teamIDs);
-            //userDO.setPicture(user.getPicture());
-            session.setAttribute(SessionAttr.USER.getValue(), userDO);
-        }
-        return SUCCESS_DATA((UserInfo) session.getAttribute(SessionAttr.USER.getValue()));
-    }
 }

@@ -5,6 +5,7 @@ package org.nesc.ec.bigdata.constant;
  * send to alerta constants
  */
 public class AlertConfig {
+    public static final String CODE = "code";
     public static final String RESOURCE = "resource";
     public static final String EVENT = "event";
     public static final String STATUS = "status";

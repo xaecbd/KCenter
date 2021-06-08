@@ -9,14 +9,12 @@ import org.nesc.ec.bigdata.common.RoleEnum;
 import org.nesc.ec.bigdata.common.model.BrokerInfo;
 import org.nesc.ec.bigdata.common.model.KafkaCenterGroupState;
 import org.nesc.ec.bigdata.common.model.MeterMetric;
+import org.nesc.ec.bigdata.common.util.CalculatePriceUtil;
 import org.nesc.ec.bigdata.common.util.ElasticSearchQuery;
 import org.nesc.ec.bigdata.common.util.JmxCollector;
 import org.nesc.ec.bigdata.constant.BrokerConfig;
 import org.nesc.ec.bigdata.constant.Constants;
-import org.nesc.ec.bigdata.model.AlertGoup;
-import org.nesc.ec.bigdata.model.ClusterInfo;
-import org.nesc.ec.bigdata.model.TopicInfo;
-import org.nesc.ec.bigdata.model.UserInfo;
+import org.nesc.ec.bigdata.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,6 +133,19 @@ public class HomeService {
 
     }
 
+    public int getBrokerSize(List<ClusterInfo> clusterInfoList) {
+        int size = 0;
+        for (ClusterInfo clusterInfo : clusterInfoList) {
+            try {
+                List<BrokerInfo> brokerInfos = zkService.getZK(clusterInfo.getId().toString()).getBrokers();
+                size += brokerInfos.size();
+            } catch (Exception e) {
+                LOG.error("get broker size failed, clusterName: " + clusterInfo.getName(), e);
+            }
+        }
+        return size;
+    }
+
     public Set<MeterMetric> brokerMetric(ClusterInfo clusterInfo) throws Exception {
         Set<MeterMetric> metricSet = new HashSet<>();
         List<BrokerInfo> brokers = zkService.getZK(clusterInfo.getId().toString()).getBrokers();
@@ -151,18 +162,7 @@ public class HomeService {
         return metricSet;
     }
 
-    public int getBrokerSize(List<ClusterInfo> clusterInfoList) {
-        int size = 0;
-        for (ClusterInfo clusterInfo : clusterInfoList) {
-            try {
-                List<BrokerInfo> brokerInfos = zkService.getZK(clusterInfo.getId().toString()).getBrokers();
-                size += brokerInfos.size();
-            } catch (Exception e) {
-                LOG.error("get broker size failed, clusterName: " + clusterInfo.getName(), e);
-            }
-        }
-        return size;
-    }
+
 
     public Map<String,JSONArray>  trendClusterData(long start,long end,long clientId) {
         Map<String, JSONArray> map = null;
@@ -210,6 +210,9 @@ public class HomeService {
          return newUserTeamMap;
 
     }
+
+
+
 
     /**
      * return the top 10 topic log size
@@ -348,10 +351,9 @@ public class HomeService {
             return MsgInOneMin;
         }
 
-        void setMsgInOneMin(String msgInOneMin) {
+        public void setMsgInOneMin(String msgInOneMin) {
             MsgInOneMin = msgInOneMin;
         }
-
     }
 
 

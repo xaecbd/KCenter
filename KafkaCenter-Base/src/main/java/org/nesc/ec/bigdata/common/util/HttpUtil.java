@@ -59,7 +59,7 @@ public class HttpUtil {
     public static String doHttpPost(String xmlInfo, String URL) {
         byte[] xmlData = xmlInfo.getBytes();
         InputStream instr = null;
-        String ResponseString = "";
+        String responsestring = "";
         try {
             java.net.URL url = new URL(URL);
             URLConnection urlCon = url.openConnection();
@@ -77,8 +77,8 @@ public class HttpUtil {
             printout.close();
             instr = urlCon.getInputStream();
             byte[] bis = IOUtils.toByteArray(instr);
-            ResponseString = new String(bis, StandardCharsets.UTF_8);
-            if ((ResponseString == null) || ("".equals(ResponseString.trim()))) {
+            responsestring = new String(bis, StandardCharsets.UTF_8);
+            if ((responsestring == null) || ("".equals(responsestring.trim()))) {
                 System.out.println("返回空");
             }
         } catch (Exception e) {
@@ -92,6 +92,6 @@ public class HttpUtil {
                 logger.error("Http close failed",ex);
             }
         }
-        return ResponseString;
+        return responsestring;
     }
 }

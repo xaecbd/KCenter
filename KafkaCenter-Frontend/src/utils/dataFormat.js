@@ -1,4 +1,21 @@
 import numeral from 'numeral';
+import dayjs from 'dayjs';
+import utc from 'dayjs-plugin-utc';
+
+
+
+export function transToLocalTimeZoned (value){
+  if(value=='' || value == null ){
+    return '-';
+  }else{
+    dayjs.extend(utc);
+    const day = dayjs(value)
+    return day.local().format('YYYY-MM-DD HH:mm:ss'); 
+  }
+
+   
+    
+}
 
 export function transToHours(miss){
   if(miss>0){
@@ -34,7 +51,7 @@ export function resturctData (data,containsAll) {
 
 
 export function transToNumer(num) {
-  if(num!== null && num!=='null'){
+  if(num!== null && num!=='null' && num!=='' && num!== undefined){
     const val = parseFloat(num.toString());
     if (val < 1000) {
       return numeral(val).format('0a');
@@ -48,9 +65,10 @@ export function transToNumer(num) {
 
 // 格式化字节单位
 export function formatSizeUnits(byte, index, record) {
-  if (byte === 0) {
+  if (byte === 0 || byte==='' || byte==null || byte===undefined) {
     return 0;
   }
+
   if (record !== '') {
     if (record.metricName === 'MessagesInPerSec' || record.metricName === 'FailedProduceRequestsPerSec' || record.metricName === 'FailedFetchRequestsPerSec') {
       return transToNumer(byte);

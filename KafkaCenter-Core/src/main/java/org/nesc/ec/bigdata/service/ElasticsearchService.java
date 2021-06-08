@@ -3,6 +3,7 @@ package org.nesc.ec.bigdata.service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.util.bcel.Const;
 import org.nesc.ec.bigdata.common.RoleEnum;
 import org.nesc.ec.bigdata.common.model.OffsetStat;
 import org.nesc.ec.bigdata.common.util.ElasticSearchQuery;
@@ -14,6 +15,7 @@ import org.nesc.ec.bigdata.constant.TopicConfig;
 import org.nesc.ec.bigdata.model.ClusterInfo;
 import org.nesc.ec.bigdata.model.TopicInfo;
 import org.nesc.ec.bigdata.model.UserInfo;
+import org.nesc.ec.bigdata.model.vo.TopicMetricVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Truman.P.Du
@@ -62,7 +65,7 @@ public class ElasticsearchService {
         try {
             elasticsearchUtil.close();
         } catch (IOException e) {
-            LOG.error("elasticsearchUtil close faild!");
+            LOG.error("elasticsearchUtil close faild!",e);
         }
     }
 
@@ -475,12 +478,13 @@ public class ElasticsearchService {
             if(!result.containsKey(Constants.EleaticSearch.AGGREGATIONS)){
                 return  objectList;
             }
+            Map<String,Long> valueMap = new HashMap<>();
             JSONArray bucketArray = result.getJSONObject(Constants.EleaticSearch.AGGREGATIONS).getJSONObject(Constants.KeyStr.DATE).getJSONArray(Constants.EleaticSearch.BUCKETS);
             for (int i =0;i<bucketArray.size();i++){
                 JSONObject bucketObj = bucketArray.getJSONObject(i);
                 long key = bucketObj.getLongValue(Constants.EleaticSearch.KEY);
                 JSONArray clusterBuckets = bucketObj.getJSONObject("cluster").getJSONArray(Constants.EleaticSearch.BUCKETS);
-                Map<String,Long> valueMap = new HashMap<>();
+
                 for(int k=0;k<clusterBuckets.size();k++){
                     JSONObject clusterObj = clusterBuckets.getJSONObject(k);
                     String clusterName = clusterObj.getString(Constants.EleaticSearch.KEY);
@@ -517,7 +521,7 @@ public class ElasticsearchService {
         if(Objects.equals("",query)){
             return objectList;
         }
-        String searchQuery =  ElasticSearchQuery.top10TopicFileSizeRang7Days(searchQuery(userInfo),start,end);
+        String searchQuery =  ElasticSearchQuery.top10TopicFileSizeRang7Days(query,start,end);
         try{
             JSONObject result = elasticsearchUtil.searchES(searchQuery,getMonitorElasticsearchIndexName()+"*");
             if(!result.containsKey(Constants.EleaticSearch.AGGREGATIONS)){
@@ -554,6 +558,124 @@ public class ElasticsearchService {
     }
 
     /**
+     * search topic ByteInPer AND ByteOutPer metric value
+     * because metric count value is increasing,we will calculate the
+     * difference value between the max and min count value.then the value that we really want
+     * */
+    public Set<TopicMetricVo> searchTopicIO(String time){
+        Set<TopicMetricVo> metricVoSet = new HashSet<>();
+        String query = ElasticSearchQuery.searchTopicInOrOutQuery(time,time);
+        try{
+          JSONObject response =   elasticsearchUtil.searchES(query,initConfig.getMonitorElasticsearchIndexName()+"*");
+          if(!response.containsKey(Constants.EleaticSearch.AGGREGATIONS)){
+              return metricVoSet;
+          }
+          JSONArray dateBucketsArray = response.getJSONObject(Constants.EleaticSearch.AGGREGATIONS).getJSONObject(Constants.KeyStr.DATE).getJSONArray(Constants.EleaticSearch.BUCKETS);
+          for (int i = 0;i<dateBucketsArray.size();i++){
+              JSONObject dateObj = dateBucketsArray.getJSONObject(i);
+              String date = dateObj.getString(Constants.EleaticSearch.KEY_AS_STRING);
+              JSONArray clusterBucketsArray = dateObj.getJSONObject(Constants.ConsumerType.BROKER).getJSONArray(Constants.EleaticSearch.BUCKETS);
+              for (int j = 0;j<clusterBucketsArray.size();j++){
+                  JSONObject clusterObj = clusterBucketsArray.getJSONObject(j);
+                  String clusterId = clusterObj.getString(Constants.EleaticSearch.KEY);
+                  JSONArray topicBucketsArray = clusterObj.getJSONObject(Constants.KeyStr.TOPIC).getJSONArray(Constants.EleaticSearch.BUCKETS);
+                  for (int k=0;k<topicBucketsArray.size();k++){
+                      JSONObject topicObj = topicBucketsArray.getJSONObject(k);
+                      String topic = topicObj.getString(Constants.EleaticSearch.KEY);
+                      JSONArray metricBucketsArray = topicObj.getJSONObject(Constants.KeyStr.METRIC).getJSONArray(Constants.EleaticSearch.BUCKETS);
+                      long byteInMetric = 0L,byteOutMetric = 0L;
+                      for (int g = 0;g<metricBucketsArray.size();g++){
+                          JSONObject countObj = metricBucketsArray.getJSONObject(g);
+                          String metric = countObj.getString(Constants.EleaticSearch.KEY);
+                          long value = countObj.getJSONObject(Constants.KeyStr.DIFF_DATA).getLongValue(Constants.EleaticSearch.VALUE);
+                          if(Objects.equals(metric,BrokerConfig.BYTES_IN_PER_SEC)){
+                              byteInMetric = value;
+                          }else {
+                              byteOutMetric = value;
+                          }
+                      }
+                      TopicMetricVo topicMetricVo = new TopicMetricVo(Long.parseLong(clusterId),date,topic,byteInMetric,byteOutMetric);
+                      metricVoSet.add(topicMetricVo);
+                  }
+              }
+          }
+        }catch (Exception e){
+          LOG.error("search Topic IO has error",e);
+        }
+        return  metricVoSet;
+
+    }
+
+    /**
+     * search topic fileSize for cluster.
+     * Take the maximum and minimum fileSize values, and the difference between them is disk,
+     * which is used today
+     * the value including replication
+     *
+     * */
+    public  Set<TopicMetricVo> searchTopicFileSize(String time){
+        String query = ElasticSearchQuery.searchFileSizeGroupByTopic(time,time);
+        Set<TopicMetricVo> topicMetricVoSet = new HashSet<>();
+        try{
+            JSONObject response = elasticsearchUtil.searchES(query,initConfig.getMonitorElasticsearchIndexName()+"*");
+            if(!response.containsKey(Constants.EleaticSearch.AGGREGATIONS)){
+                return topicMetricVoSet;
+            }
+            JSONArray dateBuckets = response.getJSONObject(Constants.EleaticSearch.AGGREGATIONS).getJSONObject(Constants.KeyStr.DATE).getJSONArray(Constants.EleaticSearch.BUCKETS);
+            for (int i = 0;i<dateBuckets.size();i++){
+                JSONObject clusterObj = dateBuckets.getJSONObject(i);
+                String date = clusterObj.getString(Constants.EleaticSearch.KEY_AS_STRING);
+                JSONArray clusterBucketsArray = clusterObj.getJSONObject(Constants.KeyStr.LOWER_CLUSTER_ID).getJSONArray(Constants.EleaticSearch.BUCKETS);
+                for (int j = 0;j<clusterBucketsArray.size();j++){
+                    JSONObject topicObj = clusterBucketsArray.getJSONObject(j);
+                    String clusterId  = topicObj.getString(Constants.EleaticSearch.KEY);
+                    JSONArray topicBucketArray = topicObj.getJSONObject(Constants.KeyStr.TOPIC).getJSONArray(Constants.EleaticSearch.BUCKETS);
+                    for (int k = 0;k<topicBucketArray.size();k++){
+                        JSONObject topicBucketObj = topicBucketArray.getJSONObject(k);
+                        String topic = topicBucketObj.getString(Constants.EleaticSearch.KEY);
+                        long value = topicBucketObj.getJSONObject(Constants.KeyStr.DIFF_DATA).getLongValue(Constants.EleaticSearch.VALUE);
+                        TopicMetricVo topicMetricVo = new TopicMetricVo(Long.parseLong(clusterId),date,topic,value);
+                        topicMetricVoSet.add(topicMetricVo);
+                    }
+
+                }
+            }
+        }catch (Exception e){
+            LOG.error("search topic fileSize has error",e);
+        }
+        return topicMetricVoSet;
+
+    }
+
+    private List<JSONObject> generateMapToArray(Map<String,Long> valueMap, long time){
+        List<JSONObject> list = new ArrayList<>();
+        Set<String> keySet = valueMap.keySet();
+        LinkedHashSet<String> keyLinkedSet =  keySet.stream().sorted((o1, o2) -> {
+            if(valueMap.get(o2) - valueMap.get(o1) > 0){
+                return 1;
+            } else if(valueMap.get(o2) - valueMap.get(o1) == 0){
+                return 0;
+            }else {
+                return  -1;
+            }
+        }).collect(Collectors.toCollection(LinkedHashSet::new));
+        boolean flag =  keyLinkedSet.size() > 10;
+       if(flag){
+           keyLinkedSet =   keyLinkedSet.stream().limit(10).collect(Collectors.toCollection(LinkedHashSet::new));
+       }
+        keyLinkedSet.forEach((key)->{
+            JSONObject object = new JSONObject();
+            object.put(Constants.KeyStr.DATE,time);
+            object.put("topic",key);
+            object.put(Constants.EleaticSearch.VALUE,valueMap.get(key));
+            list.add(object);
+
+        });
+        list.sort((o1, o2) -> (int) (o2.getLongValue(Constants.EleaticSearch.VALUE) - o1.getLongValue(Constants.EleaticSearch.VALUE)));
+        return list;
+    }
+
+    /**
      * Return topic by role
      * if user is admin,return null
      * f the user is a regular user,returns the topic owned by the user's team
@@ -574,19 +696,6 @@ public class ElasticsearchService {
             return sb.toString();
 
         }
-    }
-
-    private List<JSONObject> generateMapToArray(Map<String,Long> valueMap, long time){
-        List<JSONObject> list = new ArrayList<>();
-        valueMap.keySet().stream().sorted((o1, o2) -> (int) (valueMap.get(o1) - valueMap.get(o2))).limit(10).forEach((key)->{
-            JSONObject object = new JSONObject();
-            object.put(Constants.KeyStr.DATE,time);
-            object.put("topic",key);
-            object.put(Constants.EleaticSearch.VALUE,valueMap.get(key));
-            list.add(object);
-        });
-        list.sort((o1, o2) -> (int) (o2.getLongValue(Constants.EleaticSearch.VALUE) - o1.getLongValue(Constants.EleaticSearch.VALUE)));
-        return list;
     }
 
     private String getInterval(int diff) {

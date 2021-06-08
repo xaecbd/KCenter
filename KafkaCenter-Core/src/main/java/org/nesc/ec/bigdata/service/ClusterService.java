@@ -207,9 +207,10 @@ public class ClusterService {
         	ClusterInfo cluster = selectById(Long.valueOf(clusterID));
     		List<String> brokers = new ArrayList<>();
     		DescribeClusterResult describeClusterResult = kafkaAdminService.getKafkaAdmins(clusterID).descCluster();
-    		describeClusterResult.nodes().get().forEach(node -> brokers.add(node.host()));
+    		describeClusterResult.nodes().get().forEach(node -> brokers.add(node.host()+Constants.Symbol.COLON+node.port()));
     		taskClusterVo.setClusterName(cluster.getName());
     		taskClusterVo.setClusterVersion(cluster.getKafkaVersion());
+    		brokers.sort(String::compareTo);
     		taskClusterVo.setBrokerList(brokers);
     		taskClusterVo.setBrokerSize(brokers.size());
     		clusterMess.add(taskClusterVo);

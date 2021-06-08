@@ -46,16 +46,16 @@ CREATE TABLE IF NOT EXISTS `cluster_info` (
 
 
 -- Dumping structure for table kafka_center.ksql_info
-CREATE TABLE IF NOT EXISTS `ksql_info` (
+CREATE TABLE  IF NOT EXISTS  `ksql_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `cluster_id` int(11) DEFAULT NULL,
   `cluster_name` varchar(255) DEFAULT NULL,
   `ksql_url` varchar(255) DEFAULT NULL,
   `ksql_serverId` varchar(255) DEFAULT NULL,
   `version` varchar(255) DEFAULT NULL,
+  `team_ids` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8
 -- Data exporting was unselected.
 
 
@@ -153,4 +153,83 @@ CREATE TABLE IF NOT EXISTS `user_team` (
 
 -- Data exporting was unselected.
 
+-- Dumping structure for table kafka_center.ksql_history
+CREATE TABLE IF NOT EXISTS `ksql_history` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `ksql_server_id` varchar(255) DEFAULT NULL,
+  `user` varchar(255) DEFAULT NULL,
+  `date` datetime DEFAULT current_timestamp(),
+  `operate` text DEFAULT NULL,
+  `type` varchar(255) DEFAULT NULL,
+  `script` text DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4
 
+-- Dumping structure for table kafka_center.ksql_info
+CREATE TABLE  IF NOT EXISTS `ksql_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `cluster_id` int(11) DEFAULT NULL,
+  `cluster_name` varchar(255) DEFAULT NULL,
+  `ksql_url` varchar(255) DEFAULT NULL,
+  `ksql_serverId` varchar(255) DEFAULT NULL,
+  `version` varchar(255) DEFAULT NULL,
+  `team_ids` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8
+
+-- Dumping structure for table kafka_center.kstream
+CREATE TABLE IF NOT EXISTS  `kstream` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(233) NOT NULL,
+  `team_id` int(11) DEFAULT NULL,
+  `cluster_id` int(11) DEFAULT NULL,
+  `owner_id` int(11) DEFAULT NULL,
+  `stream_type` int(11) DEFAULT NULL,
+  `config` varchar(255) DEFAULT NULL,
+  `topic` varchar(255) DEFAULT NULL,
+  `script` text DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  KEY `id` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=579 DEFAULT CHARSET=utf8mb4
+
+-- Dumping structure for table kafka_center.ktable
+CREATE TABLE  IF NOT EXISTS `ktable` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `cluster_id` int(10) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `script` mediumtext DEFAULT NULL,
+  `topic` varchar(240) DEFAULT NULL,
+  `owner_id` int(10) DEFAULT NULL,
+  `team_id` int(10) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=238 DEFAULT CHARSET=utf8mb4
+
+-- Dumping structure for table kafka_center.connect_info
+CREATE TABLE  IF NOT EXISTS `connect_info` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) DEFAULT NULL,
+  `cluster_id` int(10) DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL,
+  `version` varchar(20) DEFAULT NULL,
+  `create_time` datetime DEFAULT current_timestamp(),
+  `team_ids` varchar(20) DEFAULT NULL,
+  `connectors` int(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4
+
+-- Dumping structure for table kafka_center.connect_job
+CREATE TABLE  IF NOT EXISTS  `connect_job` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) DEFAULT NULL,
+  `cluster_id` int(20) DEFAULT NULL,
+  `type` varchar(50) DEFAULT NULL,
+  `class_name` varchar(255) DEFAULT NULL,
+  `state` varchar(100) DEFAULT NULL,
+  `script` mediumtext DEFAULT NULL,
+  `owner_id` int(20) DEFAULT NULL,
+  `team_id` int(20) DEFAULT NULL,
+  `create_time` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=794 DEFAULT CHARSET=utf8mb4

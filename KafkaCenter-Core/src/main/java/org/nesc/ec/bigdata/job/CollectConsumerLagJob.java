@@ -185,7 +185,7 @@ class CollectConsumerLagJob {
         try {
             if (!topicConsumerLag.getStatus().equalsIgnoreCase(KafkaCenterGroupState.DEAD.name())) {
                 long lag = topicConsumerLag.getLag();
-                if (lag >= Long.parseLong(alertaConfig.getAlertDispause())) {
+                if (lag >= Long.parseLong(alertaConfig.getAlertThreshold())) {
                     String topicName, consumerGroup;
                     topicName = topicConsumerLag.getTopic();
                     consumerGroup = topicConsumerLag.getGroup();
@@ -194,7 +194,7 @@ class CollectConsumerLagJob {
                     alertGoup.setConsummerGroup(consumerGroup);
                     alertGoup.setCluster(clusterInfo);
                     alertGoup.setConsummerApi(topicConsumerLag.getConsumerType());
-                    alertGoup.setThreshold(Integer.parseInt(alertaConfig.getAlertDispause()));
+                    alertGoup.setThreshold(Integer.parseInt(alertaConfig.getAlertThreshold()));
                     if (topicMap.containsKey(topicName)) {
                         alertGoup.setMailTo(topicMap.get(topicName));
                     }

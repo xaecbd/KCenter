@@ -48,8 +48,9 @@ const asideMenuConfig = [
   },
   {
     name: 'Connect',
-    path: '/connect',
+    path: '/connector/list',
     icon: <CustomIcon type="iconlink"/>,
+    // authority: 'admin',
   },
   {
     name: 'KSQL',

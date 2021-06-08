@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import org.nesc.ec.bigdata.common.util.KafkaAdmins;
 import org.nesc.ec.bigdata.common.util.TimeUtil;
 import org.nesc.ec.bigdata.constant.Constants;
+import org.nesc.ec.bigdata.mapper.AlertMapper;
 import org.nesc.ec.bigdata.mapper.ClusterInfoMapper;
+import org.nesc.ec.bigdata.mapper.CollectionMapper;
 import org.nesc.ec.bigdata.mapper.TopicInfoMapper;
 import org.nesc.ec.bigdata.model.ClusterInfo;
 import org.nesc.ec.bigdata.model.TaskInfo;
@@ -30,6 +32,10 @@ public class TopicInfoService {
 	@Autowired
 	ClusterInfoMapper clusterInfoMapper;
 	@Autowired
+	AlertMapper alertMapper;
+	@Autowired
+	CollectionMapper collectionMapper;
+	@Autowired
 	KafkaAdminService kafkaAdminService;
 	@Autowired
 	DBLogService dbLogService;
@@ -45,6 +51,10 @@ public class TopicInfoService {
 		return topicInfoMapper.getTopicById(id);
 	}
 
+
+	public List<TopicInfo> getAllData(){
+		return topicInfoMapper.getTopics();
+	}
 	public List<TopicInfo> getTotalData(){
 		return topicInfoMapper.getTopics();
 	}
@@ -62,10 +72,27 @@ public class TopicInfoService {
 
 
 	boolean isDelete(String topicName, String clusterId) {
-		Map<String,Object> map = new HashMap<>();
-		map.put(Constants.KeyStr.TOPIC_NAME, topicName);
-		map.put(Constants.KeyStr.CLUSTER_ID, clusterId);
-		return checkResult(topicInfoMapper.deleteByMap(map));
+		try {
+			Map<String,Object> map = new HashMap<>();
+			map.put(Constants.KeyStr.TOPIC_NAME, topicName);
+			map.put(Constants.KeyStr.CLUSTER_ID, clusterId);
+			//topic��ɾ��
+			boolean topic = checkResult(topicInfoMapper.deleteByMap(map));
+			//alert��ɾ��
+			boolean alert = checkResult(alertMapper.deleteByMap(map));
+			map.remove(Constants.KeyStr.TOPIC_NAME);
+			map.put(Constants.KeyStr.USER_NAME, topicName);
+			// collection ��ɾ��
+			boolean collect = checkResult(collectionMapper.deleteByMap(map));
+			if(topic){
+				return true;
+			}
+
+		}catch (Exception e){
+			LOG.error("delete topic has error,please check,",e);
+		}
+		return false;
+
 	}
 	private boolean checkResult(Integer result) {
 		return result > 0;
@@ -160,7 +187,9 @@ public class TopicInfoService {
 			Map<String,Object> paramMap = new HashMap<String, Object>();
 			paramMap.put(Constants.KeyStr.TOPIC_NAME, task.getTopicName());
 			topicInfoMapper.deleteByMap(paramMap);
-		} catch (Exception e) {	}
+		} catch (Exception e) {
+			LOG.error("back create topic has error",e);
+		}
 
 	}
 

@@ -16,10 +16,12 @@ import CustomTableFilter from '@components/CustomTableFilter';
 import { getPersonalityCluster } from '@utils/cookies';
 import Producer from '../Producer';
 import DetailDialog from '../DetailDialog';
+import { withRouter } from 'react-router-dom';
 
 
 const { Row, Col } = Grid;
 
+@withRouter
 export default class TopicTable extends Component {
   
 
@@ -430,6 +432,10 @@ const styles = {
     color: 'rgba(49, 128, 253, 0.65)',
     cursor: 'pointer',
     textDecoration: 'none',
+    fontSize:'13px',
+    textOverflow:'ellipsis',
+    overflow:'hidden',
+    whiteSpace: 'nowrap'
   },
   separator: {
     margin: '0 8px',
@@ -448,4 +454,12 @@ const styles = {
   },
   formRow: { marginTop: 20 },
   simpleFormDialog: { width: '640px' },
+  
+  test:{
+  //  margin: 0 0 8px;
+    fontSize:'13px',
+    textOverflow:'ellipsis',
+    overflow:'hidden',
+    whiteSpace: 'nowrap'
+  }
 };

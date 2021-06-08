@@ -23,7 +23,18 @@ public class KsqlClusterInfo {
     @TableField(value = "ksql_serverId")
     private String ksqlServerId;
 
+    @TableField(value = "team_ids")
+    private String teamIds;
+
     private String version;
+
+    public String getTeamIds() {
+        return teamIds;
+    }
+
+    public void setTeamIds(String teamIds) {
+        this.teamIds = teamIds;
+    }
 
     public String getKsqlServerId() {
         return ksqlServerId;
@@ -68,8 +79,6 @@ public class KsqlClusterInfo {
         return clusterName;
     }
 
-    public KsqlClusterInfo() {
-    }
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
