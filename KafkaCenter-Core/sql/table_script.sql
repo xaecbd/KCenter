@@ -55,7 +55,7 @@ CREATE TABLE  IF NOT EXISTS  `ksql_info` (
   `version` varchar(255) DEFAULT NULL,
   `team_ids` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8;
 -- Data exporting was unselected.
 
 
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `ksql_history` (
   `type` varchar(255) DEFAULT NULL,
   `script` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4
+) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4;
 
 -- Dumping structure for table kafka_center.ksql_info
 CREATE TABLE  IF NOT EXISTS `ksql_info` (
@@ -176,7 +176,7 @@ CREATE TABLE  IF NOT EXISTS `ksql_info` (
   `version` varchar(255) DEFAULT NULL,
   `team_ids` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8;
 
 -- Dumping structure for table kafka_center.kstream
 CREATE TABLE IF NOT EXISTS  `kstream` (
@@ -191,7 +191,7 @@ CREATE TABLE IF NOT EXISTS  `kstream` (
   `script` text DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   KEY `id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=579 DEFAULT CHARSET=utf8mb4
+) ENGINE=InnoDB AUTO_INCREMENT=579 DEFAULT CHARSET=utf8mb4;
 
 -- Dumping structure for table kafka_center.ktable
 CREATE TABLE  IF NOT EXISTS `ktable` (
@@ -204,7 +204,7 @@ CREATE TABLE  IF NOT EXISTS `ktable` (
   `team_id` int(10) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=238 DEFAULT CHARSET=utf8mb4
+) ENGINE=InnoDB AUTO_INCREMENT=238 DEFAULT CHARSET=utf8mb4;
 
 -- Dumping structure for table kafka_center.connect_info
 CREATE TABLE  IF NOT EXISTS `connect_info` (
@@ -217,7 +217,7 @@ CREATE TABLE  IF NOT EXISTS `connect_info` (
   `team_ids` varchar(20) DEFAULT NULL,
   `connectors` int(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
 
 -- Dumping structure for table kafka_center.connect_job
 CREATE TABLE  IF NOT EXISTS  `connect_job` (
@@ -232,4 +232,4 @@ CREATE TABLE  IF NOT EXISTS  `connect_job` (
   `team_id` int(20) DEFAULT NULL,
   `create_time` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=794 DEFAULT CHARSET=utf8mb4
+) ENGINE=InnoDB AUTO_INCREMENT=794 DEFAULT CHARSET=utf8mb4;
