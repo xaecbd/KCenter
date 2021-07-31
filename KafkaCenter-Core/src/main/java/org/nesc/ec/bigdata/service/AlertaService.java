@@ -67,23 +67,27 @@ public class AlertaService {
 
     /**
      * 获取virtual-email-groups对应关系
+     *
      * @return
      */
-    public Map<String,String>getAlarmGroupMap(){
-        Map<String,String>map =new HashMap<>();
+    public Map<String, String> getAlarmGroupMap() {
+        Map<String, String> map = new HashMap<>();
+        if (!alertaConfig.isAlterEnable()) {
+            return map;
+        }
         try {
-            String response = restTemplate.getForObject(alertaConfig.getAlarmGroupApi(),String.class);
+            String response = restTemplate.getForObject(alertaConfig.getAlarmGroupApi(), String.class);
 
             JSONArray array = JSONArray.parseArray(response);
-            array.forEach(obj->{
+            array.forEach(obj -> {
                 JSONObject jsonObject = (JSONObject) obj;
                 String name = jsonObject.getString("Name");
                 jsonObject.remove("Id");
                 jsonObject.remove("UniqId");
-                map.put(name.toLowerCase(),jsonObject.toJSONString());
+                map.put(name.toLowerCase(), jsonObject.toJSONString());
             });
         } catch (Exception e) {
-            LOG.error("get virtual-email-groups has error.",e);
+            LOG.error("get virtual-email-groups has error.", e);
         }
 
 
@@ -112,10 +116,10 @@ public class AlertaService {
             String threshold = " " + group + " consumer lag > " + alertGoup.getThreshold();
             String clusterName = monitorNoticeInfo.getAlertGoup().getCluster().getName();
             JSONObject attriute = new JSONObject();
-            if(StringUtils.isNotBlank(monitorNoticeInfo.getAlertaOwnerGroups())){
+            if (StringUtils.isNotBlank(monitorNoticeInfo.getAlertaOwnerGroups())) {
                 JSONObject jsonObject = JSONObject.parseObject(monitorNoticeInfo.getAlertaOwnerGroups());
                 String ownerGroups = "";
-                if(jsonObject.containsKey(AlertConfig.NAME)){
+                if (jsonObject.containsKey(AlertConfig.NAME)) {
                     ownerGroups = jsonObject.getString(AlertConfig.NAME);
                 }
                 attriute.put(Constants.KeyStr.OWNER_GROUPS, ownerGroups);

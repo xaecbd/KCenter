@@ -1,10 +1,10 @@
 package org.nesc.ec.bigdata.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import org.nesc.ec.bigdata.model.UserInfo;
 import org.apache.ibatis.annotations.*;
 import org.nesc.ec.bigdata.common.RoleEnum;
 import org.nesc.ec.bigdata.common.RoleHandler;
+import org.nesc.ec.bigdata.model.UserInfo;
 
 import java.util.List;
 import java.util.Map;

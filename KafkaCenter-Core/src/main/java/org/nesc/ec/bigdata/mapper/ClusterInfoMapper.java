@@ -1,8 +1,8 @@
 package org.nesc.ec.bigdata.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import org.nesc.ec.bigdata.model.ClusterInfo;
 import org.apache.ibatis.annotations.*;
+import org.nesc.ec.bigdata.model.ClusterInfo;
 
 import java.util.List;
 

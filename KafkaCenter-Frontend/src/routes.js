@@ -38,8 +38,8 @@ const User = lazy(() => import('@/pages/Setting/User'));
 // kafka-manager
 const managerTopiDetail = lazy(() => import('@/pages/KafkaManager/Topic/TopicDetail/Detail'));
 const Cluster = lazy(() => import('@/pages/KafkaManager/Cluster'));
-const clusterTab = lazy(()=> import('@/pages/KafkaManager/ClusterTab'));
 
+const clusterTab = lazy(() => import('@/pages/KafkaManager/ClusterTab'));
 
 // monitor page
 const ProducerTable = lazy(() => import('@/pages/Monitor/Producer/Topic'));
@@ -60,6 +60,7 @@ const KsqlHome = lazy(() => import('@/pages/Ksql/KsqlList/KsqlHome'));
 const KsqlConsole = lazy(() => import('@/pages/Ksql/KsqlList/Console/index.js'));
 const Loading = lazy(() => import('@/pages/Loading'));
 
+
 const routerConfig = [
   {
     path: '/loading',
@@ -72,10 +73,6 @@ const routerConfig = [
       {
         path: '/login',
         component: Login,
-      },
-      {
-        path: '/logging',
-        component: Logging,
       },
       {
         path: '/',
@@ -192,7 +189,7 @@ const routerConfig = [
         path: '/monitor/consumer/group/detail/:clusterID/:clusterName/:consummerGroup',
         component: consumerGroupDetail,
       },
-     
+
       {
         path: '/users',
         component: MyProfile,
@@ -206,7 +203,7 @@ const routerConfig = [
         path: '/monitor/lag',
         component: ConsumerLag,
       },
-     
+
       {
         path: '/cluster/topic/:clusterId/:clusterName/:topic',
         component: managerTopiDetail,
@@ -242,7 +239,7 @@ const routerConfig = [
       },
       {
         path: '/',
-        redirect: '/home/page',
+        redirect: '/user/login',
       },
     ],
   },

@@ -1,11 +1,11 @@
 package org.nesc.ec.bigdata.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import org.nesc.ec.bigdata.model.TeamUser;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.nesc.ec.bigdata.model.TeamUser;
 
 @Mapper
 public interface TeamUserMapper extends BaseMapper<TeamUser> {
