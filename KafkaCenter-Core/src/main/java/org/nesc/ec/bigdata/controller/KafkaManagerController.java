@@ -185,10 +185,10 @@ public class KafkaManagerController extends BaseController{
         return SUCCESS_DATA(clusterGroups);
     }
 
-   /**delete the consumser groyp
-    * 1. delete the group from kafka cluster
-    * 2. delete the alert message associated with the Group
-    * */
+    /**delete the consumser groyp
+     * 1. delete the group from kafka cluster
+     * 2. delete the alert message associated with the Group
+     * */
     @PostMapping(value = "/delete/group")
     public RestResponse deleteGroup(@RequestBody ClusterGroup clusterGroup) {
         try {
@@ -255,7 +255,7 @@ public class KafkaManagerController extends BaseController{
         ClusterInfo clusterInfo = clusterService.selectById(Long.parseLong(clusterId));
         try {
             if(config.isRemoteQueryEnable() && remoteHostsMap.containsKey(clusterInfo.getLocation().toLowerCase())){
-               //TODO µ»¥˝÷ÿππ
+                //TODO Á≠âÂæÖÈáçÊûÑ
                 String url = "http://" + remoteHostsMap.get(clusterInfo.getLocation().toLowerCase())+"/manager/group/status";
                 Map<String, String> queryMap = new HashMap<>();
                 queryMap.put("cluster",clusterId);

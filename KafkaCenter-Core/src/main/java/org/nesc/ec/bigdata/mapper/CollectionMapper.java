@@ -1,10 +1,11 @@
 package org.nesc.ec.bigdata.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import org.nesc.ec.bigdata.model.Collections;
 import org.apache.ibatis.annotations.*;
+import org.nesc.ec.bigdata.model.Collections;
 
 import java.util.List;
+
 @Mapper
 public interface CollectionMapper extends BaseMapper<Collections> {
 	

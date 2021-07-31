@@ -2,21 +2,18 @@ package org.nesc.ec.bigdata.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import org.apache.kafka.common.Node;
+import org.apache.kafka.clients.admin.DescribeClusterResult;
 import org.nesc.ec.bigdata.common.model.BrokerInfo;
 import org.nesc.ec.bigdata.config.InitConfig;
-import org.nesc.ec.bigdata.constant.BrokerConfig;
 import org.nesc.ec.bigdata.constant.Constants;
 import org.nesc.ec.bigdata.mapper.ClusterInfoMapper;
 import org.nesc.ec.bigdata.model.ClusterInfo;
 import org.nesc.ec.bigdata.model.vo.TaskClusterVo;
-import org.apache.kafka.clients.admin.DescribeClusterResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class ClusterService {
@@ -206,8 +203,7 @@ public class ClusterService {
         	TaskClusterVo taskClusterVo = new TaskClusterVo();
         	ClusterInfo cluster = selectById(Long.valueOf(clusterID));
     		List<String> brokers = new ArrayList<>();
-    		DescribeClusterResult describeClusterResult = kafkaAdminService.getKafkaAdmins(clusterID).descCluster();
-    		describeClusterResult.nodes().get().forEach(node -> brokers.add(node.host()+Constants.Symbol.COLON+node.port()));
+			brokers.add(cluster.getBroker());
     		taskClusterVo.setClusterName(cluster.getName());
     		taskClusterVo.setClusterVersion(cluster.getKafkaVersion());
     		brokers.sort(String::compareTo);

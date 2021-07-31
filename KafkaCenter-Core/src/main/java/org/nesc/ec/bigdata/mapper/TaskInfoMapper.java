@@ -1,8 +1,8 @@
 package org.nesc.ec.bigdata.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import org.nesc.ec.bigdata.model.TaskInfo;
 import org.apache.ibatis.annotations.*;
+import org.nesc.ec.bigdata.model.TaskInfo;
 
 import java.util.List;
 

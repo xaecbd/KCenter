@@ -3,7 +3,6 @@ package org.nesc.ec.bigdata.service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.util.bcel.Const;
 import org.nesc.ec.bigdata.common.RoleEnum;
 import org.nesc.ec.bigdata.common.model.OffsetStat;
 import org.nesc.ec.bigdata.common.util.ElasticSearchQuery;

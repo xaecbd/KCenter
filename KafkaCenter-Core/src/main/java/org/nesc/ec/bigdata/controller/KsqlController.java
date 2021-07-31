@@ -7,9 +7,9 @@ import org.nesc.ec.bigdata.common.RoleEnum;
 import org.nesc.ec.bigdata.exception.KSQLException;
 import org.nesc.ec.bigdata.model.*;
 import org.nesc.ec.bigdata.model.vo.KsqlInfoVo;
+import org.nesc.ec.bigdata.service.KsqlClusterService;
 import org.nesc.ec.bigdata.service.KsqlHistoryService;
 import org.nesc.ec.bigdata.service.KsqlStreamService;
-import org.nesc.ec.bigdata.service.KsqlClusterService;
 import org.nesc.ec.bigdata.service.KsqlTableService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class KsqlController extends BaseController {
             }
         } catch (Exception e) {
             LOG.error("Ksql list Error!", e);
-            return ERROR("Ksql list Error!Please check");
+            return ERROR("Ksql list Error!Please check!error is:"+e.getMessage());
         }
         return SUCCESS_DATA(list);
     }
@@ -77,7 +77,7 @@ public class KsqlController extends BaseController {
             return SUCCESS_DATA(streamInfos);
         } catch (Exception e) {
             LOG.error("Get all topic error.", e);
-            return ERROR("GET TOPICS INFORMATION FAILED!");
+            return ERROR("GET TOPICS INFORMATION FAILED!error is:"+e.getMessage());
         }
     }
 
@@ -90,7 +90,7 @@ public class KsqlController extends BaseController {
             return SUCCESS_DATA(tableInfos);
         } catch (Exception e) {
             LOG.error("Get ksql table has  error.", e);
-            return ERROR("GET ksql tables FAILED!");
+            return ERROR("GET ksql tables FAILED!error is:"+e.getMessage());
         }
     }
 
@@ -109,7 +109,7 @@ public class KsqlController extends BaseController {
         }catch (Exception e1){
             ksqlHistoryService.insertTableHistory(userInfo,ksqlInfoVo.getKsqlServerId(),ksqlInfoVo.getkTableInfo().getName(),"create table has error:"+e1.getMessage(),script);
             LOG.error("create ksql table has error,",e1);
-            return ERROR("create ksql table has error");
+            return ERROR("create ksql table has error,error is:"+e1.getMessage());
         }
     }
 
@@ -131,7 +131,7 @@ public class KsqlController extends BaseController {
         }catch (Exception e1){
             ksqlHistoryService.insertTableHistory(userInfo,ksqlInfoVo.getKsqlServerId(),ksqlInfoVo.getkTableInfo().getName(),"edit table has error:"+e1.getMessage(),script);
             LOG.error("edit ksql table has error,",e1);
-            return ERROR("edit ksql table has error");
+            return ERROR("edit ksql table has error,error is:"+e1.getMessage());
         }
     }
 
@@ -151,8 +151,9 @@ public class KsqlController extends BaseController {
         }catch (Exception e1){
             ksqlHistoryService.insertTableHistory(userInfo,ksqlServerId,tableName,"describe table has error:"+e1.getMessage());
             LOG.error("describe table has error,please check",e1);
+            return ERROR("describe table has error,please check!error is:"+e1.getMessage());
         }
-        return ERROR("describe table has error,please check");
+
     }
 
     @DeleteMapping("/drop_table")
@@ -171,8 +172,9 @@ public class KsqlController extends BaseController {
         }catch (Exception e1){
             ksqlHistoryService.insertTableHistory(userInfo,ksqlServerId,tableName,"drop table has error:"+e1.getMessage());
             LOG.error(" drop table has error,please check",e1);
+            return ERROR("Ksql drop table Error!Please check!error is:"+e1.getMessage());
         }
-        return ERROR("Ksql drop table Error!Please check");
+
     }
 
     @GetMapping("/select_table")
@@ -190,7 +192,7 @@ public class KsqlController extends BaseController {
         }catch (Exception e1){
             LOG.error("select table has error,please check,",e1);
             ksqlHistoryService.insertTableHistory(userInfo,ksqlServerId,streamName,"select table success has error:"+e1.getMessage());
-            return ERROR("select table has error,please check!");
+            return ERROR("select table has error,please check!error is:"+e1.getMessage());
         }
     }
 
@@ -203,7 +205,7 @@ public class KsqlController extends BaseController {
             return ERROR(e.getMessage());
         }catch (Exception e1){
             LOG.error("show queries has error,please check,",e1);
-            return ERROR("show queries has error,please check!");
+            return ERROR("show queries has error,please check!error is:"+e1.getMessage());
         }
     }
 
@@ -218,7 +220,7 @@ public class KsqlController extends BaseController {
             return ERROR(e.getMessage());
         }catch (Exception e1) {
             LOG.error("Ksql terminateQuery Error!Please check,", e1);
-            return ERROR("Ksql terminateQuery Error!Please check");
+            return ERROR("Ksql terminateQuery Error!Please check!error is:"+e1.getMessage());
         }
 
     }
@@ -242,8 +244,8 @@ public class KsqlController extends BaseController {
         }catch (Exception e1){
             ksqlHistoryService.insertStreamHistory(userInfo,ksqlInfoVo.getKsqlServerId(),ksqlInfoVo.getkStreamInfo().getName(),"create stream error:"+e1.getMessage(),script);
             LOG.error("create stream has error,please check",e1);
+            return ERROR("create stream has error,please check!error is:"+e1.getMessage());
         }
-        return ERROR("create stream has error,please check");
     }
 
     @PostMapping("/edit_stream")
@@ -265,7 +267,7 @@ public class KsqlController extends BaseController {
         }catch (Exception e1){
             ksqlHistoryService.insertStreamHistory(userInfo,ksqlInfoVo.getKsqlServerId(),ksqlInfoVo.getkStreamInfo().getName(),"edit stream error:"+e1.getMessage(),script);
             LOG.error("edit stream has error,please check",e1);
-            return ERROR("edit stream has error,please check");
+            return ERROR("edit stream has error,please check,error is :"+e1.getMessage());
         }
     }
 
@@ -282,7 +284,7 @@ public class KsqlController extends BaseController {
         }catch (Exception e1){
             LOG.error("select stream has error,please check,",e1);
             ksqlHistoryService.insertStreamHistory(userInfo,ksqlServerId,streamName,"select stream has error:"+e1.getMessage());
-            return ERROR("select stream has error,please check!");
+            return ERROR("select stream has error,please check!,error is:"+e1.getMessage());
         }
     }
 
@@ -301,8 +303,9 @@ public class KsqlController extends BaseController {
         }catch (Exception e1){
             ksqlHistoryService.insertStreamHistory(userInfo,ksqlServerId,streamName,"describe stream has error:"+e1.getMessage());
             LOG.error("describe stream has error,please check",e1);
+            return ERROR("describe stream has error,please check! error is :"+e1.getMessage());
         }
-        return ERROR("describe stream has error,please check");
+
     }
 
     @DeleteMapping("/drop_stream")
@@ -321,8 +324,9 @@ public class KsqlController extends BaseController {
         }catch (Exception e1){
             ksqlHistoryService.insertStreamHistory(userInfo,ksqlServerId,streamName,"drop stream has error:"+e1.getMessage());
             LOG.error("drop  stream has error,please check",e1);
+            return ERROR("ksql drop Stream Error!Please check!error is:"+e1.getMessage());
         }
-        return ERROR("ksql drop Stream Error!Please check");
+
     }
 
 
@@ -341,7 +345,7 @@ public class KsqlController extends BaseController {
             }
         } catch (Exception e) {
             LOG.warn("Please check KsqlAddress is valid");
-            return ERROR("Please check KsqlAddress is valid");
+            return ERROR("Please check KsqlAddress is valid,error is:"+e.getMessage());
         }
     }
 

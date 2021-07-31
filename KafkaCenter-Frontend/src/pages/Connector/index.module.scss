@@ -1,0 +1,37 @@
+.container{
+    margin: 20px;
+    padding: 10px 20px 20px;
+    min-height: 600px;
+
+}
+
+.loading{
+    width: 100%;
+}
+
+.simpleFormDialog{
+    width: 640px;
+}
+
+.form{
+    width: 100%;
+}
+
+.input{
+    width: 100%;
+}
+
+.link{
+    margin: 0 5px;
+    color: #1111EE  !important;
+    cursor: pointer;
+    text-decoration: none;
+}
+.separator{
+    margin: 0 8px;
+    display: inline-block;
+    height: 12px;
+    width: 1px;
+    vertical-align: middle;
+    background: #e8e8e8;
+}
