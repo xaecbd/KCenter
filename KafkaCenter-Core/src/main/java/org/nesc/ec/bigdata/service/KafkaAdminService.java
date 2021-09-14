@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +27,7 @@ public class KafkaAdminService {
 	ClusterInfoMapper clusterInfoMapper;
 
 
-	private Map<String, KafkaAdmins> cacheKafkaMap  =  new HashMap<>( 1 << 4) ;
+	private final Map<String, KafkaAdmins> cacheKafkaMap  =  new HashMap<>( 1 << 4) ;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaAdminService.class);
 
@@ -73,9 +72,7 @@ public class KafkaAdminService {
 			Properties props = new Properties();
 			props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, brokerAddr);
 		    admin = new KafkaAdmins(props);
-			if(admin!=null) {
-				flag = true;
-			}
+			flag = true;
 		} catch (Exception e) {
 			LOGGER.warn("connect kafka error.",e);
 		}finally {
@@ -91,28 +88,25 @@ public class KafkaAdminService {
 
 	public boolean validateKafkaAddress(String kafkaAddress) {
 		boolean flag = false;
-		FutureTask<Object> future = new FutureTask<>(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				boolean validateKafkaAddress = false;
-				KafkaAdmins admin = null;
-				try {
-					Properties props = new Properties();
-					props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaAddress);
-					 admin = new KafkaAdmins(props);
-					String host = admin.descCluster().controller().get().host();
-					if (host != null) {
-						validateKafkaAddress = true;
-					}
-				}catch (Exception e){
-					LOGGER.warn("connect kafka error.",e);
-				}finally {
-					if(admin!=null){
-						admin.close();
-					}
+		FutureTask<Object> future = new FutureTask<>(() -> {
+			boolean validateKafkaAddress = false;
+			KafkaAdmins admin = null;
+			try {
+				Properties props = new Properties();
+				props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaAddress);
+				 admin = new KafkaAdmins(props);
+				String host = admin.descCluster().controller().get().host();
+				if (host != null) {
+					validateKafkaAddress = true;
 				}
-				return validateKafkaAddress;
+			}catch (Exception e){
+				LOGGER.warn("connect kafka error.",e);
+			}finally {
+				if(admin!=null){
+					admin.close();
+				}
 			}
+			return validateKafkaAddress;
 		});
 		Thread thread = new Thread(future);
 		thread.start();
