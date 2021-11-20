@@ -383,7 +383,7 @@ public class KsqlService {
             JSONObject stream = (JSONObject) streamOrTables.get(i);
             JSONObject getStreamName = new JSONObject();
             String streamName = (String) stream.get("name");
-            getStreamName.put("ksql", "DESCRIBE EXTENDED " + streamName + ";");
+            getStreamName.put("ksql", "DESCRIBE " + streamName + " EXTENDED;");
             getStreamName.put("id", ksqlID);
             JSONObject describeStream = (JSONObject) JSONObject.parseArray(executeKsql(getStreamName.toJSONString(), ksqlID)).get(0);
             JSONArray fields = (JSONArray) describeStream.getJSONObject("sourceDescription").get("fields");
@@ -403,7 +403,7 @@ public class KsqlService {
             JSONObject table = (JSONObject) streamOrTables.get(i);
             JSONObject getTableName = new JSONObject();
             String tableName = (String) table.get("name");
-            getTableName.put("ksql", "DESCRIBE EXTENDED " + tableName + ";");
+            getTableName.put("ksql", "DESCRIBE " + tableName + " EXTENDED;");
             getTableName.put("id", ksqlID);
             JSONObject describeTable = (JSONObject) JSONObject.parseArray(executeKsql(getTableName.toJSONString(), ksqlID)).get(0);
             JSONArray fields = (JSONArray) describeTable.getJSONObject("sourceDescription").get("fields");
