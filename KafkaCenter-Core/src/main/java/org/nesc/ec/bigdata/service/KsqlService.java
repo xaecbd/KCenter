@@ -429,7 +429,7 @@ public class KsqlService {
                 if (queryId.contains("_confluent-ksql")){
                     continue;
                 }
-                getQueryId.put("ksql", "EXPLAIN " + queryId + ";");
+                getQueryId.put("ksql", "EXPLAIN " + queryStringNoEnter);
                 getQueryId.put("id", ksqlID);
                 JSONObject explainQuery = (JSONObject) JSONObject.parseArray(executeKsql(getQueryId.toJSONString(), ksqlID)).get(0);
                 JSONArray arraySource = (JSONArray) explainQuery.getJSONObject("queryDescription").get("sources");
