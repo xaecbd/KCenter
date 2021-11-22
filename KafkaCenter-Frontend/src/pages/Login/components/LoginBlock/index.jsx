@@ -50,7 +50,12 @@ const LoginBlock = (
 
     let urls = getUrlCookie('url');
 
-    if (isUndefined(urls) || isNull(urls) || urls === '') {
+    if (
+      isUndefined(urls) ||
+      isNull(urls) ||
+      urls === '' ||
+      urls.includes('user/login')
+    ) {
       urls = '/#/home/page';
     }
     removeUrl('url');
@@ -116,11 +121,11 @@ const LoginBlock = (
       })
       .then((res) => {
         if (
-          res.data.code === 200 &&
           res.data != null &&
-          res.data.data != null &&
           res.data !== undefined &&
-          res.data.data !== undefined
+          res.data.data !== undefined &&
+          res.data.code === 200 &&
+          res.data.data != null
         ) {
           redirectToHome(res.data.data);
         } else {
