@@ -154,7 +154,7 @@ export default class EditDialog extends Component {
   };
 
   fetchTeamData = () =>{
-    axios.get('/team')
+    axios.get('/team/list')
       .then((response) => {
         if (response.data.code === 200) {
           this.setState({
