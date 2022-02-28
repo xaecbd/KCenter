@@ -36,7 +36,7 @@ API:
 
 ## 前端开发
 
-推荐使用VS Code 开发前端代码,前端项目依赖后端服务，可以先启动后端服务，或者修改`package.json`中`proxyConfig`，将其中的地址改为可用的后端服务地址。更多内容[详见地址](./KafkaCenter-Frontend/README.md)
+推荐使用VS Code 开发前端代码,前端项目依赖后端服务，可以先启动后端服务，或者修改`package.json`中`proxyConfig`，将其中的地址改为可用的后端服务地址。更多内容[详见地址](KCenter-Frontend/README.md)
 
 ### 安装node
 

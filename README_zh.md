@@ -1,15 +1,17 @@
 Language: :[us](./README.md): - :cn:
 
-# KafkaCenter
+# KCenter
 
 ![](https://img.shields.io/badge/java-1.8+-green.svg)
 ![](https://img.shields.io/badge/maven-3.5+-green.svg)
 
-KafkaCenter是Kafka 集群管理和维护，生产/消费监控，生态组件使用的统一一站式平台。
+KCenter(之前项目名称为KafkaCenter)是Apache Kafka 集群管理和维护，生产/消费监控，生态组件使用的统一一站式平台。
 
-[GitHub地址](https://github.com/xaecbd/KafkaCenter) 第一时间更新，请移步查看！
+[点击查看名称变更原因](https://github.com/xaecbd/KCenter/issues/123).
 
-- [KafkaCenter](#kafkacenter)
+[GitHub地址](https://github.com/xaecbd/KCenter) 第一时间更新，请移步查看！
+
+- [KCenter](#kcenter)
   - [主要特性](#主要特性)
   - [快速开始](#快速开始)
     - [编译/运行, 贡献代码](#贡献代码)
@@ -40,7 +42,7 @@ KafkaCenter是Kafka 集群管理和维护，生产/消费监控，生态组件�
 此模块用于管理员对集群的正常维护操作包含：集群管理，topic管理，集群监控，group管理，broker管理等。
 
 ## 配置
-[application.properties](KafkaCenter-Core/src/main/resources/application.properties)
+[application.properties](KCenter-Core/src/main/resources/application.properties)
 
 中文配置详解: [docs/application_zh.properties](docs/application_zh.properties)
 ## 快速开始
@@ -54,25 +56,25 @@ elasticsearch(7.0+)|非必须|监控信息，例如集群metirc,消费lag可视�
 邮件服务器|非必须|申请、审批，告警邮件提醒
 ### 1.首先创建数据库及修改配置
 #### 创建数据库及表
-在数据库中执行[table_script.sql](KafkaCenter-Core/sql/table_script.sql)
+在数据库中执行[table_script.sql](KCenter-Core/sql/table_script.sql)
 #### 初始化配置
-下载[application.properties](KafkaCenter-Core/src/main/resources/application.properties),按自己需求修改相应的配置
+下载[application.properties](KCenter-Core/src/main/resources/application.properties),按自己需求修改相应的配置
 ### 2.其次运行服务
 - Docker run(**推荐**)
 
 ```
-docker run -d -p 8080:8080 --name KafkaCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.3.0
+docker run -d -p 8080:8080 --name KCenter -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties xaecbd/kafka-center:2.3.0
 ```
 
 - Local run
 
 **Important**: 项目运行依赖jre1.8
 ```
-$ git clone https://github.com/xaecbd/KafkaCenter.git
-$ cd KafkaCenter
+$ git clone https://github.com/xaecbd/KCenter.git
+$ cd KCenter
 $ mvn clean package -Dmaven.test.skip=true
-$ cd KafkaCenter\KafkaCenter-Core\target
-$ java -jar KafkaCenter-Core-2.3.0-SNAPSHOT.jar
+$ cd KCenter\KCenter-Core\target
+$ java -jar KCenter-Core-2.3.0-SNAPSHOT.jar
 ```
 
 ### 3.最后访问系统
@@ -80,20 +82,20 @@ $ java -jar KafkaCenter-Core-2.3.0-SNAPSHOT.jar
 访问`http://localhost:8080`,管理员用户与密码默认：**admin/admin**
 ### 贡献代码
 
-如果你对**KafkaCenter**感兴趣，欢迎加入我们，可以贡献代码、文档、问题等。
+如果你对**KCenter**感兴趣，欢迎加入我们，可以贡献代码、文档、问题等。
 
 - [CONTRIBUTING_zh.md](CONTRIBUTING_zh.md) 可以帮助你运行代码，了解我们的开发规范.
 
 ## 文档
 
-更多文档详见： [KafkaCenter/docs](./docs).<br/>
-用户使用文档：[KafkaCenter/docs/UserGuide](./docs/UserGuide.md)  
-系统模块简介：[KafkaCenter/docs/Module](./docs/Module.md).<br/>
+更多文档详见： [KCenter/docs](./docs).<br/>
+用户使用文档：[KCenter/docs/UserGuide](./docs/UserGuide.md)  
+系统模块简介：[KCenter/docs/Module](./docs/Module.md).<br/>
 KafkaConnectUi文档：[KafkaConnectUi](./docs/KafkaConnectUi.md). 
 
 ## 计划
 
-查看 [TODO List](https://github.com/xaecbd/KafkaCenter/projects/1)
+查看 [TODO List](https://github.com/xaecbd/KCenter/projects/1)
 
 ## Changelog
 
@@ -101,6 +103,6 @@ KafkaConnectUi文档：[KafkaConnectUi](./docs/KafkaConnectUi.md).
 
 ## 问题
 
-- If you've found a bug or want to request a feature, please create a [Issue](https://github.com/xaecbd/KafkaCenter/issues/new).
+- If you've found a bug or want to request a feature, please create a [Issue](https://github.com/xaecbd/KCenter/issues/new).
 Please check to make sure someone else hasn't already created an issue for the same topic.
-- Need help using KafkaCenter? Ask EC Bigdata Team member.
+- Need help using KCenter? Ask EC Bigdata Team member.

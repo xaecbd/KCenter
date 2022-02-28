@@ -1,36 +1,39 @@
 Language: :us: - :[cn](./README_zh.md):
-# KafkaCenter
+# KCenter
 
 ![](https://img.shields.io/badge/java-1.8+-green.svg)
 ![](https://img.shields.io/badge/maven-3.5+-green.svg)
 
-KafkaCenter is a unified one-stop platform for Kafka cluster management and maintenance, producer/consumer monitoring, and use of ecological components.
+KCenter (previously known as KafkaCenter) is a unified one-stop platform for Apache Kafka cluster management and maintenance, producer/consumer monitoring, and use of ecological components. 
+
+[Details about the name change](https://github.com/xaecbd/KCenter/issues/123).
+
 
 **Table of Contents**
-  - [Why Should I Use KafkaCenter?](#why-should-i-use-kafkacenter)
+  - [Why Should I Use KCenter?](#why-should-i-use-KCenter)
   - [Main Features](#main-features)
   - [Application Config](#application-config)
   - [Getting Started](#getting-started)
     - [1. Init](#1-init)
     - [2. Run](#2-run)
     - [3. Access UI](#3-access-ui)
-  - [Building KafkaCenter and/or Contributing Code](#building-kafkacenter-andor-contributing-code)
+  - [Building KCenter and/or Contributing Code](#building-KCenter-andor-contributing-code)
   - [Documentation](#documentation)
   - [Changelog](#changelog)
   - [Questions? Problems? Suggestions?](#questions-problems-suggestions)
 
 
-## Why Should I Use KafkaCenter?
+## Why Should I Use KCenter?
 
-You have a Kafka cluster* and want to
+You have a **Kafka cluster** and want to
 - monitor producers and consumers with graphs and the ability to easily configure email alerts for thresholds
 - let your users request topics and monitor them themselves in a simple web UI
 - access the Kafka ecosystem (Kafka, KSQL, Kafka Connect, Kafka Manager) in one combined UI
 
-All you need is a MySQL DB in the background where KafkaCenter can store its configuration. If you want to use the monitoring functionalities, you additionally need an Elasticsearch installation.
+All you need is a MySQL DB in the background where KCenter can store its configuration. If you want to use the monitoring functionalities, you additionally need an Elasticsearch installation.
 Then, just download our Docker image (see HowTo below) and off you go!
 
-*\* Note: KafkaCenter does not yet support authenticating to a secured Kafka cluster (SASL or OAuth), we're working on it though.*
+*\* Note: KCenter does not yet support authenticating to a secured Kafka cluster (SASL or OAuth), we're working on it though.*
 
 
 ## Main Features
@@ -49,7 +52,7 @@ Then, just download our Docker image (see HowTo below) and off you go!
 
 
 ## Application Config
-The main application configuration is done in a central `application.properties` file. Have look at our [detailed example here](KafkaCenter-Core/src/main/resources/application.properties).
+The main application configuration is done in a central `application.properties` file. Have look at our [detailed example here](KCenter-Core/src/main/resources/application.properties).
 
 
 ## Getting Started
@@ -65,10 +68,10 @@ Email server|optional|Email notifications (topic requests & approvals, configure
 ### 1. Init
 
 #### Create database and table
-Execute the provided [table_script.sql](KafkaCenter-Core/sql/table_script.sql) on your MySQL instance to create the database and all necessary tables.
+Execute the provided [table_script.sql](KCenter-Core/sql/table_script.sql) on your MySQL instance to create the database and all necessary tables.
 
 #### Edit config
-Download the provided [application.properties](KafkaCenter-Core/src/main/resources/application.properties) example and adapt the config to your needs.
+Download the provided [application.properties](KCenter-Core/src/main/resources/application.properties) example and adapt the config to your needs.
 
 
 ### 2. Run
@@ -79,20 +82,20 @@ The following command assumes that you have your adapted `application.properties
 ```
 docker run -d \
   -p 8080:8080 \
-  --name KafkaCenter \
+  --name KCenter \
   -v ${PWD}/application.properties:/opt/app/kafka-center/config/application.properties \ 
   xaecbd/kafka-center:2.3.0
 ```
 
 #### Option B: Local
 
-**Important**: Make sure you have installed a **JRE 8** or higher and download the most recent [release package](https://github.com/xaecbd/KafkaCenter/releases).
+**Important**: Make sure you have installed a **JRE 8** or higher and download the most recent [release package](https://github.com/xaecbd/KCenter/releases).
 ```
-$ git clone https://github.com/xaecbd/KafkaCenter.git
-$ cd KafkaCenter
+$ git clone https://github.com/xaecbd/KCenter.git
+$ cd KCenter
 $ mvn clean package -Dmaven.test.skip=true
-$ cd KafkaCenter\KafkaCenter-Core\target
-$ java -jar KafkaCenter-Core-2.3.0-SNAPSHOT.jar
+$ cd KCenter\KCenter-Core\target
+$ java -jar KCenter-Core-2.3.0-SNAPSHOT.jar
 ```
 
 
@@ -100,16 +103,16 @@ $ java -jar KafkaCenter-Core-2.3.0-SNAPSHOT.jar
 The application UI is published on port *8080*. Visit `http://localhost:8080` (or insert the IP/URL of the host you deployed on) and log in with the default administrator：**user/pw = admin/admin**
 
 
-## Building KafkaCenter and/or Contributing Code
+## Building KCenter and/or Contributing Code
 
-We're happy if you want to play around and build KafkaCenter locally, or even get involved in shaping and developing KafkaCenter further. The [Contributing Guidelines](./CONTRIBUTING.md) will help to get you started.
+We're happy if you want to play around and build KCenter locally, or even get involved in shaping and developing KCenter further. The [Contributing Guidelines](./CONTRIBUTING.md) will help to get you started.
 
 
 ## Documentation
 
-For more information, see the README in [KafkaCenter/docs](./docs).<br/>
-For information about user guide the documentation, see the UserGuide in [KafkaCenter/docs/UserGuide](./docs/UserGuide.md)  
-For information about module the documentation, see the Module in [KafkaCenter/docs/Module](./docs/Module.md).<br/>
+For more information, see the README in [KCenter/docs](./docs).<br/>
+For information about user guide the documentation, see the UserGuide in [KCenter/docs/UserGuide](./docs/UserGuide.md)  
+For information about module the documentation, see the Module in [KCenter/docs/Module](./docs/Module.md).<br/>
 For information about kafka connect ui, see docs in [KafkaConnectUi](./docs/KafkaConnectUi.md).
 
 *Note that we open-sourced our tool very recently and did not translate all the documents to English yet. (We are happy about contributions in this area as well if you're motivated!)*
@@ -122,4 +125,4 @@ See the separate [Changelog](./CHANGELOG.md).
 
 ## Questions? Problems? Suggestions?
 
-If you found a bug, want to request a feature or have a question, please create an [issue](https://github.com/xaecbd/KafkaCenter/issues/new). Try to make sure someone else hasn't already created an issue for the same topic beforehand.
+If you found a bug, want to request a feature or have a question, please create an [issue](https://github.com/xaecbd/KCenter/issues/new). Try to make sure someone else hasn't already created an issue for the same topic beforehand.
