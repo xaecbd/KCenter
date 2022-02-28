@@ -6,12 +6,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.nesc.ec.bigdata</groupId>
-		<artifactId>KafkaCenter</artifactId>
+		<artifactId>KCenter</artifactId>
 		<version>${revision}</version>
 	</parent>
-	<artifactId>KafkaCenter-Base</artifactId>
-	<name>KafkaCenter-Base</name>
-	<url>https://github.com/xaecbd/KafkaCenter</url>
+	<artifactId>KCenter-Base</artifactId>
+	<name>KCenter-Base</name>
+	<url>https://github.com/xaecbd/KCenter</url>
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
 		<dependency>

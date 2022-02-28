@@ -6,12 +6,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.nesc.ec.bigdata</groupId>
-		<artifactId>KafkaCenter</artifactId>
+		<artifactId>KCenter</artifactId>
 		<version>${revision}</version>
 	</parent>
 	<artifactId>KafkaCenter-Core</artifactId>
 	<name>KafkaCenter-Core</name>
-	<url>https://github.com/xaecbd/KafkaCenter</url>
+	<url>https://github.com/xaecbd/KCenter</url>
 
 	<dependencies>
 		<dependency>
@@ -54,7 +54,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.nesc.ec.bigdata</groupId>
-			<artifactId>KafkaCenter-Base</artifactId>
+			<artifactId>KCenter-Base</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
