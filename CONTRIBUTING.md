@@ -40,7 +40,7 @@ Please adhere to the [Alibaba-Java-Coding-Guidelines](https://alibaba.github.io/
 ## Frontend Development
 [Visual Studio Code](https://code.visualstudio.com/) is recommended for development on the frontend. Since the frontend of the project depends on the backend service, you can either start the backend services locally or modify package.json `proxyConfig` in `package.json` to an address where the backend services are available.
 
-Have a look at the separate [frontend README](./KafkaCenter-Frontend/README.md) for more details.
+Have a look at the separate [frontend README](KCenter-Frontend/README.md) for more details.
 
 ### 1. Install *nodejs*
 *Self-explanatory...*

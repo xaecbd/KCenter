@@ -5,12 +5,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.nesc.ec.bigdata</groupId>
-	<artifactId>KafkaCenter</artifactId>
+	<artifactId>KCenter</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
 
-	<name>KafkaCenter</name>
-	<url>https://github.com/xaecbd/KafkaCenter</url>
+	<name>KCenter</name>
+	<url>https://github.com/xaecbd/KCenter</url>
 	<description>Kafka Center Platform</description>
 
 	<properties>
@@ -50,7 +50,7 @@
 	</dependencies>
 
 	<modules>
-		<module>KafkaCenter-Base</module>
-		<module>KafkaCenter-Core</module>
+		<module>KCenter-Base</module>
+		<module>KCenter-Core</module>
 	</modules>
 </project>

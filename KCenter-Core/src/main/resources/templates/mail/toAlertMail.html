@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<h2 style="width: 100%; text-align: center;">Kafka topic  consume lag alerting</h2>
+<br>
+<table align="center"  border="1" style="width:80%;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #555555;border-spacing: 0;border-collapse: collapse;background-color: transparent;text-align: center;">
+    <tr style="padding: 0;background-color: rgb(162, 253, 154);">
+        <th>Group</th>
+        <th>Topic</th>
+        <th>Partition</th>
+        <th>Lag</th>
+        <th>ConsumerAPI</th>
+    </tr>
+    <tr style="background-color: rgb(253, 240, 230)">
+        <td ><span th:text="${alertInfo.group}"></span></td>
+        <td ><a th:href="@{${alertInfo.publicURL}+'/#/monitor/consumer/topic/consumer_offsets/'+${alertInfo.clusterId}+'/'+${clusterName}+'/'+${alertInfo.topicName}}"><span th:text="${alertInfo.topicName}"></span></a></td>
+        <td ></td>
+        <td ><span th:text="${alertInfo.lagCount}"></span></td>
+        <td ></td>
+    </tr>
+    <tr style="background-color: rgb(253, 240, 230)" th:each="offset: ${alertInfo.offsets}">
+        <td ><span th:text="${alertInfo.group}"></span></td>
+        <td ><a th:href="@{${alertInfo.publicURL}+'/#/monitor/consumer/topic/consumer_offsets/'+${alertInfo.clusterId}+'/'+${clusterName}+'/'+${offset.topic}}"><span th:text="${offset.topic}"></span></a></td>
+        <td ><span th:text="${offset.partition}"></span></td>
+        <td ><span th:text="${offset.lag}"></span></td>
+        <td ><span th:text="${offset.consumerMethod}"></span></td>
+    </tr>
+</table>
+<br>
+<br>
+<br>
+<div style="font-size: 15px;">
+    <small>Best Regards</small>
+    <div><b>CN XAEC Bigdata</b></div>
+    <div style="margin: 18px 0;">
+   
+        <pre style="font-size: 8pt; font-family: Consolas; margin: 0;"> _  __      __ _            _____           _
+| |/ /     / _| |          / ____|         | |
+| ' / __ _| |_| | ____ _  | |     ___ _ __ | |_ ___ _ __
+|  < / _` |  _| |/ / _` | | |    / _ \ '_ \| __/ _ \ '__|
+| . \ (_| | | |   < (_| | | |___|  __/ | | | ||  __/ |
+|_|\_\__,_|_| |_|\_\__,_|  \_____\___|_| |_|\__\___|_|
+			</pre>
+		</div>
+	</div>
+</body>
+</html>
