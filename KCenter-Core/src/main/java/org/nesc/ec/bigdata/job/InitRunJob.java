@@ -4,6 +4,7 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.nesc.ec.bigdata.cache.HomeCache;
 import org.nesc.ec.bigdata.config.InitConfig;
 import org.nesc.ec.bigdata.model.ClusterInfo;
+import org.nesc.ec.bigdata.model.TaskInfo;
 import org.nesc.ec.bigdata.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -48,8 +50,12 @@ public class InitRunJob {
     @Autowired
     CollectConnectorJob connectorJob;
 
+    @Autowired
+    EmailService emailService;
+
     private ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(10,
             new BasicThreadFactory.Builder().build());
+
 
     @PostConstruct
     public void init() {
@@ -128,5 +134,15 @@ public class InitRunJob {
         }catch (Exception e){
             LOG.error("cluster statistics cache fail,please check",e);
         }
+    }
+
+    public void sendEmail(Map<String, Object> emailMap,int type){
+        scheduledExecutorService.schedule(()->{
+            try {
+                emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), type);
+            } catch (Exception e) {
+                LOG.error("邮件发送出错！");
+            }
+        },0L,TimeUnit.MICROSECONDS);
     }
 }

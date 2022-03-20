@@ -6,6 +6,7 @@ import org.nesc.ec.bigdata.common.RestResponse;
 import org.nesc.ec.bigdata.common.RoleEnum;
 import org.nesc.ec.bigdata.constant.Constants;
 import org.nesc.ec.bigdata.constant.TopicConfig;
+import org.nesc.ec.bigdata.job.InitRunJob;
 import org.nesc.ec.bigdata.model.ClusterInfo;
 import org.nesc.ec.bigdata.model.TaskInfo;
 import org.nesc.ec.bigdata.model.UserInfo;
@@ -52,6 +53,9 @@ public class TaskController extends BaseController {
 
     @Value("${mail.enable:true}")
     private Boolean mailEnable;
+
+    @Autowired
+    InitRunJob initRunJob;
 
     /**return the task list according to taskId*/
     @GetMapping("/get")
@@ -143,7 +147,7 @@ public class TaskController extends BaseController {
             if (taskInfoService.insert(task)) {
                 if (mailEnable) {
                     Map<String, Object> emailMap = taskInfoService.getSendEmailInfo(task, 1);
-                    emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), 1);
+                    initRunJob.sendEmail(emailMap,1);
                 }
 
                 return SUCCESS("Add task data success.");
@@ -174,15 +178,15 @@ public class TaskController extends BaseController {
                 if (taskInfoService.updateTask(task)) {
                     if (mailEnable) {
                         Map<String, Object> emailMap = taskInfoService.getSendEmailInfo(task, 1);
-                        emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), 1);
+                        initRunJob.sendEmail(emailMap,1);
                     }
-                    return SUCCESS("Update task data success.");
+                    return SUCCESS("成功更新申请.");
                 } else {
-                    return ERROR("Update task data failed.");
+                    return ERROR("更新申请失败！");
                 }
             }
         } catch (Exception e) {
-            LOG.error("Update task error.", e);
+            LOG.error("更新申请失败！", e);
             return ERROR(e.getMessage());
         }
     }
@@ -249,17 +253,17 @@ public class TaskController extends BaseController {
                     if (taskInfoService.update(task)) {
                         if (mailEnable) {
                             Map<String, Object> emailMap = taskInfoService.getSendEmailInfo(task, 3);
-                            emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), 3);
+                            initRunJob.sendEmail(emailMap,3);
                         }
-                        return SUCCESS("Approve task success, the topic will be create.");
+                        return SUCCESS("成功通过创建申请，Topic将被创建。");
                     } else {
-                        return ERROR("Approve task failed.");
+                        return ERROR("失败，未能通过申请。");
                     }
                 } else {
-                    return ERROR("This task have already processed.");
+                    return ERROR("这一申请已被处理过了！");
                 }
             } else {
-                return ERROR("task is not exit.");
+                return ERROR("申请不存在！");
             }
         } catch (Exception e) {
             LOG.error("Approve task error.", e);
@@ -289,15 +293,15 @@ public class TaskController extends BaseController {
             if (taskInfoService.update(task)) {
                 if (mailEnable) {
                     Map<String, Object> emailMap = taskInfoService.getSendEmailInfo(task, 2);
-                    emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), 2);
+                    initRunJob.sendEmail(emailMap,2);
                 }
-                return SUCCESS("Reject task request success.");
+                return SUCCESS("拒绝申请成功.");
             } else {
-                return ERROR("Reject task request failed.");
+                return ERROR("拒绝失败！");
             }
         } catch (Exception e) {
             LOG.error("Reject task error.", e);
-            return ERROR("Reject task request failed.");
+            return ERROR("拒绝失败！");
         }
 
     }
