@@ -129,4 +129,14 @@ public class InitRunJob {
             LOG.error("cluster statistics cache fail,please check",e);
         }
     }
+    
+    public void sendEmail(Map<String, Object> emailMap,int type){
+        scheduledExecutorService.schedule(()->{
+            try {
+                emailService.renderTemplateAndSend(emailMap.get("emailEntity"), emailMap.get("emailContent"), type);
+            } catch (Exception e) {
+                LOG.error("邮件发送出错！");
+            }
+        },0L,TimeUnit.MICROSECONDS);
+    }
 }
