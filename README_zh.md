@@ -7,7 +7,14 @@ Language: :[us](./README.md): - :cn:
 
 KCenter(之前项目名称为KafkaCenter)是Apache Kafka 集群管理和维护，生产/消费监控，生态组件使用的统一一站式平台。
 
-[点击查看名称变更原因](https://github.com/xaecbd/KCenter/issues/123).
+
+:loudspeaker::loudspeaker::loudspeaker:
+可以直接在 [**azure**](https://azuremarketplace.microsoft.com/zh-cn/marketplace/apps/newegginc1646343565758.kafka_center?tab=Overview)一键快速使用
+:loudspeaker::loudspeaker::loudspeaker:
+
+:fire::fire::fire:  **商业化产品有更完善功能和技术支持.**
+
+如果你有更多需求，包括但不限于aws上支持，商业个性化开发:technologist:.你可以创建 [issue](https://github.com/xaecbd/KCenter/issues/new) ，我们会第一时间响应。
 
 [GitHub地址](https://github.com/xaecbd/KCenter) 第一时间更新，请移步查看！
 
