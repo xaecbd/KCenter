@@ -7,7 +7,7 @@ Language: :us: - :[cn](./README_zh.md):
 KCenter (previously known as KafkaCenter) is a unified one-stop platform for Apache Kafka cluster management and maintenance, producer/consumer monitoring, and use of ecological components. 
 
 :loudspeaker::loudspeaker::loudspeaker:
-Now we have deployed this product on [**azure**](https://azuremarketplace.microsoft.com/zh-cn/marketplace/apps/newegginc1646343565758.kafka_center?tab=Overview)
+Now we have deployed this product on [**Azure**](https://azuremarketplace.microsoft.com/zh-cn/marketplace/apps/newegginc1646343565758.kafka_center?tab=Overview)/[**AWS**](https://aws.amazon.com/marketplace/pp/prodview-g6kmcxajfu3bw?sr=0-9&ref_=beagle&applicationId=AWSMPContessa)
 :loudspeaker::loudspeaker::loudspeaker:
 
 :fire::fire::fire:  **Commercial products have better functions and technical support.**
