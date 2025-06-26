@@ -128,7 +128,12 @@ For information about kafka connect ui, see docs in [KafkaConnectUi](./docs/Kafk
 
 See the separate [Changelog](./CHANGELOG.md).
 
-
 ## Questions? Problems? Suggestions?
 
 If you found a bug, want to request a feature or have a question, please create an [issue](https://github.com/xaecbd/KCenter/issues/new). Try to make sure someone else hasn't already created an issue for the same topic beforehand.
+
+## Sponsorship
+CDN acceleration and security protection for this project are sponsored by [Tencent EdgeOne](https://edgeone.ai/?from=github).
+
+[Best Asian CDN, Edge, and Secure Solutions - Tencent EdgeOne](https://edgeone.ai/?from=github)
+<a href="https://edgeone.ai/?from=github"><img src="https://edgeone.ai/media/34fe3a45-492d-4ea4-ae5d-ea1087ca7b4b.png"></a>
